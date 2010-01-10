@@ -79,24 +79,24 @@ class TestWn < Test::Unit::TestCase
   context "Git init" do
     should "call git init and commit initial commit" do
       app = Wn::App.new(["abcdef"])
-      app.expects(:exec).with("git init")
+      app.expects(:sys_exec).with("git init")
 
       app.expects(:app_name).with().returns("my_app")
-      app.expects(:exec).with("git remote add webbynode git@2.2.3.3:my_app")
+      app.expects(:sys_exec).with("git remote add webbynode git@2.2.3.3:my_app")
 
-      app.expects(:exec).with("git add .")
-      app.expects(:exec).with("git commit -m \"Initial commit\"")
+      app.expects(:sys_exec).with("git add .")
+      app.expects(:sys_exec).with("git commit -m \"Initial commit\"")
 
       app.git_init "2.2.3.3"
       
       app = Wn::App.new(["abcdef"])
-      app.expects(:exec).with("git init")
+      app.expects(:sys_exec).with("git init")
 
       app.expects(:app_name).with().returns("another_app")
-      app.expects(:exec).with("git remote add webbynode git@5.4.2.1:another_app")
+      app.expects(:sys_exec).with("git remote add webbynode git@5.4.2.1:another_app")
 
-      app.expects(:exec).with("git add .")
-      app.expects(:exec).with("git commit -m \"Initial commit\"")
+      app.expects(:sys_exec).with("git add .")
+      app.expects(:sys_exec).with("git commit -m \"Initial commit\"")
 
       app.git_init "5.4.2.1"
     end
@@ -108,7 +108,7 @@ class TestWn < Test::Unit::TestCase
       app.expects(:dir_exists).with(".git").returns(true)
       app.expects(:app_name).with().returns("another_app")
       app.expects(:out).with("Publishing another_app to Webbynode...")
-      app.expects(:exec).with("git push webbynode master")
+      app.expects(:sys_exec).with("git push webbynode master")
       app.run
     end
     

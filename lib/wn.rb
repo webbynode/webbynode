@@ -30,7 +30,7 @@ module Wn
       end
       
       out "Publishing #{app_name} to Webbynode..."
-      exec "git push webbynode master"
+      sys_exec "git push webbynode master"
     end
     
     def init
@@ -41,14 +41,10 @@ module Wn
       
       webby_ip, host = *params
       
-      unless dir_exists(".git")
-        out "Initializing git repository..."
-        git_init webby_ip
-      end
-      
       unless file_exists(".pushand")
         out "Initializing deployment descriptor for #{host}..."
         create_file ".pushand", "#! /bin/bash\nphd $0 #{host}\n"
+        sys_exec "chmod +x .pushand"
       end
       
       unless file_exists(".gitignore")
@@ -60,15 +56,20 @@ tmp/*
 db/*.sqlite3
 EOS
       end
+
+      unless dir_exists(".git")
+        out "Initializing git repository..."
+        git_init webby_ip
+      end
     end
     
     def git_init(ip)
-      exec "git init"
+      sys_exec "git init"
       
-      exec "git remote add webbynode git@#{ip}:#{app_name}"
+      sys_exec "git remote add webbynode git@#{ip}:#{app_name}"
       
-      exec "git add ."
-      exec "git commit -m \"Initial commit\""
+      sys_exec "git add ."
+      sys_exec "git commit -m \"Initial commit\""
     end
     
     def app_name
@@ -91,6 +92,11 @@ EOS
       File.open(filename, "w") do |file|
         file.write(contents)
       end
+    end
+    
+    def sys_exec(cmd)
+      raise "Tried to run: #{cmd}" if $testing
+      `#{cmd}`
     end
   end
 end

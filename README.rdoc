@@ -2,8 +2,6 @@
 
 Available on GitHub and installable from Gemcutter.
 
-* [Webbynode Gem](http://github.com/webbynode/webbynode)
-
 == DESCRIPTION:
 
 Automates Rails or Rack application deployment using Webbynode Rapid App Deployment.

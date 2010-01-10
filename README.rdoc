@@ -1,6 +1,8 @@
 = Webbynode Gem
 
-* http://github.com/webbynode/webbynode
+Available on GitHub and installable from Gemcutter.
+
+* [Webbynode Gem](http://github.com/webbynode/webbynode)
 
 == DESCRIPTION:
 
@@ -98,8 +100,9 @@ Then to update:
 
 == REQUIREMENTS:
 
-* Webbynode account
-* Webby server
+* Requires, obviously, a Webbynode account
+* Webby server deployed with Rapid Deployment option
+* Only works for Apache with Passenger (Nginx and Passenger on the works)
 
 == INSTALL:
 

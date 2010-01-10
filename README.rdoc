@@ -1,26 +1,109 @@
-= wn
+= Webbynode Gem
 
-* http://github.com/#{github_username}/#{project_name}
+* http://github.com/webbynode/webbynode
 
 == DESCRIPTION:
 
-FIX (describe your package)
+Automates Rails or Rack application deployment using Webbynode Rapid App Deployment.
 
 == FEATURES/PROBLEMS:
 
-* FIX (list of features or problems)
+* From zero to production with two commands;
+* Super easy updates;
 
 == SYNOPSIS:
 
-  FIX (code sample of usage)
+  $ rails app
+  create  
+  create  app/controllers
+  create  app/helpers
+  create  app/models
+  (...)
+
+  $ cd myapp
+  $ webbynode init 200.120.123.123 myapp.com
+  Initializing deployment descriptor for myapp.com...
+  Creating .gitignore file...
+  Initializing git repository...
+
+  $ webbynode push
+  Publishing myapp to Webbynode...
+  git@200.120.123.123's password: 
+  mkdir: created directory `myapp'
+  Counting objects: 62, done.
+  Delta compression using up to 2 threads.
+  Compressing objects: 100% (53/53), done.
+  Writing objects: 100% (62/62), 79.14 KiB, done.
+  Total 62 (delta 10), reused 0 (delta 0)
+  Checked out master branch
+  
+  ----------------------------
+    Webbynode git deployment 
+  ----------------------------
+  
+  Deploying application myapp as myapp.com...
+  Configuring Rails application...
+    => Configuring apache vHost...
+    => Configuring database...
+    => Configuring database.yml...
+    => Installing missing gems...
+    => Migrating database...
+  /var/rails/myapp/.git
+  
+  Restarting apache...
+  
+  myapp deployed successfully.
+  
+  To git@208.88.125.207:myapp
+   * [new branch]      master -> master
+
+And that's it, just visit myapp.com (considering DNS is working) and you should have your Rails app displayed.
+
+Then to update:
+
+  $ script/generate scaffold user name:string age:integer password:string
+  exists  app/models/
+  exists  app/controllers/
+  exists  app/helpers/
+  create  app/views/users
+  exists  app/views/layouts/
+  exists  test/functional/
+  exists  test/unit/
+  create  test/unit/helpers/
+  exists  public/stylesheets/
+  create  app/views/users/index.html.erb
+  (...)  
+
+  $ git add .
+
+  $ git commit -m "Added users"
+  [master a607460] Added users
+   15 files changed, 334 insertions(+), 0 deletions(-)
+   create mode 100644 app/controllers/users_controller.rb
+   create mode 100644 app/helpers/users_helper.rb
+   create mode 100644 app/models/user.rb
+  (...)
+
+  $ webbynode push
+  Publishing myapp to Webbynode...
+  git@208.88.125.207's password: 
+  Counting objects: 43, done.
+  (...)
+  Restarting apache...
+
+  myapp deployed successfully.
+
+  To git@208.88.125.207:myapp
+     2355220..a607460  master -> master
 
 == REQUIREMENTS:
 
-* FIX (list of requirements)
+* Webbynode account
+* Webby server
 
 == INSTALL:
 
-* FIX (sudo gem install, anything else)
+  sudo gem install webbynode
 
 == LICENSE:
 

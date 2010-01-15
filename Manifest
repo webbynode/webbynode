@@ -10,3 +10,4 @@ oldRakefile
 test/test_helper.rb
 test/test_webbynode.rb
 test/test_wn.rb
+webbynode.gemspec

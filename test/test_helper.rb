@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'stringio'
 require 'shoulda'
 require 'matchy'

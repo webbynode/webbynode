@@ -34,12 +34,13 @@ module Wn
     end
     
     def init
-      if params.size < 2
-        out "usage: wn init [webby_ip] [host]" 
+      if params.size < 1
+        out "usage: webbynode init webby_ip [host]" 
         return
       end
       
       webby_ip, host = *params
+      host = app_name unless host
       
       unless file_exists(".pushand")
         out "Initializing deployment descriptor for #{host}..."
@@ -57,14 +58,17 @@ db/*.sqlite3
 EOS
       end
 
-      unless dir_exists(".git")
+      if dir_exists(".git")
+        out "Adding Webbynode remote host to git..."
+      else
         out "Initializing git repository..."
-        git_init webby_ip
       end
+      
+      git_init webby_ip
     end
     
     def git_init(ip)
-      sys_exec "git init"
+      sys_exec "git init" unless dir_exists(".git")
       
       sys_exec "git remote add webbynode git@#{ip}:#{app_name}"
       
@@ -73,7 +77,7 @@ EOS
     end
     
     def app_name
-      Dir.pwd.split("/").last
+      Dir.pwd.split("/").last.gsub(/\./, "_")
     end
     
     def dir_exists(dir)

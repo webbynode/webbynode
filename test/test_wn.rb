@@ -121,19 +121,36 @@ class TestWn < Test::Unit::TestCase
   end
   
   context "Init command" do
-    should "require two arguments" do
+    should "require one arguments" do
       app = command("init")
-      app.expects(:out).with("usage: wn init [webby_ip] [host]")
-      app.run
-
-      app = command("init abc")
-      app.expects(:out).with("usage: wn init [webby_ip] [host]")
+      app.expects(:out).with("usage: webbynode init webby_ip [host]")
       app.run
     end
     
     should "create .gitignore" do
       app = command("init 2.2.2.2 teste.myserver.com")
       app.expects(:out).with("Creating .gitignore file...")
+      app.expects(:dir_exists).with(".git").times(2).returns(true)
+      app.expects(:out).with("Adding Webbynode remote host to git...")
+      app.expects(:file_exists).with(".pushand").returns(true)
+      app.expects(:file_exists).with(".gitignore").returns(false)
+      app.expects(:create_file).with(".gitignore", <<EOS)
+config/database.yml
+log/*
+tmp/*
+db/*.sqlite3
+EOS
+
+      app.expects(:app_name).with().returns("teste.myserver.com")
+      app.expects(:sys_exec).with("git remote add webbynode git@2.2.2.2:teste_myserver_com")
+      app.expects(:sys_exec).with("git add .")
+      app.expects(:sys_exec).with("git commit -m \"Initial commit\"")
+      
+      app.run
+      
+      app = command("init 2.2.2.2")
+      app.expects(:out).with("Creating .gitignore file...")
+      app.expects(:app_name).with().returns("myapp")
       app.expects(:dir_exists).with(".git").returns(true)
       app.expects(:file_exists).with(".pushand").returns(true)
       app.expects(:file_exists).with(".gitignore").returns(false)
@@ -156,32 +173,46 @@ EOS
       app.expects(:out).with("Initializing deployment descriptor for teste.myserver.com...")
       app.expects(:file_exists).with(".gitignore").returns(true)
       app.expects(:file_exists).with(".pushand").returns(false)
+      app.expects(:sys_exec).with("chmod +x .pushand")
       app.expects(:create_file).with(".pushand", <<EOS)
 #! /bin/bash
 phd $0 teste.myserver.com
 EOS
       app.run 
+    end
 
-      app = command("init 3.3.3.3 another.myserver.com")
+    should "create .pushand with app name as the host if not specified" do
+      app = command("init 3.3.3.3")
 
       app.expects(:dir_exists).with(".git").returns(true)
+      app.expects(:out).with("Adding Webbynode remote host to git...")
+      app.expects(:app_name).with().times(2).returns("myapp")
+      
+      app.expects(:sys_exec).with("git remote add webbynode git@3.3.3.3:myapp")
+      app.expects(:sys_exec).with("git add .")
+      app.expects(:sys_exec).with("git commit -m \"Initial commit\"")
 
-      app.expects(:out).with("Initializing deployment descriptor for another.myserver.com...")
+      app.expects(:out).with("Initializing deployment descriptor for myapp...")
       app.expects(:file_exists).with(".gitignore").returns(true)
       app.expects(:file_exists).with(".pushand").returns(false)
+      app.expects(:sys_exec).with("chmod +x .pushand")
       app.expects(:create_file).with(".pushand", <<EOS)
 #! /bin/bash
-phd $0 another.myserver.com
+phd $0 myapp
 EOS
-      app.run 
+      app.run
     end
-    
+
     should "tell the app has already been initialized" do
       app = command("init 5.5.5.5 teste.myserver.com")
-      app.expects(:dir_exists).with(".git").returns(true)
+      app.expects(:dir_exists).times(2).with(".git").returns(true)
       app.expects(:file_exists).with(".pushand").returns(true)
       app.expects(:file_exists).with(".gitignore").returns(true)
       app.expects(:create_file).never
+
+      app.expects(:sys_exec).with("git remote add webbynode git@5.5.5.5:webbynode")
+      app.expects(:sys_exec).with("git add .")
+      app.expects(:sys_exec).with("git commit -m \"Initial commit\"")
       app.run
     end
   end

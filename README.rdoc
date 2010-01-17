@@ -95,6 +95,12 @@ Then to update:
 
   To git@208.88.125.207:myapp
      2355220..a607460  master -> master
+     
+== ROADMAP:
+
+* Ability to delete an app from command line:
+
+  webbynode delete    deletes the current app
 
 == REQUIREMENTS:
 

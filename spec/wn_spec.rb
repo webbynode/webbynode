@@ -111,6 +111,75 @@ describe Webbynode do
       end
       
     end
+    
+    describe "get_config" do
+      before do
+        @wn = Wn::App.new("remote", "ls -la")
+        @wn.stub!(:run).and_return(true)
+      end
+      
+      it "should parse the .git/config file and set the remote_ip" do
+        File.should_receive(:open).with(".git/config").and_return(<<EOS)
+[core]
+        repositoryformatversion = 0
+        filemode = true
+        bare = false
+        logallrefupdates = true
+        ignorecase = true
+[remote "webbynode"]
+        url = git@210.11.13.12:myapp
+        fetch = +refs/heads/*:refs/remotes/webbynode/*
+EOS
+        ip = @wn.remote_ip
+        puts "IP: #{ip}"
+        ip.should == "210.11.13.12"
+      end
+    end
+    
+    describe "remote" do
+      before do
+        @wn = Wn::App.new("remote", "ls -la")
+        @wn.stub!(:run).and_return(true)
+      end
+      
+      it "should parse the options correctly" do
+        @wn.parse
+        @wn.command.should == "remote"
+        @wn.options[0].should == "ls -la"
+      end
+      
+      it "should parse the .git/config file" do
+        @wn.should_receive(:get_config).with().and_return(<<EOS)
+[core]
+        repositoryformatversion = 0
+        filemode = true
+        bare = false
+        logallrefupdates = true
+        ignorecase = true
+[remote "webbynode"]
+        url = git@67.23.79.32:myapp
+        fetch = +refs/heads/*:refs/remotes/webbynode/*
+EOS
+        @wn.execute
+        @wn.remote_ip.should == "67.23.79.32"
+      end
+      
+      it "should parse the .git/config file for another ip" do
+        @wn.should_receive(:get_config).with().and_return(<<EOS)
+[core]
+        repositoryformatversion = 0
+        filemode = true
+        bare = false
+        logallrefupdates = true
+        ignorecase = true
+[remote "webbynode"]
+        url = git@67.23.79.31:myapp
+        fetch = +refs/heads/*:refs/remotes/webbynode/*
+EOS
+        @wn.execute
+        @wn.remote_ip.should == "67.23.79.31"
+      end
+    end
   end
 
 end

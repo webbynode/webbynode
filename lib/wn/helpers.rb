@@ -33,12 +33,13 @@ module Wn
     # Alias for executing a command
     # Raises an exception when in test environment
     def run(command)
-      return "Tried to run: #{cmd}" if $testing
+      log_and_exit "Tried to run: #{command}" if $testing
       %x(#{command})
     end
     
+    # Runs and returned a "chomped" version of the output
     def run_and_return(command)
-      return "Tried to run: #{cmd}" if $testing
+      log_and_exit "Tried to run: #{command}" if $testing
       %x(#{command}).chomp
     end
     
@@ -48,10 +49,12 @@ module Wn
       Dir.pwd.split("/").last.gsub(/\./, "_")
     end
     
+    # Returns the full path to the template folder
     def templates_path
       File.join(File.dirname(__FILE__), '..', 'templates')
     end
     
+    # Reads a file from the template folder
     def read_template(template)
       File.open(File.join(templates_path, template), 'r').read
     end

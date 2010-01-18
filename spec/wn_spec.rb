@@ -5,6 +5,8 @@ describe Wn do
   describe "initialization" do
     before do
       @wn = Wn::App.new("init", "2.2.2.2", "test.webbynode.com")
+      @wn.stub!(:git_init)
+      @wn.stub!(:send)
     end
     
     it "should convert arguments into an array" do
@@ -46,6 +48,7 @@ describe Wn do
     describe "init" do
       before do
         @wn = Wn::App.new("init", "2.2.2.2", "test.webbynode.com")
+        @wn.stub!(:git_init)
       end
       
       it "should execute the init command" do

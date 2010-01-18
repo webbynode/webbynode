@@ -5,9 +5,13 @@ PostInstall.txt
 README.rdoc
 Rakefile
 bin/webbynode
+lib/templates/gitignore
+lib/templates/help
 lib/wn.rb
 lib/wn/commands.rb
 lib/wn/helpers.rb
+spec/spec_helper.rb
+spec/wn_spec.rb
 test/test_helper.rb
 test/test_webbynode.rb
 test/test_wn.rb

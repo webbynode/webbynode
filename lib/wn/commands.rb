@@ -18,12 +18,6 @@ module Wn
     # Determines what the [dns]/[host] will be, depending on user's arguments
     # Will default to the applications folder name if the [dns]/[host] is not specified
     def init
-      # if params.size < 1
-      #   # TODO
-      #   # Add a template with all commands (when more are available)
-      #   log_and_exit "usage: webbynode init webby_ip [host]"
-      # end
-
       webby_ip, host = *options
       host = app_name unless host
 

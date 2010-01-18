@@ -6,6 +6,8 @@ README.rdoc
 Rakefile
 bin/webbynode
 lib/wn.rb
+lib/wn/commands.rb
+lib/wn/helpers.rb
 test/test_helper.rb
 test/test_webbynode.rb
 test/test_wn.rb

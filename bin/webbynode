@@ -4,4 +4,4 @@ require 'rubygems'
 require 'wn'
 
 app = Wn::App.new(ARGV)
-app.run
+app.execute

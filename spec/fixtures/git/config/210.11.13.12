@@ -1,0 +1,9 @@
+[core]
+        repositoryformatversion = 0
+        filemode = true
+        bare = false
+        logallrefupdates = true
+        ignorecase = true
+[remote "webbynode"]
+        url = git@210.11.13.12:myapp
+        fetch = +refs/heads/*:refs/remotes/webbynode/*

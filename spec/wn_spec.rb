@@ -1,6 +1,9 @@
 # Load Webbynode Class
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'lib', 'wn')
-Webbynode = Wn
+
+# Load Spec Helper
+require File.join(File.expand_path(File.dirname(__FILE__)), 'spec_helper')
+
 
 describe Webbynode do
   
@@ -119,17 +122,7 @@ describe Webbynode do
       end
       
       it "should parse the .git/config file and set the remote_ip" do
-        File.should_receive(:open).with(".git/config").and_return(<<EOS)
-[core]
-        repositoryformatversion = 0
-        filemode = true
-        bare = false
-        logallrefupdates = true
-        ignorecase = true
-[remote "webbynode"]
-        url = git@210.11.13.12:myapp
-        fetch = +refs/heads/*:refs/remotes/webbynode/*
-EOS
+        File.should_receive(:open).with(".git/config").and_return(read_fixture("git/config/210.11.13.12"))
         ip = @wn.remote_ip
         puts "IP: #{ip}"
         ip.should == "210.11.13.12"
@@ -149,33 +142,13 @@ EOS
       end
       
       it "should parse the .git/config file" do
-        @wn.should_receive(:get_config).with().and_return(<<EOS)
-[core]
-        repositoryformatversion = 0
-        filemode = true
-        bare = false
-        logallrefupdates = true
-        ignorecase = true
-[remote "webbynode"]
-        url = git@67.23.79.32:myapp
-        fetch = +refs/heads/*:refs/remotes/webbynode/*
-EOS
+        @wn.should_receive(:get_config).with().and_return(read_fixture('git/config/67.23.79.32'))
         @wn.execute
         @wn.remote_ip.should == "67.23.79.32"
       end
       
       it "should parse the .git/config file for another ip" do
-        @wn.should_receive(:get_config).with().and_return(<<EOS)
-[core]
-        repositoryformatversion = 0
-        filemode = true
-        bare = false
-        logallrefupdates = true
-        ignorecase = true
-[remote "webbynode"]
-        url = git@67.23.79.31:myapp
-        fetch = +refs/heads/*:refs/remotes/webbynode/*
-EOS
+        @wn.should_receive(:get_config).with().and_return(read_fixture('git/config/67.23.79.31'))
         @wn.execute
         @wn.remote_ip.should == "67.23.79.31"
       end

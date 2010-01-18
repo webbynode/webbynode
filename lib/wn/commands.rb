@@ -12,6 +12,10 @@ module Wn
       run "git push webbynode master"
     end
     
+    def remote
+      
+    end
+    
     # Initializes the Repository and adds Webbynode to the remote
     # Adds a populated the .gitignore file
     # Creates the .pushand file and sets permissions on it
@@ -40,12 +44,15 @@ module Wn
 
       git_init webby_ip
     end
-
+    
+    # Initializes git unless it already exists
+    # Adds git remote for webbynode 
+    # Adds an initial commit labled as "Initial Webbynode Commit"
     def git_init(ip)
       run "git init" unless dir_exists(".git")
       run "git remote add webbynode git@#{ip}:#{app_name}"
       run "git add ."
-      run "git commit -m \"Initial commit\""
+      run "git commit -m \"Initial Webbynode Commit\""
     end
   
   end

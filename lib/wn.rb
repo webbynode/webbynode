@@ -31,13 +31,23 @@ module Wn
     # Executes the parsed command
     def execute
       parse
-      send(command)
+      run_command(command)
     end
     
+    def run_command(command)
+      if !command.nil? and respond_to?(command)
+        send(command)
+      else
+        log_and_exit read_template('help')
+      end
+    end
+    
+    # Parses the given file (would assumingly only be for .git/config files)
+    # It returns/generates a hash containing the configuration for each remote
+    # Webbynode will be particularly interesseted in the @config["remote"]["webbynode"] hash/key
     def parse_configuration(file)
       config = {}
       current = nil
-      
       File.open(file).each_line do |line|
         case line
         when /^\[(\w+)(?: "(.+)")*\]/
@@ -49,13 +59,14 @@ module Wn
           current[key] = value
         end
       end
-
       config
     end
     
+    # Returns the remote IP that's stored inside the .git/config file
+    # Will only parse it once. Any other requests will be pulled from memory
     def remote_ip
-      @config ||= parse_configuration(".git/config")
-      @remote_ip ||= $2  if @config["remote"]["webbynode"]["url"] =~ /^(\w+)@(.+):(\w+)$/ 
+      @config     ||= parse_configuration(".git/config")
+      @remote_ip  ||= $2 if @config["remote"]["webbynode"]["url"] =~ /^(\w+)@(.+):(\w+)$/ 
     end
   end
 end

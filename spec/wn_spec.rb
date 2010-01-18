@@ -29,7 +29,7 @@ describe Webbynode do
     
     it "should display the help text when no arguments are provided" do
       @wn = Wn::App.new
-      @wn.should_receive(:log_and_exit).with(@wn.read_template('help'))
+      @wn.should_receive(:log_and_exit).at_least(:once).with(@wn.read_template('help'))
       @wn.stub!(:send)
       @wn.execute
     end
@@ -48,6 +48,38 @@ describe Webbynode do
     it "should execute the given command" do
       @wn.should_receive(:send).with("init")
       @wn.execute
+    end
+  end
+  
+  describe "parser" do
+    before do
+      @wn = Wn::App.new("remote", "ls -la")
+      @wn.stub!(:run).and_return(true)
+    end
+    
+    it "should parse the .git/config file and set the remote_ip" do
+      File.should_receive(:open).with(".git/config").and_return(read_fixture("git/config/210.11.13.12"))
+      ip = @wn.remote_ip
+      puts "IP: #{ip}"
+      ip.should == "210.11.13.12"
+    end
+    
+    it "should parse the options correctly" do
+      @wn.parse
+      @wn.command.should == "remote"
+      @wn.options[0].should == "ls -la"
+    end
+    
+    it "should parse the .git/config file" do
+      File.should_receive(:open).with(".git/config").and_return(read_fixture('git/config/67.23.79.32'))
+      @wn.execute
+      @wn.remote_ip.should == "67.23.79.32"
+    end
+    
+    it "should parse the .git/config file for another ip" do
+      File.should_receive(:open).with(".git/config").and_return(read_fixture('git/config/67.23.79.31'))
+      @wn.execute
+      @wn.remote_ip.should == "67.23.79.31"
     end
   end
   
@@ -78,11 +110,26 @@ describe Webbynode do
       end
       
       it "should run 4 git commands" do
-        @wn.should_receive(:run).at_least(3).times
+        @wn.stub!(:dir_exists).at_least(:once).with(".git").and_return(true)
+        @wn.should_receive(:run).at_least(:once).with(/git remote add webbynode git@(.+):(.+)/)
+        @wn.should_receive(:run).at_least(:once).with(/git add ./)
+        @wn.should_receive(:run).at_least(:once).with(/git commit -m "Initial Webbynode Commit"/)
         @wn.execute
       end
+      
+      it "should initialize git for webbynode if the .git directory does not exist" do
+        @wn.stub!(:dir_exists).with(".git").and_return(false)
+        @wn.should_receive(:run).at_least(:once).with("git init")
+        @wn.execute
+      end
+      
+      it "should not initialize git for Webbynode if the .git directory already exists" do
+        @wn.stub!(:dir_exists).with(".git").and_return(true)
+        @wn.should_not_receive(:run).with("git init")
+      end
+      
     end
-    
+        
     describe "push" do
       before do
         @wn = Wn::App.new("push", "2.2.2.2", "test.webbynodeqwerty.com")
@@ -109,21 +156,6 @@ describe Webbynode do
         @wn.should_receive(:run).with("git push webbynode master")
         @wn.execute
       end
-      
-    end
-    
-    describe "get_config" do
-      before do
-        @wn = Wn::App.new("remote", "ls -la")
-        @wn.stub!(:run).and_return(true)
-      end
-      
-      it "should parse the .git/config file and set the remote_ip" do
-        File.should_receive(:open).with(".git/config").and_return(read_fixture("git/config/210.11.13.12"))
-        ip = @wn.remote_ip
-        puts "IP: #{ip}"
-        ip.should == "210.11.13.12"
-      end
     end
     
     describe "remote" do
@@ -131,25 +163,6 @@ describe Webbynode do
         @wn = Wn::App.new("remote", "ls -la")
         @wn.stub!(:run).and_return(true)
       end
-      
-      it "should parse the options correctly" do
-        @wn.parse
-        @wn.command.should == "remote"
-        @wn.options[0].should == "ls -la"
-      end
-      
-      it "should parse the .git/config file" do
-        @wn.should_receive(:get_config).with().and_return(read_fixture('git/config/67.23.79.32'))
-        @wn.execute
-        @wn.remote_ip.should == "67.23.79.32"
-      end
-      
-      it "should parse the .git/config file for another ip" do
-        @wn.should_receive(:get_config).with().and_return(read_fixture('git/config/67.23.79.31'))
-        @wn.execute
-        @wn.remote_ip.should == "67.23.79.31"
-      end
     end
   end
-
 end

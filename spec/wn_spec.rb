@@ -6,7 +6,7 @@ describe Webbynode do
   
   describe "initialization" do
     before do
-      @wn = Wn::App.new("init", "2.2.2.2", "test.webbynodeqwerty.com")
+      @wn = Wn::App.new(["init", "2.2.2.2", "test.webbynodeqwerty.com"])
       @wn.stub!(:git_init)
       @wn.stub!(:send)
     end

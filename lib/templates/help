@@ -1,16 +1,25 @@
-==================================
+
+===================================
   Webbynode Rapid Deployment Gem
-==================================
+===================================
 
 Setup an initial webbynode repository with:
-webbynode init webby_ip [host]
+
+  webbynode init [webby_ip] [example.com]
+
 
 Deploy your application with:
-webbynode push
+  
+  webbynode push
+
 
 Then follow the familiar git workflow:
-git add .
-git commit -m "My Updates"
+
+  git add .
+  git commit -m "My Updates"
 
 Then to re-deploy your application:
-webbynode push
+
+  webbynode push
+
+

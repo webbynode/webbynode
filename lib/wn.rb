@@ -16,7 +16,7 @@ module Wn
     
     # Initializes the Webbynode App
     def initialize(*input)
-      @input = input
+      @input = input.flatten
     end
     
     # Parses user input (commands)
@@ -30,8 +30,8 @@ module Wn
     
     # Executes the parsed command
     def execute
-      parse(@input)
-      send(@command)
+      parse(input)
+      send(command)
     end
         
   end

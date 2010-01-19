@@ -1,6 +1,6 @@
 require 'yaml'
 
-module Wn
+module Webbynode
   module Io
     def create_yaml_file(file, contents, for_real=true)
       raise "Attempted to create #{file}" if $testing and for_real

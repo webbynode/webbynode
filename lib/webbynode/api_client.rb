@@ -1,6 +1,6 @@
 require 'httparty'
 
-module Wn
+module Webbynode
   module ApiClient
     CREDENTIALS_FILE = "#{ENV['HOME']}/.webbynode"
     

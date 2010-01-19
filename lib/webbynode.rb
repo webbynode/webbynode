@@ -7,19 +7,19 @@ require 'highline/import'
 require 'pp'
 
 %w[helpers commands api_client io].each do |f|
-  require File.join(File.dirname(__FILE__), 'wn', f)
+  require File.join(File.dirname(__FILE__), 'webbynode', f)
 end
 
-module Wn
+module Webbynode
   VERSION = '0.1.2'
   
-  class App
+  class Application
     attr_accessor :input, :command, :options, :named_options
     
-    include Wn::Helpers
-    include Wn::Commands
-    include Wn::ApiClient
-    include Wn::Io
+    include Webbynode::Helpers
+    include Webbynode::Commands
+    include Webbynode::ApiClient
+    include Webbynode::Io
     
     # Initializes the Webbynode App
     def initialize(*input)

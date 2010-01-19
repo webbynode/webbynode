@@ -12,14 +12,11 @@ rescue LoadError
 end
 
 # Load Webbynode Class
-require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'lib', 'wn')
+require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'lib', 'webbynode')
 
 # Set Testing Environment
 $testing = true
 FakeWeb.allow_net_connect = false
-
-# Alias the Wn Class Object
-Webbynode = Wn
 
 # Helper Methods
 

@@ -1,4 +1,4 @@
-module Wn
+module Webbynode
   module Helpers
   
     attr_accessor :remote_ip, :remote_app_name

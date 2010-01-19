@@ -12,7 +12,6 @@ Deploy your application with:
   
   webbynode push
 
-
 Then follow the familiar git workflow:
 
   git add .
@@ -22,4 +21,13 @@ Then to re-deploy your application:
 
   webbynode push
 
+
+Additional Webbynode Commands:
+  
+  webbynode remote [command]
+  Run a command on the Webby from the applications' root
+  
+  example(s):
+    webbynode remote 'rake my:custom:task'
+    webbynode remote 'cat log/production.log'
 

@@ -18,12 +18,6 @@ module Wn
     def remote
       log_and_exit read_template('help') if options.empty?
       
-      # Finds the remote ip and stores it in "remote_ip"
-      parse_remote_ip
-      
-      # Finds the remote ip and stores it in "remote_app_name"
-      parse_remote_app_name
-      
       # Attempts to run the specified command
       run_remote_command(options[0])
     end
@@ -102,7 +96,7 @@ module Wn
       run "ssh-keygen -t rsa -N \"#{named_options["passphrase"]}\" -f #{key}" unless File.exists?(key)
 
       key_contents = File.read(key)
-      remote_command "mkdir ~/.ssh 2>/dev/null; chmod 700 ~/.ssh; echo \"#{key_contents}\" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys"
+      run_remote_command "mkdir ~/.ssh 2>/dev/null; chmod 700 ~/.ssh; echo \"#{key_contents}\" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys"
     end
     
     # Initializes git unless it already exists

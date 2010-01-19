@@ -211,8 +211,8 @@ describe Webbynode do
         @wn.options.should be_empty
       end
       
-      it  do
-        @wn.should respond_to(:remote_command)
+      it do
+        @wn.should respond_to(:run_remote_command)
       end
       
       it "should have one option" do
@@ -225,14 +225,12 @@ describe Webbynode do
       
       it "should parse the .git/config folder and retrieve the Webby IP" do
         @wn.stub!(:parse_remote_app_name)
-        @wn.should_receive(:parse_remote_ip)
+        @wn.stub!(:parse_remote_ip)
         @wn.should_receive(:run_remote_command).with("ls -la")
         @wn.execute
       end
       
       it "should parse the .pushand file and retrieve the remote app name" do
-        @wn.stub!(:parse_remote_ip)
-        @wn.should_receive(:parse_pushand)
         @wn.should_receive(:run_remote_command).with("ls -la")
         @wn.execute
       end
@@ -240,8 +238,6 @@ describe Webbynode do
       it "should attempt to execute a command on the Webby using SSH" do
         File.should_receive(:open).with('.git/config').and_return(read_fixture('git/config/210.11.13.12'))
         File.should_receive(:open).with('.pushand').and_return(read_fixture('pushand'))
-        @wn.should_receive(:run_remote_command).with("ls -la")
-        @wn.should respond_to(:remote_command)          
         @wn.execute
         @wn.remote_ip.should eql('210.11.13.12')
         @wn.remote_app_name.should eql('test.webbynodeqwerty.com')        
@@ -276,7 +272,7 @@ describe Webbynode do
           
           File.should_receive(:exists?).with("#{ENV['HOME']}/.ssh/id_rsa.pub").and_return(true)
           File.should_receive(:read).with("#{ENV['HOME']}/.ssh/id_rsa.pub").and_return("mah key")
-          cmd.should_receive(:remote_command).with('mkdir ~/.ssh 2>/dev/null; chmod 700 ~/.ssh; echo "mah key" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys')
+          cmd.should_receive(:run_remote_command).with('mkdir ~/.ssh 2>/dev/null; chmod 700 ~/.ssh; echo "mah key" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys')
           
           cmd.addkey
         end
@@ -288,7 +284,7 @@ describe Webbynode do
           cmd.should_receive(:run).with("ssh-keygen -t rsa -N \"#{passphrase}\" -f #{ENV['HOME']}/.ssh/id_rsa.pub")
 
           File.should_receive(:read).with("#{ENV['HOME']}/.ssh/id_rsa.pub").and_return(passphrase)
-          cmd.should_receive(:remote_command).with("mkdir ~/.ssh 2>/dev/null; chmod 700 ~/.ssh; echo \"#{passphrase}\" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys")
+          cmd.should_receive(:run_remote_command).with("mkdir ~/.ssh 2>/dev/null; chmod 700 ~/.ssh; echo \"#{passphrase}\" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys")
         end
         
         it "should create a key for the user" do

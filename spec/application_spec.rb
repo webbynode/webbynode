@@ -85,7 +85,7 @@ describe Webbynode::Application do
     end
 
     it "should parse the .git/config file" do
-      @wn.stub(:require_application_environment!).and_return(true)
+      @wn.stub(:requires_application_environment!).and_return(true)
       File.should_receive(:open).at_least(:once).with(".git/config").and_return(read_fixture('git/config/67.23.79.32'))
       File.should_receive(:open).at_least(:once).with(".pushand").and_return(read_fixture('pushand'))
       @wn.execute
@@ -95,7 +95,7 @@ describe Webbynode::Application do
     it "should parse the .git/config file for another ip" do
       File.should_receive(:open).with(".git/config").and_return(read_fixture('git/config/67.23.79.31'))
       File.should_receive(:open).at_least(:once).with(".pushand").and_return(read_fixture('pushand'))
-      @wn.stub!(:require_application_environment!).and_return(true)
+      @wn.stub!(:requires_application_environment!).and_return(true)
       @wn.execute
       @wn.remote_ip.should == "67.23.79.31"
     end
@@ -103,7 +103,7 @@ describe Webbynode::Application do
     it "should parse the application name from the .pushand file" do
       File.should_receive(:open).with(".git/config").and_return(read_fixture('git/config/67.23.79.31'))
       File.should_receive(:open).at_least(:once).with(".pushand").and_return(read_fixture('pushand'))  
-      @wn.stub!(:require_application_environment!).and_return(true)    
+      @wn.stub!(:requires_application_environment!).and_return(true)    
       @wn.execute
       @wn.remote_app_name.should eql('test.webbynodeqwerty.com')
     end
@@ -116,7 +116,7 @@ describe Webbynode::Application do
       @wn.stub!(:git_remote_webbynode?).and_return(false)
       @wn.stub!(:is_webbynode_environment?).and_return(false)
       @wn.stub!(:run_remote_command)
-      @wn.should_receive(:require_application_environment!).exactly(:once)
+      @wn.should_receive(:requires_application_environment!).exactly(:once)
 
       # Another one that should work but doesn't..
       # @wn.should_receive(:log_and_exit).at_least(:once).with("You can only execute the \"remote\" from inside a Webbynode initialized application.")

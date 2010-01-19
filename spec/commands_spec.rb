@@ -100,7 +100,7 @@ describe Webbynode::Commands do
     before do
       @wn = Webbynode::Application.new("remote", "ls -la")
       @wn.stub!(:run).and_return(true)
-      @wn.stub!(:require_application_environment!).and_return(true)
+      @wn.stub!(:requires_application_environment!).and_return(true)
       Net::SSH.stub!(:start).and_return(true)
     end
 
@@ -113,7 +113,7 @@ describe Webbynode::Commands do
       @wn.should_receive(:log_and_exit).at_least(:once).with(@wn.read_template('help'))
       @wn.stub!(:parse_remote_ip)
       @wn.stub!(:parse_remote_app_name)
-      @wn.stub!(:require_application_environment!).and_return(true)
+      @wn.stub!(:requires_application_environment!).and_return(true)
       @wn.execute
       @wn.options.should be_empty
     end

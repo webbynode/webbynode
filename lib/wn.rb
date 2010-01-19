@@ -22,7 +22,7 @@ module Wn
     # Parses user input (commands)
     # Initial param is the command
     # Other params are arguments
-    def parse
+    def parse_command
       log_and_exit read_template('help') if @input.empty?
       @command  = @input.shift
       @options  = @input
@@ -30,10 +30,9 @@ module Wn
     
     # Executes the parsed command
     def execute
-      parse
+      parse_command
       run_command(command)
     end
-    # Be more specific what im parsing
     
     # Runs the command unless it's nil or doesn't exist
     # If it fails, it will display the help screen

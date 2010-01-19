@@ -14,14 +14,18 @@ module Wn
     
     # Executes a command on the server
     # Expects the first option to be the task
-    # Command will be executed from the ~/ directory, which is the application root
+    # Command will be executed from the ~/remote_app_name directory, which is the application root
     def remote
       log_and_exit read_template('help') if options.empty?
       
-      # Finds the remote ip and stores it in @remote_ip
+      # Finds the remote ip and stores it in "remote_ip"
       parse_remote_ip
+      
+      # Finds the remote ip and stores it in "remote_app_name"
       parse_remote_app_name
       
+      # Attempts to run the specified command
+      # run_remote_command(options[0])
       
     end
     

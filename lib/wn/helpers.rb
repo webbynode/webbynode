@@ -131,8 +131,15 @@ module Wn
     # password prompt if this is required by the Webby
     def remote_command(command, password = nil)
       Net::SSH.start(remote_ip, 'git', :password => password) do |ssh|
-        ssh.exec("cd #{remote_app_name} && #{command}")
-      end  
+        output = ssh.exec!("cd #{remote_app_name}")
+        unless output =~ /No such file or directory/
+          ssh.exec("cd #{remote_app_name} && #{command}")
+        else
+          puts "Your application has not yet been deployed to your Webby."
+          puts "To issue remote commands from the Webby, you must first push your application."
+        end
+      end
     end
+    
   end
 end

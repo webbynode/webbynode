@@ -242,7 +242,6 @@ describe Webbynode do
         @wn.remote_ip.should eql('210.11.13.12')
         @wn.remote_app_name.should eql('test.webbynodeqwerty.com')        
       end
-      
     end
     
     describe "addkey" do

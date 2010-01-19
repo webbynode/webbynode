@@ -59,8 +59,7 @@ describe Webbynode do
     
     it "should parse the .git/config file and set the remote_ip" do
       File.should_receive(:open).with(".git/config").and_return(read_fixture("git/config/210.11.13.12"))
-      ip = @wn.remote_ip
-      puts "IP: #{ip}"
+      ip = @wn.parse_remote_ip
       ip.should == "210.11.13.12"
     end
     
@@ -71,15 +70,30 @@ describe Webbynode do
     end
     
     it "should parse the .git/config file" do
-      File.should_receive(:open).with(".git/config").and_return(read_fixture('git/config/67.23.79.32'))
+      File.should_receive(:open).at_least(:once).with(".git/config").and_return(read_fixture('git/config/67.23.79.32'))
+      File.should_receive(:open).at_least(:once).with(".pushand").and_return(read_fixture('pushand'))
       @wn.execute
       @wn.remote_ip.should == "67.23.79.32"
     end
     
     it "should parse the .git/config file for another ip" do
       File.should_receive(:open).with(".git/config").and_return(read_fixture('git/config/67.23.79.31'))
+      File.should_receive(:open).at_least(:once).with(".pushand").and_return(read_fixture('pushand'))
       @wn.execute
       @wn.remote_ip.should == "67.23.79.31"
+    end
+    
+    it "should parse the application name from the .pushand file" do
+      File.should_receive(:open).with(".git/config").and_return(read_fixture('git/config/67.23.79.31'))
+      File.should_receive(:open).at_least(:once).with(".pushand").and_return(read_fixture('pushand'))      
+      @wn.execute
+      @wn.remote_app_name.should eql('test.webbynodeqwerty.com')
+    end
+  end
+  
+  def parse_pushand(file)
+    File.open(file).each_line do |line|
+      return $1 if line =~ /^phd $0 (.+)$/
     end
   end
   
@@ -90,6 +104,10 @@ describe Webbynode do
         @wn.stub!(:run)
         @wn.stub!(:create_file)
         @wm.stub!(:log)
+      end
+      
+      it "should be available" do
+        @wn.should respond_to(:init)
       end
       
       it "should execute the init command" do
@@ -136,6 +154,10 @@ describe Webbynode do
         @wn.stub!(:run).and_return(true)
       end
       
+      it "should be available" do
+        @wn.should respond_to(:push)
+      end
+      
       it "should check if the .git directory exists" do
         @wn.should_receive(:dir_exists).exactly(:once).with(".git")
         @wn.execute
@@ -163,6 +185,39 @@ describe Webbynode do
         @wn = Wn::App.new("remote", "ls -la")
         @wn.stub!(:run).and_return(true)
       end
+      
+      it "should be available" do
+        @wn.should respond_to(:remote)
+      end
+      
+      it "should display help instructions if no remote command is given" do
+        @wn = Wn::App.new("remote")
+        @wn.should_receive(:log_and_exit).at_least(:once).with(@wn.read_template('help'))
+        @wn.execute
+        @wn.options.should be_empty
+      end
+      
+      it "should have one option" do
+        @wn.execute
+        @wn.options.count.should eql(1)
+      end
+      
+      it "should parse the .git/config folder and retrieve the Webby IP" do
+        @wn.should_receive(:parse_remote_ip)
+        @wn.execute
+      end
+      
+      it "should parse the .pushand file and retrieve the remote app name" do
+        @wn.should_receive(:parse_pushand)
+        @wn.execute
+      end
+      
+      # it "should establish a connection to the remote server using SSH" do
+      #   @wn.should_receive(:parse_remote_ip).with('fixtures/git/config/210.11.13.12').and_return('210.11.13.12')
+      #   @wn.execute
+      #   @wn.remote_ip.should eql('210.11.13.12')
+      # end
+      
     end
   end
 end

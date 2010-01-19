@@ -1,6 +1,8 @@
 module Wn
   module Helpers
   
+    attr_accessor :remote_ip, :remote_app_name
+  
     # Tests if specified directory exist
     def dir_exists(dir)
       File.directory?(dir)
@@ -59,5 +61,71 @@ module Wn
       File.open(File.join(templates_path, template), 'r').read
     end
     
+    # Parses the given file (would assumingly only be for .git/config files)
+    # It returns/generates a hash containing the configuration for each remote
+    # Webbynode will be particularly interesseted in the @config["remote"]["webbynode"] hash/key
+    def parse_configuration(file)
+      config = {}
+      current = nil
+      File.open(file).each_line do |line|
+        case line
+        when /^\[(\w+)(?: "(.+)")*\]/
+          key, subkey = $1, $2
+          current = (config[key] ||= {})
+          current = (current[subkey] ||= {}) if subkey
+        else
+          key, value = line.strip.split(' = ')
+          current[key] = value
+        end
+      end
+      config
+    end
+    
+    # Parses the given file (the .pushand) and extracts the remote application name/folder
+    def parse_pushand(file)
+      File.open(file).each_line do |line|
+        case line
+        when /^phd \$0 (.+)$/
+          return $1
+        end
+      end
+    end
+    
+    # Parses the remote IP that's stored inside the .git/config file
+    # Will only parse it once. Any other requests will be pulled from memory
+    # The remote IP will be stored inside the @remote_ip instance variable
+    def parse_remote_ip
+      @config     ||= parse_configuration(".git/config")
+      @remote_ip  ||= $2 if @config["remote"]["webbynode"]["url"] =~ /^(\w+)@(.+):(\w+)$/ 
+    end
+    
+    # Parses the remote app name that's stored inside the .pushand file
+    # Will only parse it once. Any other requests will be pulled from memory
+    # The remote app name will be stored inside the @remote_ip instance variable
+    def parse_remote_app_name
+      @remote_app_name ||= parse_pushand(".pushand")
+    end
+    
+    # Will attempt to run a command on the Webby (inside the application root)
+    # This must only be initialized through "run_remote_command(command)" to ensure
+    # password prompt if this is required by the Webby
+    def remote_command(command, password = nil)
+      Net::SSH.start(remote_ip, 'git', :password => password) do |ssh|
+        ssh.exec(command)
+      end  
+    end
+     
+    # Attempts to connect to the Webby without a password
+    # if this failed, it will re-attempt and prompt the user for the password for the "git" user
+    def run_remote_command(command)
+      begin
+        remote_command(command)
+      rescue Net::SSH::AuthenticationFailed
+        HighLine.track_eof  = false
+        password            = ask("Enter your password: ") { |q| q.echo = '' }
+        remote_command(command, password)
+      end
+    end
+ 
   end
 end

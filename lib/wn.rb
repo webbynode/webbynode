@@ -33,7 +33,10 @@ module Wn
       parse
       run_command(command)
     end
+    # Be more specific what im parsing
     
+    # Runs the command unless it's nil or doesn't exist
+    # If it fails, it will display the help screen
     def run_command(command)
       if !command.nil? and respond_to?(command)
         send(command)
@@ -41,32 +44,9 @@ module Wn
         log_and_exit read_template('help')
       end
     end
+    # TODO
+    # Check for tests on RunComand
     
-    # Parses the given file (would assumingly only be for .git/config files)
-    # It returns/generates a hash containing the configuration for each remote
-    # Webbynode will be particularly interesseted in the @config["remote"]["webbynode"] hash/key
-    def parse_configuration(file)
-      config = {}
-      current = nil
-      File.open(file).each_line do |line|
-        case line
-        when /^\[(\w+)(?: "(.+)")*\]/
-          key, subkey = $1, $2
-          current = (config[key] ||= {})
-          current = (current[subkey] ||= {}) if subkey
-        else
-          key, value = line.strip.split(' = ')
-          current[key] = value
-        end
-      end
-      config
-    end
     
-    # Returns the remote IP that's stored inside the .git/config file
-    # Will only parse it once. Any other requests will be pulled from memory
-    def remote_ip
-      @config     ||= parse_configuration(".git/config")
-      @remote_ip  ||= $2 if @config["remote"]["webbynode"]["url"] =~ /^(\w+)@(.+):(\w+)$/ 
-    end
   end
 end

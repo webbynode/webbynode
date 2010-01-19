@@ -12,7 +12,16 @@ module Wn
       run "git push webbynode master"
     end
     
+    # Executes a command on the server
+    # Expects the first option to be the task
+    # Command will be executed from the ~/ directory, which is the application root
     def remote
+      log_and_exit read_template('help') if options.empty?
+      
+      # Finds the remote ip and stores it in @remote_ip
+      parse_remote_ip
+      parse_remote_app_name
+      
       
     end
     

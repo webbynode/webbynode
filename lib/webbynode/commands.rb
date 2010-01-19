@@ -30,6 +30,10 @@ module Webbynode
     def init
       webby_ip, host = *options
       host = app_name unless host
+      
+      unless webby_ip
+        log_and_exit "Missing host"
+      end
 
       unless file_exists(".pushand")
         log "Initializing deployment descriptor for #{host}..."

@@ -20,6 +20,12 @@ describe Webbynode do
         @wn.execute
       end
       
+      it "should show an error if the host is omitted" do
+        @wn = Webbynode::Application.new("init")
+        @wn.should_receive(:log_and_exit)
+        @wn.execute
+      end
+      
       it "should check if the .pushand/gitignore files exist. and if the .git directory is present." do
         @wn.should_receive(:file_exists).exactly(:once).with(".gitignore")
         @wn.should_receive(:file_exists).exactly(:once).with(".pushand")

@@ -23,9 +23,9 @@ module Webbynode
     end
     
     def init_credentials
-      @credentials = read_yaml_file(Wn::ApiClient::CREDENTIALS_FILE) do
+      @credentials = read_yaml_file(Webbynode::ApiClient::CREDENTIALS_FILE) do
         creds = { :email => ask("Login email: "), :token => ask("API Token:   ") }
-        create_yaml_file Wn::ApiClient::CREDENTIALS_FILE, creds
+        create_yaml_file Webbynode::ApiClient::CREDENTIALS_FILE, creds
         creds
       end
     end

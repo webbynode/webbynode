@@ -106,18 +106,15 @@ module Wn
       @remote_app_name ||= parse_pushand(".pushand")
     end
     
-    # Will attempt to run a command on the Webby (inside the application root)
-    # This must only be initialized through "run_remote_command(command)" to ensure
-    # password prompt if this is required by the Webby
-    def remote_command(command, password = nil)
-      Net::SSH.start(remote_ip, 'git', :password => password) do |ssh|
-        ssh.exec("cd #{remote_app_name} && #{command}")
-      end  
-    end
-     
     # Attempts to connect to the Webby without a password
     # if this failed, it will re-attempt and prompt the user for the password for the "git" user
     def run_remote_command(command)
+      # Finds the remote ip and stores it in "remote_ip"
+      parse_remote_ip
+      
+      # Finds the remote ip and stores it in "remote_app_name"
+      parse_remote_app_name
+      
       begin
         remote_command(command)
       rescue Net::SSH::AuthenticationFailed
@@ -126,6 +123,16 @@ module Wn
         remote_command(command, password)
       end
     end
+    
+    private
  
+    # Will attempt to run a command on the Webby (inside the application root)
+    # This must only be initialized through "run_remote_command(command)" to ensure
+    # password prompt if this is required by the Webby
+    def remote_command(command, password = nil)
+      Net::SSH.start(remote_ip, 'git', :password => password) do |ssh|
+        ssh.exec("cd #{remote_app_name} && #{command}")
+      end  
+    end
   end
 end

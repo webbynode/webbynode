@@ -104,6 +104,15 @@ module Wn
       run "git add ."
       run "git commit -m \"Initial Webbynode Commit\""
     end
+    
+    # Adds user's public SSH key to a Webby
+    def addkey(ip)
+      key = "#{ENV['HOME']}/.ssh/id_rsa.pub"
+      run "ssh-keygen -t rsa -N \"#{named_options["passphrase"]}\" -f #{key}" unless File.exists?(key)
+
+      key_contents = File.read(key)
+      remote_command "mkdir ~/.ssh 2>/dev/null; chmod 700 ~/.ssh; echo \"#{key_contents}\" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys"
+    end
   
   end
 end

@@ -26,6 +26,15 @@ describe Webbynode do
       @wn.options[0].should eql("2.2.2.2")
       @wn.options[1].should eql("test.webbynodeqwerty.com")
     end
+    
+    it "should extract named parameters to a hash" do
+      wn = Wn::App.new("command", "2.2.2.2", "--option=this", "--boolean_option")
+      wn.parse_command
+      wn.command.should eql("command")
+      wn.options.should == ["2.2.2.2"]
+      wn.named_options["option"].should == "this"
+      wn.named_options["boolean_option"].should == true
+    end
         
     it "should display the help text when no arguments are provided" do
       @wn = Wn::App.new
@@ -238,6 +247,68 @@ describe Webbynode do
         @wn.remote_app_name.should eql('test.webbynodeqwerty.com')        
       end
       
+    end
+    
+    describe "addkey" do
+      def create_command(_options=[], _named_options={})
+        kls = Class.new do
+          include Wn::Commands
+        end
+        
+        kls.send(:define_method, :options) do
+          _options
+        end
+        
+        kls.send(:define_method, :named_options) do
+          _named_options
+        end
+
+        kls.new
+      end
+      
+      it "should be valid" do
+        Wn::App.new("addkey").respond_to?(:addkey).should == true
+      end
+      
+      describe "when key is present" do
+        it "should copy the key over SSH" do
+          cmd = create_command
+          
+          File.should_receive(:exists?).with("#{ENV['HOME']}/.ssh/id_rsa.pub").and_return(true)
+          File.should_receive(:read).with("#{ENV['HOME']}/.ssh/id_rsa.pub").and_return("mah key")
+          cmd.should_receive(:remote_command).with('mkdir ~/.ssh 2>/dev/null; chmod 700 ~/.ssh; echo "mah key" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys')
+          
+          cmd.addkey "210.11.13.12"
+        end
+      end
+      
+      describe "when key is missing" do
+        def set_expectations(cmd, passphrase="")
+          File.should_receive(:exists?).with("#{ENV['HOME']}/.ssh/id_rsa.pub").and_return(false)
+          cmd.should_receive(:run).with("ssh-keygen -t rsa -N \"#{passphrase}\" -f #{ENV['HOME']}/.ssh/id_rsa.pub")
+
+          File.should_receive(:read).with("#{ENV['HOME']}/.ssh/id_rsa.pub").and_return(passphrase)
+          cmd.should_receive(:remote_command).with("mkdir ~/.ssh 2>/dev/null; chmod 700 ~/.ssh; echo \"#{passphrase}\" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys")
+        end
+        
+        it "should create a key for the user" do
+          cmd = create_command
+          set_expectations cmd
+          cmd.addkey "210.11.13.12"
+        end
+      
+        it "should create a key with passprase if provided" do
+          cmd = create_command [], { "passphrase" => "hello" }
+          set_expectations cmd, "hello"
+          cmd.addkey "210.11.13.12"
+        end
+      
+        it "should allow a passphrase to contain multiple words" do
+          cmd = create_command [], { "passphrase" => "hello mommy" }
+          set_expectations cmd, "hello mommy"
+          cmd.addkey "210.11.13.12"
+        end
+      end
     end
   end
 end

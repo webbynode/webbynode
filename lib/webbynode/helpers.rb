@@ -3,11 +3,6 @@ module Webbynode
   
     attr_accessor :remote_ip, :remote_app_name
   
-    # Tests if specified directory exist
-    def dir_exists(dir)
-      File.directory?(dir)
-    end
-  
     # Alias for printing to command line
     def log(text)
       puts text
@@ -17,6 +12,11 @@ module Webbynode
     def log_and_exit(text)
       puts text
       exit
+    end
+  
+    # Tests if specified directory exist
+    def dir_exists(dir)
+      File.directory?(dir)
     end
   
     # Tests to see if the specified file exists
@@ -124,6 +124,17 @@ module Webbynode
       end
     end
     
+    # Checks to see if the webbynode command is being invoked from a webbynode initialized application
+    # it checks to see if the .pushand file is present, if the .git repository is present and if the git remote
+    # includes the webbynode remote repository
+    # This should be called inside any command definition (such as "remote") which relies on the application environment.
+    def require_application_environment!
+      if !is_webbynode_environment?
+        log_and_exit "You can only execute the \"#{command}\" from inside a Webbynode initialized application."
+      end
+    end
+    
+    
     private
  
     # Will attempt to run a command on the Webby (inside the application root)
@@ -139,6 +150,24 @@ module Webbynode
           puts "Your application has not yet been deployed to your Webby."
           puts "To issue remote commands from the Webby, you must first push your application."
         end
+      end
+    end
+    
+    # Checks to see if "webbynode" is listed under the "git remote"
+    def git_remote_webbynode?
+      if %x(git remote) =~ /webbynode/
+        true
+      else
+        false
+      end
+    end
+    
+    # Checks to see if the user is currently inside a webbynode initialized application environment
+    def is_webbynode_environment?
+      if file_exists('.pushand') and dir_exists('.git') and git_remote_webbynode?
+        true
+      else
+        false
       end
     end
     

@@ -54,15 +54,15 @@ module Wn
         log "Initializing git repository..."
       end
 
-      git_init webby_ip
+      git_init webby_ip, host
     end
     
     # Initializes git unless it already exists
     # Adds git remote for webbynode 
     # Adds an initial commit labled as "Initial Webbynode Commit"
-    def git_init(ip)
+    def git_init(ip, host)
       run "git init" unless dir_exists(".git")
-      run "git remote add webbynode git@#{ip}:#{app_name}"
+      run "git remote add webbynode git@#{ip}:#{host}"
       run "git add ."
       run "git commit -m \"Initial Webbynode Commit\""
     end

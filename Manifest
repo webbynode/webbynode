@@ -12,6 +12,9 @@ lib/webbynode/api_client.rb
 lib/webbynode/commands.rb
 lib/webbynode/helpers.rb
 lib/webbynode/io.rb
+spec/api_client_spec.rb
+spec/application_spec.rb
+spec/commands_spec.rb
 spec/fixtures/api/credentials
 spec/fixtures/api/webbies
 spec/fixtures/fixture_helpers
@@ -19,5 +22,5 @@ spec/fixtures/git/config/210.11.13.12
 spec/fixtures/git/config/67.23.79.31
 spec/fixtures/git/config/67.23.79.32
 spec/fixtures/pushand
+spec/io_spec.rb
 spec/spec_helper.rb
-spec/wn_spec.rb

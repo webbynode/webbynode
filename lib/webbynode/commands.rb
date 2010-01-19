@@ -32,7 +32,12 @@ module Webbynode
       host = app_name unless host
       
       unless webby_ip
-        log_and_exit "Missing host"
+        log_and_exit read_template('help')
+        return
+      end
+      
+      unless webby_ip =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/
+        webby_ip = webby_ip(webby_ip)
       end
 
       unless file_exists(".pushand")

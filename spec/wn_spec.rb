@@ -125,7 +125,7 @@ describe Webbynode do
       end
       
       it "should initialize git for webbynode" do
-        @wn.should_receive(:git_init).with('2.2.2.2')
+        @wn.should_receive(:git_init).with('2.2.2.2', 'test.webbynodeqwerty.com')
         @wn.execute
       end
       

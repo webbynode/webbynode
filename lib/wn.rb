@@ -1,9 +1,10 @@
 $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
-require 'pp'
+require 'rubygems'
 require 'net/ssh'
 require 'highline/import'
+require 'pp'
 require File.join(File.dirname(__FILE__), 'wn', 'helpers')
 require File.join(File.dirname(__FILE__), 'wn', 'commands')
 

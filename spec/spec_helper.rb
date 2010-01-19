@@ -4,11 +4,6 @@ require 'spec'
 # Load Webbynode Class
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'lib', 'wn')
 
-# Load SSH / Highline
-require 'rubygems'
-require 'net/ssh'
-require 'highline/import'
-
 # Set Testing Environment
 $testing = true
 

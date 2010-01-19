@@ -77,6 +77,17 @@ module Wn
       # manually inside the config/database.yml and it worked again.
       #
       # What do you think?
+      #
+      # Here is an example of what got rendered as database.yml on my Webby
+      #
+      # # inside: /var/rails/test.wizardry-ls.com/config/database.yml
+      # production:
+      #   adapter: mysql
+      #   encoding: utf8
+      #   database: test.wizardry-ls.com # <= Will fail i think
+      #   username: test.wizardry-ls.com # <= Will fail i think
+      #   password: mypassword
+      #
       git_init(webby_ip, host)
     end
     

@@ -18,18 +18,53 @@ Echoe.new('webbynode', '0.1.2') do |p|
   #   ['httparty', '>=0.4.5']
   # ]
   p.install_message = <<EOS
-  -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         Webbynode deployment gem 
-  -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  
+-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-
+      Webbynode Rapid Deployment Gem
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-
 
   This deployment engine is highly experimental and
-  should be considered beta code for the time being.
+  should be considered beta code for now.
 
-  Commands:
 
-  	webbynode init		Initializes the current app for deployment to a Webby
-  	webbynode push		Deploys the current committed code to a Webby
+  Initial Setup
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-
 
+  Setup an initial Webbynode repository with:
+
+    webbynode init [webby_ip] [example.com]
+    * This will initialize git
+    * This will add and commit what you currently have
+    * This will add Webbynode to "git remote"
+
+  Now, deploy your application with:
+
+    webbynode push
+
+  Then, for each update, follow the familiar git workflow:
+
+    git add .
+    git commit -m "My Updates"
+
+  And finally, to release the updated version of your application, again, execute:
+
+    webbynode push
+
+
+
+  Webbynode Commands
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-
+
+  webbynode remote [command]
+  * Run a command on the Webby from the applications' root
+    example(s):
+      webbynode remote 'rake my:custom:task'
+      webbynode remote 'cat log/production.log'
+
+  webbynode addkey
+  * Adds your public SSH key to your Webby so you will no longer
+    be prompted for your password when interacting with your Webby
+      
 EOS
 end
 # 

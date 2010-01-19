@@ -10,6 +10,10 @@ lib/templates/help
 lib/wn.rb
 lib/wn/commands.rb
 lib/wn/helpers.rb
+spec/fixtures/git/config/210.11.13.12
+spec/fixtures/git/config/67.23.79.31
+spec/fixtures/git/config/67.23.79.32
+spec/fixtures/pushand
 spec/spec_helper.rb
 spec/wn_spec.rb
 test/test_helper.rb

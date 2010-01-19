@@ -84,9 +84,13 @@ module Wn
       # production:
       #   adapter: mysql
       #   encoding: utf8
-      #   database: test.wizardry-ls.com # <= Will fail i think
-      #   username: test.wizardry-ls.com # <= Will fail i think
+      #   database: test.wizardry-ls.com # <= Will fail
+      #   username: test.wizardry-ls.com # <= Will fail
       #   password: mypassword
+      #
+      # I think we should always strip out "any" characters for the database.yml that aren't characters/digits. So that you end up always having alphanumeric.
+      # The only issue is the database.yml on this part as far as I can see. If we can fix it so it will remove any non [a-zA-z0-9] characters then it should work
+      # right out of the box.
       #
       git_init(webby_ip, host)
     end

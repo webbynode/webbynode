@@ -256,7 +256,7 @@ describe Webbynode do
         end
         
         kls.send(:define_method, :options) do
-          _options
+          _options.is_a?(Array) ? _options : [_options]
         end
         
         kls.send(:define_method, :named_options) do
@@ -272,13 +272,13 @@ describe Webbynode do
       
       describe "when key is present" do
         it "should copy the key over SSH" do
-          cmd = create_command
+          cmd = create_command []
           
           File.should_receive(:exists?).with("#{ENV['HOME']}/.ssh/id_rsa.pub").and_return(true)
           File.should_receive(:read).with("#{ENV['HOME']}/.ssh/id_rsa.pub").and_return("mah key")
           cmd.should_receive(:remote_command).with('mkdir ~/.ssh 2>/dev/null; chmod 700 ~/.ssh; echo "mah key" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys')
           
-          cmd.addkey "210.11.13.12"
+          cmd.addkey
         end
       end
       
@@ -292,21 +292,21 @@ describe Webbynode do
         end
         
         it "should create a key for the user" do
-          cmd = create_command
+          cmd = create_command []
           set_expectations cmd
-          cmd.addkey "210.11.13.12"
+          cmd.addkey 
         end
       
         it "should create a key with passprase if provided" do
           cmd = create_command [], { "passphrase" => "hello" }
           set_expectations cmd, "hello"
-          cmd.addkey "210.11.13.12"
+          cmd.addkey 
         end
       
         it "should allow a passphrase to contain multiple words" do
           cmd = create_command [], { "passphrase" => "hello mommy" }
           set_expectations cmd, "hello mommy"
-          cmd.addkey "210.11.13.12"
+          cmd.addkey
         end
       end
     end

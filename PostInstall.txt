@@ -9,4 +9,4 @@ Commands:
 
 	webbynode init		Initializes the current app for deployment to a Webby
 	webbynode push		Deploys the current committed code to a Webby
-	
+	webbynode remote	Executes a remote command on your app

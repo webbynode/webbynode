@@ -1,33 +1,44 @@
 
-===================================
-  Webbynode Rapid Deployment Gem
-===================================
-
-Setup an initial webbynode repository with:
-
-  webbynode init [webby_ip] [example.com]
+-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-
+      Webbynode Rapid Deployment Gem
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-
 
 
-Deploy your application with:
+  Initial Setup
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-
+
+  Setup an initial Webbynode repository with:
+
+    webbynode init [webby_ip] [example.com]
+    * This will initialize git
+    * This will add and commit what you currently have
+    * This will add Webbynode to "git remote"
   
-  webbynode push
-
-Then follow the familiar git workflow:
-
-  git add .
-  git commit -m "My Updates"
-
-Then to re-deploy your application:
-
-  webbynode push
-
-
-Additional Webbynode Commands:
+  Now, deploy your application with:
   
+    webbynode push
+
+  Then, for each update, follow the familiar git workflow:
+
+    git add .
+    git commit -m "My Updates"
+
+  And finally, to release the updated version of your application, again, execute:
+
+    webbynode push
+
+
+
+  Webbynode Commands
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-
+    
   webbynode remote [command]
-  Run a command on the Webby from the applications' root
+  * Run a command on the Webby from the applications' root
+    example(s):
+      webbynode remote 'rake my:custom:task'
+      webbynode remote 'cat log/production.log'
   
-  example(s):
-    webbynode remote 'rake my:custom:task'
-    webbynode remote 'cat log/production.log'
+  webbynode addkey
+  * Adds your public SSH key to your Webby so you will no longer
+    be prompted for your password when interacting with your Webby
 

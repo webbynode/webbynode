@@ -8,10 +8,10 @@ bin/webbynode
 lib/templates/gitignore
 lib/templates/help
 lib/webbynode.rb
+lib/webbynode/api_client.rb
 lib/webbynode/commands.rb
 lib/webbynode/helpers.rb
-lib/wn/api_client.rb
-lib/wn/io.rb
+lib/webbynode/io.rb
 spec/fixtures/api/credentials
 spec/fixtures/api/webbies
 spec/fixtures/fixture_helpers

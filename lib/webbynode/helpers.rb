@@ -133,6 +133,7 @@ module Webbynode
       Net::SSH.start(remote_ip, 'git', :password => password) do |ssh|
         output = ssh.exec!("cd #{remote_app_name}")
         unless output =~ /No such file or directory/
+          command = "#{command} < /dev/null"
           ssh.exec("cd #{remote_app_name} && #{command}")
         else
           puts "Your application has not yet been deployed to your Webby."

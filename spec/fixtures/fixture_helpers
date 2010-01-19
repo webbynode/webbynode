@@ -1,0 +1,2 @@
+#! /bin/bash
+curl -is -F "email=$1" -F "token=$2" https://manager.webbynode.com/api/yaml/webbies > spec/fixtures/api/webbies

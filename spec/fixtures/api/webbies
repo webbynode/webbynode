@@ -1,0 +1,26 @@
+HTTP/1.1 200 OK
+Server: nginx/0.5.33
+Date: Tue, 19 Jan 2010 18:49:34 GMT
+Content-Type: text/yaml; charset=utf-8
+Connection: keep-alive
+Set-Cookie: _webbymanager_session=BAh7BjoPc2Vzc2lvbl9pZCIlYjA3M2Y0MDYwNjM4MjM2ZWMxY2E0ZTlmMWE5OGI4MTg%3D--67402230568aa8e5cf60775185b3235785584eef; path=/; HttpOnly
+Status: 200
+ETag: "07d4dbf860b002d75b666bbbbede61c0"
+X-Runtime: 2842
+Cache-Control: private, max-age=0, must-revalidate
+Content-Length: 222
+
+--- 
+webbies: 
+- :ip: 201.81.121.201
+  :status: "on"
+  :name: sandbox
+  :notes: 
+  :plan: Webbybeta
+  :node: miami-b15
+- :ip: 61.21.71.31
+  :status: "on"
+  :name: webby3067
+  :notes: 
+  :plan: Webbybeta
+  :node: miami-b02

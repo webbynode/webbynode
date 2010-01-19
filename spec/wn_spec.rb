@@ -306,4 +306,108 @@ describe Webbynode do
       end
     end
   end
+
+  describe "init_credentials" do
+    it "should ask the user for credentials when ~/.webbynode is missing" do
+      File.should_receive(:exists?).twice.with("#{ENV['HOME']}/.webbynode").and_return(false)
+
+      wn = Wn::App.new("")
+      wn.should_receive(:ask).with("API Token:   ").and_return("apitoken")
+      wn.should_receive(:ask).with("Login email: ").and_return("fcoury@me.com")
+      wn.should_receive(:create_yaml_file)
+      wn.init_credentials.should == {:email => "fcoury@me.com", :token => "apitoken"}
+
+      wn = Wn::App.new("")
+      wn.should_receive(:ask).with("API Token:   ").and_return("anothertoken")
+      wn.should_receive(:ask).with("Login email: ").and_return("you@mail.com")
+      wn.should_receive(:create_yaml_file)
+      wn.init_credentials.should == {:email => "you@mail.com", :token => "anothertoken"}
+    end
+    
+    it "should read ~/.webbynode if present" do
+      yaml_file_contents = read_fixture("api/credentials")
+      
+      File.should_receive(:exists?).with("#{ENV['HOME']}/.webbynode").and_return(true)
+      File.should_receive(:read).with("#{ENV['HOME']}/.webbynode").and_return(yaml_file_contents)
+
+      wn = Wn::App.new("")
+      wn.init_credentials.should == {:email => "fcoury@me.com", :token => "apitoken"}
+    end
+    
+    it "should save the credentials in ~/.webbynode" do
+      wn = Wn::App.new("")
+      File.should_receive(:exists?).with("#{ENV['HOME']}/.webbynode").and_return(false)
+
+      wn.should_receive(:ask).with("API Token:   ").and_return("apitoken")
+      wn.should_receive(:ask).with("Login email: ").and_return("fcoury@me.com")
+      wn.should_receive(:create_yaml_file).with("#{ENV['HOME']}/.webbynode", {:email => "fcoury@me.com", :token => "apitoken"})
+      wn.init_credentials.should == {:email => "fcoury@me.com", :token => "apitoken"}
+    end
+  end
+  
+  describe "create_yaml_file" do
+    it "should persist a ruby variable to a YAML file" do
+      mock_file = mock("yaml_file")
+      mock_file.should_receive(:write).with("--- \n:teste: works\n")
+      
+      File.should_receive(:open).with("x.yml", "w").and_yield(mock_file)
+      
+      wn = Wn::App.new("")
+      wn.create_yaml_file "x.yml", {:teste => "works"}, false
+    end
+  end
+  
+  describe "read_yaml_file" do
+    it "should read and parse a YAML file" do
+      File.should_receive(:exists?).with("x.yml").and_return(true)
+      File.should_receive(:read).with("x.yml").and_return("--- \n:teste: works\n")
+      
+      wn = Wn::App.new("")
+      wn.read_yaml_file("x.yml").should == {:teste => "works"}
+    end
+    
+    it "should evaluate the block if file doesn't exist" do
+      File.should_receive(:exists?).with("x.yml").and_return(false)
+      
+      wn = Wn::App.new("")
+      wn.read_yaml_file("x.yml") { "hey there!" }.should == "hey there!"
+    end
+  end
+
+  describe "webby_ip" do
+    describe "when file ~/.webbynode is absent" do
+      it "should call init_credentials email address and API token" do
+        FakeWeb.register_uri(:post, "#{Wn::App.base_uri}/webbies", 
+          :email => "fcoury@me.com", :response => read_fixture("api/webbies"))
+        
+        wn = Wn::App.new("")
+        wn.should_receive(:init_credentials).and_return({:email => "fcoury@me.com", :token => "apitoken"})
+        wn.webby_ip("webby3067").should == "61.21.71.31"
+
+        wn = Wn::App.new("")
+        wn.should_receive(:init_credentials).and_return({:email => "fcoury@me.com", :token => "apitoken"})
+        wn.webby_ip("sandbox").should == "201.81.121.201"
+      end
+    end
+    
+    describe "when file ~/.webbynode is present" do
+      before do
+        FakeWeb.clean_registry
+        FakeWeb.register_uri(:post, "#{Wn::App.base_uri}/webbies", 
+          :email => "fcoury@me.com", :response => read_fixture("api/webbies"))
+      end
+
+      it "should return the IP for existing Webby hostname" do
+        wn = Wn::App.new("")
+        wn.should_receive(:credentials).and_return({:email => "fcoury@me.com", :token => "apitoken"})
+        wn.webby_ip("sandbox").should == "201.81.121.201"
+      end
+      
+      it "should show an error message if the Webby does not exist for the user" do
+        wn = Wn::App.new("")
+        wn.should_receive(:credentials).and_return({:email => "fcoury@me.com", :token => "apitoken"})
+        wn.webby_ip("this_doesnt_exist").nil?.should == true
+      end
+    end
+  end
 end

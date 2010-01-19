@@ -5,8 +5,10 @@ require 'rubygems'
 require 'net/ssh'
 require 'highline/import'
 require 'pp'
-require File.join(File.dirname(__FILE__), 'wn', 'helpers')
-require File.join(File.dirname(__FILE__), 'wn', 'commands')
+
+%w[helpers commands api_client io].each do |f|
+  require File.join(File.dirname(__FILE__), 'wn', f)
+end
 
 module Wn
   VERSION = '0.1.2'
@@ -16,6 +18,8 @@ module Wn
     
     include Wn::Helpers
     include Wn::Commands
+    include Wn::ApiClient
+    include Wn::Io
     
     # Initializes the Webbynode App
     def initialize(*input)

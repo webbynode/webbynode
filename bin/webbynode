@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 $:.unshift File.dirname(__FILE__)+"/../lib"
 require 'rubygems'
-require 'wn'
+require 'webbynode'
 
-app = Wn::App.new(ARGV)
-app.execute
+application = Webbynode::Application.new(ARGV)
+application.execute

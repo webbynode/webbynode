@@ -5,17 +5,17 @@ require 'rubygems'
 require 'net/ssh'
 require 'highline/import'
 require 'pp'
-require File.join(File.dirname(__FILE__), 'wn', 'helpers')
-require File.join(File.dirname(__FILE__), 'wn', 'commands')
+require File.join(File.dirname(__FILE__), 'webbynode', 'helpers')
+require File.join(File.dirname(__FILE__), 'webbynode', 'commands')
 
-module Wn
+module Webbynode
   VERSION = '0.1.2'
   
-  class App
+  class Application
     attr_accessor :input, :command, :options, :named_options
     
-    include Wn::Helpers
-    include Wn::Commands
+    include Webbynode::Helpers
+    include Webbynode::Commands
     
     # Initializes the Webbynode App
     def initialize(*input)

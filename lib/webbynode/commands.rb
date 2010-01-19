@@ -1,4 +1,4 @@
-module Wn
+module Webbynode
   module Commands
     
     # Deploys the application to Webbynode

@@ -1,18 +1,17 @@
 # Load Spec Helper
 require File.join(File.expand_path(File.dirname(__FILE__)), 'spec_helper')
 
-
 describe Webbynode do
   
   describe "initialization" do
     before do
-      @wn = Wn::App.new(["init", "2.2.2.2", "test.webbynodeqwerty.com"])
+      @wn = Webbynode::Application.new(["init", "2.2.2.2", "test.webbynodeqwerty.com"])
       @wn.stub!(:git_init)
       @wn.stub!(:send)
     end
     
     it "should convert arguments into an array" do
-      Wn::App.new('init', '2.2.2.2')
+      Webbynode::Application.new('init', '2.2.2.2')
     end
     
     it "should have parse and execute methods" do
@@ -28,7 +27,7 @@ describe Webbynode do
     end
     
     it "should extract named parameters to a hash" do
-      wn = Wn::App.new("command", "2.2.2.2", "--option=this", "--boolean_option")
+      wn = Webbynode::Application.new("command", "2.2.2.2", "--option=this", "--boolean_option")
       wn.parse_command
       wn.command.should eql("command")
       wn.options.should == ["2.2.2.2"]
@@ -37,14 +36,14 @@ describe Webbynode do
     end
         
     it "should display the help text when no arguments are provided" do
-      @wn = Wn::App.new
+      @wn = Webbynode::Application.new
       @wn.should_receive(:log_and_exit).at_least(:once).with(@wn.read_template('help'))
       @wn.should_not_receive(:send)
       @wn.execute
     end
     
     it "should display the help text when a non-existent command is being called" do
-      @wn = Wn::App.new("thisdoesnotexist")
+      @wn = Webbynode::Application.new("thisdoesnotexist")
       @wn.should_receive(:log_and_exit).at_least(:once).with(@wn.read_template('help'))
       @wn.should_not_receive(:send)
       @wn.execute      
@@ -58,7 +57,7 @@ describe Webbynode do
 
   describe "execution" do
     before do
-      @wn = Wn::App.new("init", "2.2.2.2", "test.webbynodeqwerty.com")
+      @wn = Webbynode::Application.new("init", "2.2.2.2", "test.webbynodeqwerty.com")
     end
     
     it "should execute the given command" do
@@ -69,7 +68,7 @@ describe Webbynode do
   
   describe "parser" do
     before do
-      @wn = Wn::App.new("remote", "ls -la")
+      @wn = Webbynode::Application.new("remote", "ls -la")
       @wn.stub!(:run).and_return(true)
       Net::SSH.stub!(:start).and_return(true)
     end
@@ -111,7 +110,7 @@ describe Webbynode do
   describe "commands" do    
     describe "init" do
       before do
-        @wn = Wn::App.new("init", "2.2.2.2", "test.webbynodeqwerty.com")
+        @wn = Webbynode::Application.new("init", "2.2.2.2", "test.webbynodeqwerty.com")
         @wn.stub!(:run)
         @wn.stub!(:create_file)
         @wm.stub!(:log)
@@ -161,7 +160,7 @@ describe Webbynode do
         
     describe "push" do
       before do
-        @wn = Wn::App.new("push", "2.2.2.2", "test.webbynodeqwerty.com")
+        @wn = Webbynode::Application.new("push", "2.2.2.2", "test.webbynodeqwerty.com")
         @wn.stub!(:run).and_return(true)
       end
       
@@ -193,7 +192,7 @@ describe Webbynode do
     
     describe "remote" do
       before do
-        @wn = Wn::App.new("remote", "ls -la")
+        @wn = Webbynode::Application.new("remote", "ls -la")
         @wn.stub!(:run).and_return(true)
         Net::SSH.stub!(:start).and_return(true)
       end
@@ -203,7 +202,7 @@ describe Webbynode do
       end
       
       it "should display help instructions if no remote command is given" do
-        @wn = Wn::App.new("remote")
+        @wn = Webbynode::Application.new("remote")
         @wn.should_receive(:log_and_exit).at_least(:once).with(@wn.read_template('help'))
         @wn.stub!(:parse_remote_ip)
         @wn.stub!(:parse_remote_app_name)
@@ -247,7 +246,7 @@ describe Webbynode do
     describe "addkey" do
       def create_command(_options=[], _named_options={})
         kls = Class.new do
-          include Wn::Commands
+          include Webbynode::Commands
         end
         
         kls.send(:define_method, :options) do
@@ -262,7 +261,7 @@ describe Webbynode do
       end
       
       it "should be valid" do
-        Wn::App.new("addkey").respond_to?(:addkey).should == true
+        Webbynode::Application.new("addkey").respond_to?(:addkey).should == true
       end
       
       describe "when key is present" do

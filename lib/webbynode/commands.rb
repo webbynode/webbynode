@@ -117,6 +117,11 @@ module Webbynode
       run "git add ."
       run "git commit -m \"Initial Webbynode Commit\""
     end
+    
+    # Returns the version to the user
+    def version
+      log "Webbynode Rapid Deployment Gem v#{Webbynode::VERSION}"
+    end
   
   end
 end

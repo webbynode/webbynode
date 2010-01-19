@@ -220,7 +220,7 @@ describe Webbynode do
         @wn.stub!(:parse_remote_app_name)
         @wn.should_receive(:run_remote_command).with("ls -la")
         @wn.execute
-        @wn.options.count.should eql(1)
+        @wn.options.size.should eql(1)
       end
       
       it "should parse the .git/config folder and retrieve the Webby IP" do

@@ -111,7 +111,7 @@ module Wn
     # password prompt if this is required by the Webby
     def remote_command(command, password = nil)
       Net::SSH.start(remote_ip, 'git', :password => password) do |ssh|
-        ssh.exec(command)
+        ssh.exec("cd #{remote_app_name} && #{command}")
       end  
     end
      

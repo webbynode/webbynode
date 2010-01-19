@@ -62,6 +62,7 @@ describe Webbynode do
     before do
       @wn = Wn::App.new("remote", "ls -la")
       @wn.stub!(:run).and_return(true)
+      Net::SSH.stub!(:start).and_return(true)
     end
     
     it "should parse the .git/config file and set the remote_ip" do
@@ -72,8 +73,8 @@ describe Webbynode do
     
     it "should parse the options correctly" do
       @wn.parse_command
-      @wn.command.should == "remote"
-      @wn.options[0].should == "ls -la"
+      @wn.command.should eql("remote")
+      @wn.options[0].should eql("ls -la")
     end
     
     it "should parse the .git/config file" do
@@ -95,12 +96,6 @@ describe Webbynode do
       File.should_receive(:open).at_least(:once).with(".pushand").and_return(read_fixture('pushand'))      
       @wn.execute
       @wn.remote_app_name.should eql('test.webbynodeqwerty.com')
-    end
-  end
-  
-  def parse_pushand(file)
-    File.open(file).each_line do |line|
-      return $1 if line =~ /^phd $0 (.+)$/
     end
   end
   
@@ -191,6 +186,7 @@ describe Webbynode do
       before do
         @wn = Wn::App.new("remote", "ls -la")
         @wn.stub!(:run).and_return(true)
+        Net::SSH.stub!(:start).and_return(true)
       end
       
       it "should be available" do
@@ -206,9 +202,14 @@ describe Webbynode do
         @wn.options.should be_empty
       end
       
+      it  do
+        @wn.should respond_to(:remote_command)
+      end
+      
       it "should have one option" do
         @wn.stub!(:parse_remote_ip)
         @wn.stub!(:parse_remote_app_name)
+        @wn.should_receive(:run_remote_command).with("ls -la")
         @wn.execute
         @wn.options.count.should eql(1)
       end
@@ -216,32 +217,26 @@ describe Webbynode do
       it "should parse the .git/config folder and retrieve the Webby IP" do
         @wn.stub!(:parse_remote_app_name)
         @wn.should_receive(:parse_remote_ip)
+        @wn.should_receive(:run_remote_command).with("ls -la")
         @wn.execute
       end
       
       it "should parse the .pushand file and retrieve the remote app name" do
         @wn.stub!(:parse_remote_ip)
         @wn.should_receive(:parse_pushand)
+        @wn.should_receive(:run_remote_command).with("ls -la")
         @wn.execute
       end
       
-      # Unsure how to do this yet.
-      # 
-      # it "should attempt to execute a command on the Webby using SSH" do
-      #   File.should_receive(:open).with('.git/config').and_return(read_fixture('git/config/210.11.13.12'))
-      #   File.should_receive(:open).with('.pushand').and_return(read_fixture('pushand'))
-      #   @wn.execute
-      #   @wn.remote_ip.should eql('210.11.13.12')
-      #   @wn.remote_app_name.should eql('test.webbynodeqwerty.com')
-      #   @wn.should_receive(:run_remote_command).with("ls -la")
-      # end
-
-         #    
-         # should parse the .git/config file
-         # <File (class)> received :open with unexpected arguments
-         #   expected: (".git/config")
-         #        got: ("/Users/Michael/.ssh/known_hosts")
-         # 
+      it "should attempt to execute a command on the Webby using SSH" do
+        File.should_receive(:open).with('.git/config').and_return(read_fixture('git/config/210.11.13.12'))
+        File.should_receive(:open).with('.pushand').and_return(read_fixture('pushand'))
+        @wn.should_receive(:run_remote_command).with("ls -la")
+        @wn.should respond_to(:remote_command)          
+        @wn.execute
+        @wn.remote_ip.should eql('210.11.13.12')
+        @wn.remote_app_name.should eql('test.webbynodeqwerty.com')        
+      end
       
     end
   end

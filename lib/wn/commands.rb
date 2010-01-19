@@ -25,8 +25,7 @@ module Wn
       parse_remote_app_name
       
       # Attempts to run the specified command
-      # run_remote_command(options[0])
-      
+      run_remote_command(options[0])
     end
     
     # Initializes the Repository and adds Webbynode to the remote

@@ -43,9 +43,6 @@ module Wn
         log_and_exit read_template('help')
       end
     end
-    # TODO
-    # Check for tests on RunComand
-    
     
   end
 end

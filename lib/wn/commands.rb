@@ -54,7 +54,30 @@ module Wn
         log "Initializing git repository..."
       end
 
-      git_init webby_ip, host
+      # @ Felipe
+      #
+      # Now also passes the host to the git_init method
+      # Notice how I replaced the "git remote add webbynode git@#{ip}:{app_name}"
+      # to "git remote add webbynode git@#{ip}:{HOST}"
+      #
+      # Is this a good idea? The reason I did this is because when you execute
+      # webbynode remote 'ls -la' to read out the directory, it parses the .pushand file to
+      # fetch the [host]. However, what apparently happens is that the folder on the remote server
+      # would always be named after the folder on the local machine (app_name) in this case.
+      # So I changed this app_name to host inside the git_init method so that if you for example execute:
+      #
+      # webbynode init 2.2.2.2 dev.webbynode.com
+      #
+      # It will create for example: /var/rails/dev.webbynode.com, which, also is in my opinion better than just webbynode
+      # because if you want to have subdomains (such as that dev. (development) subdomain, it's more clear as to what is the main and what is the subdomain)
+      #
+      # One problem (which should be easy to solve but I think it's serverside) is that it apparently attempts to create a user for the MySQL and PostgreSQL database.
+      # And as we both know it will most likely fail when it creates a user with the username: dev.webbynode.com instead. I deployed an app, and this seemed to be the case.
+      # It failed to create a database and migrate it because it couldn't find the user, which most likely cannot be created due to the name I think. So I changed it to root
+      # manually inside the config/database.yml and it worked again.
+      #
+      # What do you think?
+      git_init(webby_ip, host)
     end
     
     # Initializes git unless it already exists

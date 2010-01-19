@@ -96,7 +96,7 @@ module Wn
     # The remote IP will be stored inside the @remote_ip instance variable
     def parse_remote_ip
       @config     ||= parse_configuration(".git/config")
-      @remote_ip  ||= $2 if @config["remote"]["webbynode"]["url"] =~ /^(\w+)@(.+):(\w+)$/ 
+      @remote_ip  ||= $2 if @config["remote"]["webbynode"]["url"] =~ /^(\w+)@(.+):(.+)$/
     end
     
     # Parses the remote app name that's stored inside the .pushand file

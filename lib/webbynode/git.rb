@@ -4,12 +4,8 @@ module Webbynode
   class GitRemoteAlreadyExistsError < StandardError; end
 
   class Git
-    def initialize(io_handler)
-      @io = io_handler
-    end
-    
     def present?
-      @io.directory?(".git")
+      io.directory?(".git")
     end
     
     def init
@@ -41,7 +37,7 @@ module Webbynode
     private
     
     def exec(cmd, &blk)
-      handle_output @io.exec(cmd), &blk
+      handle_output io.exec(cmd), &blk
     end
     
     def handle_output(output, &blk)

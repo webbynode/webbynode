@@ -10,8 +10,10 @@ require 'pp'
   require File.join(File.dirname(__FILE__), 'webbynode', f)
 end
 
-require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'init_command')
 require File.join(File.dirname(__FILE__), 'webbynode', 'git')
+require File.join(File.dirname(__FILE__), 'webbynode', 'server')
+require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'init_command')
+require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'add_key_command')
 
 module Webbynode
   VERSION = '0.1.2'

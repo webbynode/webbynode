@@ -6,7 +6,8 @@ describe Webbynode::Git do
     io_handler = mock("io")
     io_handler.should_receive(:exec).with(command).and_return(response)
 
-    git = Webbynode::Git.new(io_handler)
+    git = Webbynode::Git.new
+    git.should_receive(:io).and_return(io_handler)
     lambda { yield git }.should raise_exception(exception)
   end
 
@@ -24,13 +25,14 @@ describe Webbynode::Git do
     should_raise_when_response Webbynode::GitNotRepoError, command, 
       "fatal: Not a git repository (or any of the parent directories): .git", &blk
   end
-
+  
   describe "present?" do
     it "should be true if folder .git exists" do
       io_handler = mock("io")
       io_handler.should_receive(:directory?).with(".git").and_return(true)
     
-      git = Webbynode::Git.new(io_handler)
+      git = Webbynode::Git.new
+      git.should_receive(:io).and_return(io_handler)
       git.should be_present
     end
 
@@ -38,7 +40,8 @@ describe Webbynode::Git do
       io_handler = mock("io")
       io_handler.should_receive(:directory?).with(".git").and_return(false)
 
-      git = Webbynode::Git.new(io_handler)
+      git = Webbynode::Git.new
+      git.should_receive(:io).and_return(io_handler)
       git.should_not be_present
     end
   end
@@ -49,7 +52,8 @@ describe Webbynode::Git do
         io_handler = mock("io")
         io_handler.should_receive(:exec).with("git init").and_return("Initialized empty Git repository in /Users/fcoury/tmp/.git/")
 
-        git = Webbynode::Git.new(io_handler)
+        git = Webbynode::Git.new
+        git.should_receive(:io).and_return(io_handler)
         git.init.should be_true
       end
     end
@@ -71,7 +75,8 @@ describe Webbynode::Git do
         io_handler = mock("io")
         io_handler.should_receive(:exec).with("git remote add webbynode git@1.2.3.4:the_repo").and_return("")
 
-        git = Webbynode::Git.new(io_handler)
+        git = Webbynode::Git.new
+        git.should_receive(:io).and_return(io_handler)
         git.add_remote("webbynode", "1.2.3.4", "the_repo").should be_true
       end
     end
@@ -99,7 +104,8 @@ describe Webbynode::Git do
         io_handler = mock("io")
         io_handler.should_receive(:exec).with('git add the_file')
       
-        git = Webbynode::Git.new(io_handler)
+        git = Webbynode::Git.new
+        git.should_receive(:io).and_return(io_handler)
         git.add("the_file")
       end
 
@@ -107,7 +113,8 @@ describe Webbynode::Git do
         io_handler = mock("io")
         io_handler.should_receive(:exec).with('git add one_file/ other_file/')
       
-        git = Webbynode::Git.new(io_handler)
+        git = Webbynode::Git.new
+        git.should_receive(:io).and_return(io_handler)
         git.add("one_file/ other_file/")
       end
     end
@@ -129,7 +136,8 @@ describe Webbynode::Git do
         io_handler = mock("io")
         io_handler.should_receive(:exec).with('git commit -m "Commit comment"')
 
-        git = Webbynode::Git.new(io_handler)
+        git = Webbynode::Git.new
+        git.should_receive(:io).and_return(io_handler)
         git.commit("Commit comment")
       end
       
@@ -137,7 +145,8 @@ describe Webbynode::Git do
         io_handler = mock("io")
         io_handler.should_receive(:exec).with('git commit -m "Commiting \"the comment\""')
 
-        git = Webbynode::Git.new(io_handler)
+        git = Webbynode::Git.new
+        git.should_receive(:io).and_return(io_handler)
         git.commit('Commiting "the comment"')
       end
     end

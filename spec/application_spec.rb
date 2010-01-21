@@ -112,15 +112,9 @@ describe Webbynode::Application do
   describe "application environment" do
     it "should require the application environment" do
       @wn = Webbynode::Application.new("remote", "ls -la")
-      @wn.stub!(:is_webbynode_environment?).and_return(false)
-      @wn.stub!(:git_remote_webbynode?).and_return(false)
-      @wn.stub!(:is_webbynode_environment?).and_return(false)
       @wn.stub!(:run_remote_command)
-      @wn.should_receive(:requires_application_environment!).exactly(:once)
-
-      # Another one that should work but doesn't..
-      # @wn.should_receive(:log_and_exit).at_least(:once).with("You can only execute the \"remote\" from inside a Webbynode initialized application.")
-
+      @wn.stub!(:is_webbynode_environment?).and_return(false)
+      @wn.should_receive(:log_and_exit).at_least(:once).with("You can only execute the \"remote\" from inside a Webbynode initialized application.")
       @wn.execute
     end
   end

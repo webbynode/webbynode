@@ -128,7 +128,7 @@ module Webbynode
     # it checks to see if the .pushand file is present, if the .git repository is present and if the git remote
     # includes the webbynode remote repository
     # This should be called inside any command definition (such as "remote") which relies on the application environment.
-    def require_application_environment!
+    def requires_application_environment!
       if !is_webbynode_environment?
         log_and_exit "You can only execute the \"#{command}\" from inside a Webbynode initialized application."
       end

@@ -244,11 +244,7 @@ describe Webbynode::Commands do
     it "should return the current gem version" do
       @wn = Webbynode::Application.new("version")
       @wn.should respond_to(:version)
-      @wn.should_receive(:run_command).with("version")
-      
-      # Why does this line below fail. seriously? HALP!
-      # @wn.should_receive(:log).exactly(:once).with("Webbynode Rapid Deployment Gem v#{Webbynode::VERSION}")
-      
+      @wn.should_receive(:log).exactly(:once).with("Webbynode Rapid Deployment Gem v#{Webbynode::VERSION}")      
       @wn.execute
     end
   end

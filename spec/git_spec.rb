@@ -8,7 +8,7 @@ describe Webbynode::Git do
       io_handler.should_receive(:directory?).with(".git").and_return(true)
     
       git = Webbynode::Git.new(io_handler)
-      git.present?.should == true
+      git.should be_present
     end
 
     it "should be false if folder .git doesn't exist" do
@@ -16,7 +16,7 @@ describe Webbynode::Git do
       io_handler.should_receive(:directory?).with(".git").and_return(false)
 
       git = Webbynode::Git.new(io_handler)
-      git.present?.should == false
+      git.should_not be_present
     end
   end
   
@@ -27,7 +27,7 @@ describe Webbynode::Git do
         io_handler.should_receive(:exec).with("git init").and_return("Initialized empty Git repository in /Users/fcoury/tmp/.git/")
 
         git = Webbynode::Git.new(io_handler)
-        git.init.should == true
+        git.init.should be_true
       end
     end
     
@@ -57,7 +57,7 @@ describe Webbynode::Git do
         io_handler.should_receive(:exec).with("git remote add webbynode git@1.2.3.4:the_repo").and_return("")
 
         git = Webbynode::Git.new(io_handler)
-        git.add_remote("webbynode", "1.2.3.4", "the_repo").should == true
+        git.add_remote("webbynode", "1.2.3.4", "the_repo").should be_true
       end
     end
     

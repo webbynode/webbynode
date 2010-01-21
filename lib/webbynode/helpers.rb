@@ -147,8 +147,9 @@ module Webbynode
           command = "#{command} < /dev/null"
           ssh.exec("cd #{remote_app_name} && #{command}")
         else
-          puts "Your application has not yet been deployed to your Webby."
-          puts "To issue remote commands from the Webby, you must first push your application."
+          raise Webbynode::AppError, 
+            "Your application has not yet been deployed to your Webby.\n" +
+            "To issue remote commands from the Webby, you must first push your application."
         end
       end
     end

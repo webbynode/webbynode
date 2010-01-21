@@ -158,6 +158,7 @@ describe Webbynode::Commands do
     def create_command(_options=[], _named_options={})
       kls = Class.new do
         include Webbynode::Commands
+        include Webbynode::SshKeys
       end
 
       kls.send(:define_method, :options) do
@@ -182,6 +183,28 @@ describe Webbynode::Commands do
         File.should_receive(:exists?).with("#{ENV['HOME']}/.ssh/id_rsa.pub").and_return(true)
         File.should_receive(:read).with("#{ENV['HOME']}/.ssh/id_rsa.pub").and_return("mah key")
         cmd.should_receive(:run_remote_command).with('mkdir ~/.ssh 2>/dev/null; chmod 700 ~/.ssh; echo "mah key" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys')
+        cmd.should_receive(:remote_has_key?).and_return(false)
+
+        cmd.addkey
+      end
+      
+      it "should not add the key if it's already there" do
+        cmd = create_command []
+        File.should_receive(:exists?).with("#{ENV['HOME']}/.ssh/id_rsa.pub").and_return(true)
+        File.should_receive(:read).with("#{ENV['HOME']}/.ssh/id_rsa.pub").and_return("mah key")
+        cmd.should_receive(:run_remote_command).with("cat \$HOME/.ssh/authorized_keys").and_return("mah key")
+        cmd.should_receive(:add_key_to_server).never()
+
+        cmd.addkey
+      end
+      
+      it "should create the file authorized_keys when not there" do
+        cmd = create_command []
+        File.should_receive(:exists?).with("#{ENV['HOME']}/.ssh/id_rsa.pub").and_return(true)
+        File.should_receive(:read).with("#{ENV['HOME']}/.ssh/id_rsa.pub").and_return("mah key")
+        cmd.should_receive(:run_remote_command).with("mkdir ~/.ssh 2>/dev/null; chmod 700 ~/.ssh; echo \"mah key\" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys")
+        cmd.should_receive(:run_remote_command).with("cat \$HOME/.ssh/authorized_keys").and_return(nil)
+        cmd.should_receive(:add_key_to_server).never()
 
         cmd.addkey
       end
@@ -194,6 +217,7 @@ describe Webbynode::Commands do
 
         File.should_receive(:read).with("#{ENV['HOME']}/.ssh/id_rsa.pub").and_return(passphrase)
         cmd.should_receive(:run_remote_command).with("mkdir ~/.ssh 2>/dev/null; chmod 700 ~/.ssh; echo \"#{passphrase}\" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys")
+        cmd.should_receive(:remote_has_key?).and_return(false)
       end
 
       it "should create a key for the user" do

@@ -17,7 +17,7 @@ module Webbynode
     # Command will be executed from the ~/remote_app_name directory, which is the application root
     def remote
       log_and_exit read_template('help') if options.empty?
-      requires_application_environment!
+      require_application_environment!
       run_remote_command(options[0])
     end
     
@@ -97,14 +97,10 @@ module Webbynode
       git_init(webby_ip, host)
     end
     
-    
     # Adds user's public SSH key to a Webby
     def addkey
-      key = "#{ENV['HOME']}/.ssh/id_rsa.pub"
-      run "ssh-keygen -t rsa -N \"#{named_options["passphrase"]}\" -f #{key}" unless File.exists?(key)
-
-      key_contents = File.read(key)
-      run_remote_command "mkdir ~/.ssh 2>/dev/null; chmod 700 ~/.ssh; echo \"#{key_contents}\" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys"
+      key = local_key
+      add_key_to_remote(key) unless remote_has_key?(key)
     end
     
     # Initializes git unless it already exists

@@ -6,7 +6,7 @@ require 'net/ssh'
 require 'highline/import'
 require 'pp'
 
-%w[helpers commands api_client io].each do |f|
+%w[helpers ssh_keys commands api_client io].each do |f|
   require File.join(File.dirname(__FILE__), 'webbynode', f)
 end
 
@@ -17,6 +17,7 @@ module Webbynode
     attr_accessor :input, :command, :options, :named_options
     
     include Webbynode::Helpers
+    include Webbynode::SshKeys
     include Webbynode::Commands
     include Webbynode::ApiClient
     include Webbynode::Io

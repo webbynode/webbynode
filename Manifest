@@ -13,6 +13,7 @@ lib/webbynode/api_client.rb
 lib/webbynode/commands.rb
 lib/webbynode/helpers.rb
 lib/webbynode/io.rb
+lib/webbynode/ssh_keys.rb
 spec/api_client_spec.rb
 spec/application_spec.rb
 spec/commands_spec.rb

@@ -17,7 +17,7 @@ module Webbynode
     # Command will be executed from the ~/remote_app_name directory, which is the application root
     def remote
       log_and_exit read_template('help') if options.empty?
-      require_application_environment!
+      requires_application_environment!
       run_remote_command(options[0])
     end
     

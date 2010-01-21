@@ -55,30 +55,47 @@ describe Webbynode::Git do
       git.add_remote("webbynode", "1.2.3.4", "the_repo").should == true
     end
     
-    it "should return false if there's an error creating the repo" do
+    it "should raise exception if not a git repo" do
       io_handler = mock("io")
       io_handler.should_receive(:exec).with("git remote add other git@5.6.7.8:a_repo").and_return("fatal: Not a git repository (or any of the parent directories): .git")
 
       git = Webbynode::Git.new(io_handler)
-      git.add_remote("other", "5.6.7.8", "a_repo").should == false
+      lambda { git.add_remote("other", "5.6.7.8", "a_repo") }.should raise_exception(Webbynode::GitNotRepoError)
     end
     
-    it "should return false if the remote already exists" do
+    it "should return raise exception if the remote already exists" do
       io_handler = mock("io")
       io_handler.should_receive(:exec).and_return("fatal: remote webbynode already exists.")
 
       git = Webbynode::Git.new(io_handler)
-      git.add_remote("other", "5.6.7.8", "a_repo").should == false
+      lambda { git.add_remote("other", "5.6.7.8", "a_repo") }.should raise_exception(Webbynode::GitRemoteAlreadyExistsError)
     end
   end
   
   describe "add" do
     it "should add objects to git" do
-      pending
       io_handler = mock("io")
       io_handler.should_receive(:exec).with('git add the_file')
       
-      git = Webbynode::Git.new()
+      git = Webbynode::Git.new(io_handler)
+      git.add("the_file")
+    end
+
+    it "should specified files" do
+      io_handler = mock("io")
+      io_handler.should_receive(:exec).with('git add one_file/ other_file/')
+      
+      git = Webbynode::Git.new(io_handler)
+      git.add("one_file/ other_file/")
+    end
+    
+    it "should return false if there's an error creating the repo" do
+      pending
+      io_handler = mock("io")
+      io_handler.should_receive(:exec).with("git remote add other git@5.6.7.8:a_repo").and_return("fatal: Not a git repository (or any of the parent directories): .git")
+
+      git = Webbynode::Git.new(io_handler)
+      git.add_remote("other", "5.6.7.8", "a_repo").should == false
     end
   end
 

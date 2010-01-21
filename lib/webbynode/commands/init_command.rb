@@ -23,7 +23,7 @@ module Webbynode
         git.commit "Initial commit"
       end
       
-      git.add_remote "webbynode", "1.2.3.4"
+      git.add_remote "webbynode", "1.2.3.4", io.app_name
     end
   end
 end

@@ -2,9 +2,13 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 
 describe Webbynode::InitCommand do
-  def run_with(git_handler)
+  def run_with(options)
+    git_handler = options[:git_handler] || mock("dummy_git_handler").as_null_object
+    io_handler  = options[:io_handler]  || mock("dummy_io_handler").as_null_object
+
     command = Webbynode::InitCommand.new("1.2.3.4")
-    command.stub(:git).and_return(git_handler)
+    command.should_receive(:git).any_number_of_times.and_return(git_handler) 
+    command.should_receive(:io).any_number_of_times.and_return(io_handler)
     command.run
   end
   
@@ -15,40 +19,46 @@ describe Webbynode::InitCommand do
   end
   
   it "should create a new git repo when one is not present" do
-    git_handler = mock("git_handler")
+    git_handler = mock("git_handler1")
     git_handler.should_receive(:present?).and_return(false)
     git_handler.should_receive(:init)
     git_handler.as_null_object
     
-    run_with(git_handler)
+    run_with(:git_handler => git_handler)
   end
 
   it "should add a new remote after creating the git repo" do
-    git_handler = mock("git_handler")
+    io_handler = mock("io_handler")
+    io_handler.should_receive(:app_name).and_return("my_app")
+    
+    git_handler = mock("git_handler2")
     git_handler.should_receive(:present?).and_return(false)
-    git_handler.should_receive(:add_remote).with("webbynode", "1.2.3.4")
+    git_handler.should_receive(:add_remote).with("webbynode", "1.2.3.4", "my_app")
     git_handler.as_null_object
 
-    run_with(git_handler)
+    run_with(:git_handler => git_handler, :io_handler => io_handler)
   end
   
   it "should create the initial commit after creating a new git repo" do
-    git_handler = mock("git_handler")
+    git_handler = mock("git_handler3")
     git_handler.should_receive(:present?).and_return(false)
     git_handler.should_receive(:add).with(".")
     git_handler.should_receive(:commit).with("Initial commit")
     git_handler.as_null_object
 
-    run_with(git_handler)
+    run_with(:git_handler => git_handler)
   end
 
   it "should add a new remote when git is already created" do
-    git_handler = mock("git_handler")
+    io_handler = mock("io_handler")
+    io_handler.should_receive(:app_name).and_return("my_app")
+    
+    git_handler = mock("git_handler4")
     git_handler.should_receive(:present?).and_return(true)
-    git_handler.should_receive(:add_remote).with("webbynode", "1.2.3.4")
+    git_handler.should_receive(:add_remote).with("webbynode", "1.2.3.4", "my_app")
     git_handler.as_null_object
 
-    run_with(git_handler)
+    run_with(:git_handler => git_handler, :io_handler => io_handler)
   end
 
   it "should not create a commit if git repo is already created" do
@@ -57,7 +67,7 @@ describe Webbynode::InitCommand do
     git_handler.should_receive(:commit).never
     git_handler.as_null_object
 
-    run_with(git_handler)
+    run_with(:git_handler => git_handler)
   end
   
   it "should try to add a remote even if the repo is created" do
@@ -66,6 +76,6 @@ describe Webbynode::InitCommand do
     git_handler.should_receive(:add_remote)
     git_handler.as_null_object
 
-    run_with(git_handler)
+    run_with(:git_handler => git_handler)
   end
 end

@@ -2,6 +2,14 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), 'spec_helper')
 
 describe Webbynode::Git do
+  def should_raise_giterror(command)
+    io_handler = mock("io")
+    io_handler.should_receive(:exec).with(command).and_return("fatal: Not a git repository (or any of the parent directories): .git")
+
+    git = Webbynode::Git.new(io_handler)
+    lambda { yield git }.should raise_exception(Webbynode::GitNotRepoError)
+  end
+
   describe "present?" do
     it "should be true if folder .git exists" do
       io_handler = mock("io")
@@ -41,11 +49,7 @@ describe Webbynode::Git do
       end
 
       it "should raise a generic Git error if there's another error creating the repo" do
-        io_handler = mock("io")
-        io_handler.should_receive(:exec).with("git init").and_return("/Users/fcoury/tmp/other/.git: Permission denied")
-
-        git = Webbynode::Git.new(io_handler)
-        lambda { git.init }.should raise_exception(Webbynode::GitError)
+        should_raise_giterror("git init") { |git| git.init }
       end
     end
   end
@@ -79,11 +83,7 @@ describe Webbynode::Git do
       end
 
       it "should raise a generic Git error when another error occurs" do
-        io_handler = mock("io")
-        io_handler.should_receive(:exec).and_return("/Users/fcoury/tmp/other/.git: Permission denied")
-
-        git = Webbynode::Git.new(io_handler)
-        lambda { git.add_remote("other", "5.6.7.8", "a_repo") }.should raise_exception(Webbynode::GitError)
+        should_raise_giterror("git remote add other git@5.6.7.8:a_repo") { |git| git.add_remote("other", "5.6.7.8", "a_repo") }
       end
     end
   end
@@ -117,23 +117,34 @@ describe Webbynode::Git do
       end
 
       it "should raise a generic Git error when another error occurs" do
-        io_handler = mock("io")
-        io_handler.should_receive(:exec).and_return("/Users/fcoury/tmp/other/.git: Permission denied")
-
-        git = Webbynode::Git.new(io_handler)
-        lambda { git.add("something") }.should raise_exception(Webbynode::GitError)
+        should_raise_giterror("git add something") { |git| git.add("something") }
       end
     end
   end
 
   describe "commit" do
-    it "should add objects to git" do
-      pending
-      io_handler = mock("io")
-      io_handler.should_receive(:exec).with('git commit -m "Commit comment"')
+    context "when successfull" do
+      it "should add objects to git" do
+        io_handler = mock("io")
+        io_handler.should_receive(:exec).with('git commit -m "Commit comment"')
+
+        git = Webbynode::Git.new(io_handler)
+        git.commit("Commit comment")
+      end
       
-      git = Webbynode::Git.new(io_handler)
-      git.commit("Commit comment")
+      it "should escape double quotes" do
+        io_handler = mock("io")
+        io_handler.should_receive(:exec).with('git commit -m "Commiting \"the comment\""')
+
+        git = Webbynode::Git.new(io_handler)
+        git.commit('Commiting "the comment"')
+      end
+    end
+    
+    context "when unsuccessfull" do
+      it "should raise exception if not a git repo" do
+        should_raise_giterror("git add .") { |git| git.add(".") }
+      end
     end
   end
 end

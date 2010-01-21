@@ -33,6 +33,11 @@ module Webbynode
       end
     end
     
+    def commit(comments)
+      comments.gsub! /"/, '\"'
+      exec("git commit -m \"#{comments}\"")
+    end
+    
     private
     
     def exec(cmd, &blk)

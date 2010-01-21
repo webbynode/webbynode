@@ -18,7 +18,7 @@ module Webbynode
     def remote
       log_and_exit read_template('help') if options.empty?
       requires_application_environment!
-      puts run_remote_command(options[0])
+      run_remote_command(options[0], true)
     end
     
     # Initializes the Repository and adds Webbynode to the remote

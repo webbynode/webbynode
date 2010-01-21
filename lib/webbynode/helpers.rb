@@ -108,7 +108,7 @@ module Webbynode
     
     # Attempts to connect to the Webby without a password
     # if this failed, it will re-attempt and prompt the user for the password for the "git" user
-    def run_remote_command(command)
+    def run_remote_command(command, echo=false)
       # Finds the remote ip and stores it in "remote_ip"
       parse_remote_ip
       
@@ -116,7 +116,7 @@ module Webbynode
       parse_remote_app_name
       
       @conn ||= Ssh.new(remote_ip)
-      @conn.execute(command)
+      remote_command command, echo 
     end
     
     # Checks to see if the webbynode command is being invoked from a webbynode initialized application
@@ -131,21 +131,17 @@ module Webbynode
     
     private
     
-    def exec(cmd)
-      @conn.execute(cmd)
-    end
- 
     # Will attempt to run a command on the Webby (inside the application root)
     # This must only be initialized through "run_remote_command(command)" to ensure
     # password prompt if this is required by the Webby
-    def remote_command(command, password = nil)
-      if exec("cd #{remote_app_name}") =~ /No such file or directory/
+    def remote_command(command, echo=false)
+      if @conn.execute("cd #{remote_app_name}") =~ /No such file or directory/
         raise Webbynode::AppError, 
           "Your application has not yet been deployed to your Webby.\n" +
           "To issue remote commands from the Webby, you must first push your application."
       end
       
-      exec command
+      @conn.execute "cd #{remote_app_name} && #{command}", echo
     end
     
     # Checks to see if "webbynode" is listed under the "git remote"

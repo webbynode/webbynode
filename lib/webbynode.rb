@@ -13,6 +13,8 @@ end
 module Webbynode
   VERSION = '0.1.2'
   
+  class AppError < StandardError; end
+  
   class Application
     attr_accessor :input, :command, :options, :named_options
     

@@ -6,7 +6,7 @@ require 'net/ssh'
 require 'highline/import'
 require 'pp'
 
-%w[helpers ssh_keys commands api_client io].each do |f|
+%w[helpers ssh ssh_keys commands api_client io].each do |f|
   require File.join(File.dirname(__FILE__), 'webbynode', f)
 end
 

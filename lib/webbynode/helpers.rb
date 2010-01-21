@@ -115,13 +115,8 @@ module Webbynode
       # Finds the remote ip and stores it in "remote_app_name"
       parse_remote_app_name
       
-      begin
-        remote_command(command)
-      rescue Net::SSH::AuthenticationFailed
-        HighLine.track_eof  = false
-        password            = ask("Enter your password: ") { |q| q.echo = '' }
-        remote_command(command, password)
-      end
+      @conn ||= Ssh.new(remote_ip)
+      @conn.execute(command)
     end
     
     # Checks to see if the webbynode command is being invoked from a webbynode initialized application
@@ -134,24 +129,23 @@ module Webbynode
       end
     end
     
-    
     private
+    
+    def exec(cmd)
+      @conn.execute(cmd)
+    end
  
     # Will attempt to run a command on the Webby (inside the application root)
     # This must only be initialized through "run_remote_command(command)" to ensure
     # password prompt if this is required by the Webby
     def remote_command(command, password = nil)
-      Net::SSH.start(remote_ip, 'git', :password => password) do |ssh|
-        output = ssh.exec!("cd #{remote_app_name}")
-        unless output =~ /No such file or directory/
-          command = "#{command} < /dev/null"
-          ssh.exec("cd #{remote_app_name} && #{command}")
-        else
-          raise Webbynode::AppError, 
-            "Your application has not yet been deployed to your Webby.\n" +
-            "To issue remote commands from the Webby, you must first push your application."
-        end
+      if exec("cd #{remote_app_name}") =~ /No such file or directory/
+        raise Webbynode::AppError, 
+          "Your application has not yet been deployed to your Webby.\n" +
+          "To issue remote commands from the Webby, you must first push your application."
       end
+      
+      exec command
     end
     
     # Checks to see if "webbynode" is listed under the "git remote"

@@ -1,5 +1,5 @@
-module Webbynode
-  class AddKeyCommand
+module Webbynode::Commands
+  class AddKey
     LocalSshKey = "#{ENV['HOME']}/.ssh/id_rsa.pub"
     
     def initialize(*options)

@@ -1,19 +1,19 @@
 # Load Spec Helper
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 
-describe Webbynode::InitCommand do
+describe Webbynode::Commands::Init do
   def run_with(options)
     git_handler = options[:git_handler] || mock("dummy_git_handler").as_null_object
     io_handler  = options[:io_handler]  || mock("dummy_io_handler").as_null_object
 
-    command = Webbynode::InitCommand.new("1.2.3.4")
+    command = Webbynode::Commands::Init.new("1.2.3.4")
     command.should_receive(:git).any_number_of_times.and_return(git_handler) 
     command.should_receive(:io).any_number_of_times.and_return(io_handler)
     command.run
   end
   
   it "should output usage if no params given" do
-    command = Webbynode::InitCommand.new(nil)
+    command = Webbynode::Commands::Init.new(nil)
     command.run
     command.output.should =~ /Usage: webbynode init \[webby\]/
   end

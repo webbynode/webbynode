@@ -1,27 +1,27 @@
 # Load Spec Helper
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 
-describe Webbynode::AddKeyCommand do
+describe Webbynode::Commands::AddKey do
   it "should have a constant pointing to the ssh key location" do
-    Webbynode::AddKeyCommand::LocalSshKey.should == "#{ENV['HOME']}/.ssh/id_rsa.pub"
+    Webbynode::Commands::AddKey::LocalSshKey.should == "#{ENV['HOME']}/.ssh/id_rsa.pub"
   end
   
   describe "when user doesn't have a local key yet" do
     context "when successful" do
       it "should upload the local ssh key into the server" do
         server = mock("server")
-        server.should_receive(:add_ssh_key).with(Webbynode::AddKeyCommand::LocalSshKey, nil)
+        server.should_receive(:add_ssh_key).with(Webbynode::Commands::AddKey::LocalSshKey, nil)
 
-        cmd = Webbynode::AddKeyCommand.new
+        cmd = Webbynode::Commands::AddKey.new
         cmd.should_receive(:server).any_number_of_times.and_return(server)
         cmd.run
       end
 
       it "should create an ssh key with a provided passphrase" do
         server = mock("server")
-        server.should_receive(:add_ssh_key).with(Webbynode::AddKeyCommand::LocalSshKey, "my_passphrase")
+        server.should_receive(:add_ssh_key).with(Webbynode::Commands::AddKey::LocalSshKey, "my_passphrase")
 
-        cmd = Webbynode::AddKeyCommand.new({ :passphrase => "my_passphrase" })
+        cmd = Webbynode::Commands::AddKey.new({ :passphrase => "my_passphrase" })
         cmd.should_receive(:server).any_number_of_times.and_return(server)
         cmd.run
       end
@@ -32,7 +32,7 @@ describe Webbynode::AddKeyCommand do
         server = mock("server")
         server.should_receive(:add_ssh_key).and_raise(Webbynode::InvalidAuthentication)
 
-        cmd = Webbynode::AddKeyCommand.new
+        cmd = Webbynode::Commands::AddKey.new
         cmd.should_receive(:server).any_number_of_times.and_return(server)
         cmd.should_receive(:puts).with("Could not connect to server: invalid authentication.")
         cmd.run
@@ -42,7 +42,7 @@ describe Webbynode::AddKeyCommand do
         server = mock("server")
         server.should_receive(:add_ssh_key).and_raise(Webbynode::PermissionError)
 
-        cmd = Webbynode::AddKeyCommand.new
+        cmd = Webbynode::Commands::AddKey.new
         cmd.should_receive(:server).any_number_of_times.and_return(server)
         cmd.should_receive(:puts).with("Could not create an SSH key: permission error.")
         cmd.run

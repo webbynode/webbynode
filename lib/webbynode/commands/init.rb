@@ -1,5 +1,5 @@
-module Webbynode
-  class InitCommand
+module Webbynode::Commands
+  class Init
     attr_accessor :output, :params
     
     def initialize(params)

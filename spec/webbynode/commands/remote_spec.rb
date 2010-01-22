@@ -3,23 +3,23 @@ require File.join(File.expand_path(File.dirname(__FILE__)), '../..', 'spec_helpe
 
 describe Webbynode::Commands::Remote do
  
-  context "when successful" do
-    before do
-      @re = mock("RemoteExecutor")
-      @re.as_null_object
-      
-      @git = mock("Git")
-      @git.as_null_object
-
-      @pushand = mock("Pushand")
-      @pushand.as_null_object
-
-      @remote = Webbynode::Commands::Remote.new('ls -la')
-      @remote.should_receive(:remote_executor).any_number_of_times.and_return(@re)
-      @remote.should_receive(:git).any_number_of_times.and_return(@git)
-      @remote.should_receive(:pushand).any_number_of_times.and_return(@pushand)
-    end
+  before do
+    @re = mock("RemoteExecutor")
+    @re.as_null_object
     
+    @git = mock("Git")
+    @git.as_null_object
+
+    @pushand = mock("Pushand")
+    @pushand.as_null_object
+
+    @remote = Webbynode::Commands::Remote.new('ls -la')
+    @remote.should_receive(:remote_executor).any_number_of_times.and_return(@re)
+    @remote.should_receive(:git).any_number_of_times.and_return(@git)
+    @remote.should_receive(:pushand).any_number_of_times.and_return(@pushand)
+  end
+ 
+  context "when successful" do    
     it "should receive at least one option when passing in the remote command" do
       @remote = Webbynode::Commands::Remote.new('ls')
       @remote.options.should eql('ls')
@@ -47,21 +47,46 @@ describe Webbynode::Commands::Remote do
 
   end
   
-  context "when unsuccesful" do
-    before do
-      @re = mock("RemoteExecutor")
-      @re.as_null_object
-      
-      @remote = Webbynode::Commands::Remote.new('ls -la')
-      @remote.should_receive(:remote_executor).any_number_of_times.and_return(@re)
-    end
-    
+  context "when unsuccesful" do    
     it "should raise an error if no options are provided" do
       @remote = Webbynode::Commands::Remote.new
       @remote.options.should be_empty
       @re.should_not_receive(:exec)
       lambda { @remote.run }.should raise_exception(Webbynode::Commands::NoOptionsProvided, 'No remote options were provided.')
     end
+    
+    context "from a webbynode uninitialized application" do
+      before do
+        @re = mock("RemoteExecutor")
+        @re.as_null_object
+
+        @git = mock("Git")
+        @git.as_null_object
+
+        @pushand = mock("Pushand")
+        @pushand.as_null_object
+
+        @remote = Webbynode::Commands::Remote.new('ls -la')
+        @remote.should_receive(:remote_executor).any_number_of_times.and_return(@re)
+        @remote.should_receive(:git).any_number_of_times.and_return(@git)
+        @remote.should_receive(:pushand).any_number_of_times.and_return(@pushand)
+      end
+      
+      it "should not have a git repository" do
+        @git.should_receive(:present?).and_return(false)
+        lambda { @remote.run }.should raise_exception(Webbynode::GitNotRepoError, "Could not find a git repository.")
+      end
+      
+      it "should not have webbynode git remote" do
+        @git.should_receive(:remote_present?).and_return(false)
+        lambda { @remote.run }.should raise_exception(Webbynode::GitRemoteDoesNotExistError, "Webbynode has not been initialized for this git repository.")
+      end
+      
+      it "should not have a pushand file" do
+        @pushand.should_receive(:present?).and_return(false)
+        lambda { @remote.run }.should raise_exception(Webbynode::PushAndFileNotFound, "Could not find .pushand file, has Webbynode been initialized for this repository?")
+      end
+    end
+    
   end
-  
 end

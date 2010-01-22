@@ -20,9 +20,9 @@ describe Webbynode::Commands::AddKey do
       server = mock("server")
       server.should_receive(:add_ssh_key).with(Webbynode::Commands::AddKey::LocalSshKey, "my_passphrase")
 
-      cmd = Webbynode::Commands::AddKey.new({ :passphrase => "my_passphrase" })
+      cmd = Webbynode::Commands::AddKey.new
       cmd.should_receive(:server).any_number_of_times.and_return(server)
-      cmd.run
+      cmd.run [], { :passphrase => "my_passphrase" }
     end
   end
 

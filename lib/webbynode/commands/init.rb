@@ -1,18 +1,13 @@
 module Webbynode::Commands
   class Init
-    attr_accessor :output, :params
-    
-    def initialize(params)
-      @params = params
-      @output = ""
-    end
+    attr_accessor :output
     
     def out(s)
-      @output << s
+      (@output ||= "") << s
     end
     
-    def run
-      unless params
+    def run(params=[], options={})
+      unless params.any?
         out "Usage: webbynode init [webby]"
         return
       end

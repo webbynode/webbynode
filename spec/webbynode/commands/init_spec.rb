@@ -6,14 +6,14 @@ describe Webbynode::Commands::Init do
     git_handler = options[:git_handler] || mock("dummy_git_handler").as_null_object
     io_handler  = options[:io_handler]  || mock("dummy_io_handler").as_null_object
 
-    command = Webbynode::Commands::Init.new("1.2.3.4")
+    command = Webbynode::Commands::Init.new
     command.should_receive(:git).any_number_of_times.and_return(git_handler) 
     command.should_receive(:io).any_number_of_times.and_return(io_handler)
-    command.run
+    command.run "1.2.3.4"
   end
   
   it "should output usage if no params given" do
-    command = Webbynode::Commands::Init.new(nil)
+    command = Webbynode::Commands::Init.new
     command.run
     command.output.should =~ /Usage: webbynode init \[webby\]/
   end

@@ -44,6 +44,12 @@ describe Webbynode::Commands::Remote do
       @remote.run
     end
     
+    it "should initialize the remote executor with an IP" do
+      @git.should_receive(:parse_remote_ip).and_return('5.6.7.8')
+      @re.should_receive(:new).with('5.6.7.8')
+      @remote.run
+    end
+    
     it "should parse the pushand file for the application folder name on the remote server" do
       @pushand.should_receive(:parse_remote_app_name).and_return("dummy_app")
       @remote.run
@@ -56,7 +62,8 @@ describe Webbynode::Commands::Remote do
       @remote = Webbynode::Commands::Remote.new
       @remote.options.should be_empty
       @re.should_not_receive(:exec)
-      lambda { @remote.run }.should raise_exception(Webbynode::Commands::NoOptionsProvided, 'No remote options were provided.')
+      lambda { @remote.run }.should raise_exception(Webbynode::Commands::NoOptionsProvided,
+        'No remote options were provided.')
     end
     
     context "from a webbynode uninitialized application" do
@@ -66,23 +73,27 @@ describe Webbynode::Commands::Remote do
       
       it "should not have a git repository" do
         @git.should_receive(:present?).and_return(false)
-        lambda { @remote.run }.should raise_exception(Webbynode::GitNotRepoError, "Could not find a git repository.")
+        lambda { @remote.run }.should raise_exception(Webbynode::GitNotRepoError,
+          "Could not find a git repository.")
       end
       
       it "should not have webbynode git remote" do
         @git.should_receive(:remote_present?).and_return(false)
-        lambda { @remote.run }.should raise_exception(Webbynode::GitRemoteDoesNotExistError, "Webbynode has not been initialized for this git repository.")
+        lambda { @remote.run }.should raise_exception(Webbynode::GitRemoteDoesNotExistError,
+          "Webbynode has not been initialized for this git repository.")
       end
       
       it "should not have a pushand file" do
         @pushand.should_receive(:present?).and_return(false)
-        lambda { @remote.run }.should raise_exception(Webbynode::PushAndFileNotFound, "Could not find .pushand file, has Webbynode been initialized for this repository?")
+        lambda { @remote.run }.should raise_exception(Webbynode::PushAndFileNotFound,
+          "Could not find .pushand file, has Webbynode been initialized for this repository?")
       end
       
       it "should not have the application pushed to the server" do
         @pushand.should_receive(:parse_remote_app_name).and_return('bdd.webbynode.com')
         @re.should_receive(:application_exists?).and_return(false)
-        lambda { @remote.run }.should raise_exception(Webbynode::ApplicationNotDeployed, "Before being able to run commands from your Webby, you must first push it.")
+        lambda { @remote.run }.should raise_exception(Webbynode::ApplicationNotDeployed,
+          "Before being able to run commands from your Webby, you must first push it.")
       end
     end
     

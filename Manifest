@@ -10,6 +10,8 @@ lib/templates/gitignore
 lib/templates/help
 lib/webbynode.rb
 lib/webbynode/api_client.rb
+lib/webbynode/application.rb
+lib/webbynode/command.rb
 lib/webbynode/commands.rb
 lib/webbynode/commands/add_key.rb
 lib/webbynode/commands/init.rb
@@ -22,7 +24,6 @@ lib/webbynode/remote_executor.rb
 lib/webbynode/server.rb
 lib/webbynode/ssh.rb
 lib/webbynode/ssh_keys.rb
-spec/application_spec.rb
 spec/fixtures/api/credentials
 spec/fixtures/api/webbies
 spec/fixtures/fixture_helpers
@@ -32,6 +33,8 @@ spec/fixtures/git/config/67.23.79.32
 spec/fixtures/git/config/config
 spec/fixtures/pushand
 spec/spec_helper.rb
+spec/webbynode/application_spec.rb
+spec/webbynode/command_spec.rb
 spec/webbynode/commands/add_key_spec.rb
 spec/webbynode/commands/init_spec.rb
 spec/webbynode/commands/remote_spec.rb

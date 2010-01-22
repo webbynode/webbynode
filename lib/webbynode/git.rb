@@ -42,7 +42,9 @@ module Webbynode
     
     def commit(comments)
       comments.gsub! /"/, '\"'
-      exec("git commit -m \"#{comments}\"")
+      exec("git commit -m \"#{comments}\"") do |output|
+        output =~ /#{comments}/
+      end
     end
 
     def parse_config

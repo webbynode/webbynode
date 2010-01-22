@@ -2,7 +2,7 @@ module Webbynode
   class Io
     class KeyAlreadyExists < StandardError; end
     
-    TemplatesPath = File.join(File.dirname(__FILE__), '../../..', 'templates')
+    TemplatesPath = File.join(File.dirname(__FILE__), '..', 'templates')
     
     def app_name
       Dir.pwd.split("/").last.gsub(/[\.| ]/, "_")

@@ -151,7 +151,8 @@ describe Webbynode::Git do
     context "when successfull" do
       it "should add objects to git" do
         io_handler = mock("io")
-        io_handler.should_receive(:exec).with('git commit -m "Commit comment"')
+        io_handler.should_receive(:exec).with('git commit -m "Commit comment"').and_return("[master (root-commit) 8f590c7] Commit comment
+         43 files changed, 8445 insertions(+), 0 deletions(-)")
 
         git = Webbynode::Git.new
         git.should_receive(:io).and_return(io_handler)
@@ -160,7 +161,8 @@ describe Webbynode::Git do
       
       it "should escape double quotes" do
         io_handler = mock("io")
-        io_handler.should_receive(:exec).with('git commit -m "Commiting \"the comment\""')
+        io_handler.should_receive(:exec).with('git commit -m "Commiting \"the comment\""').and_return("[master (root-commit) 8f590c7] Commiting \"the comment\"
+         43 files changed, 8445 insertions(+), 0 deletions(-)")
 
         git = Webbynode::Git.new
         git.should_receive(:io).and_return(io_handler)

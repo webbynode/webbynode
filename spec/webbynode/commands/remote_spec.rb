@@ -26,17 +26,29 @@ describe Webbynode::Commands::Remote do
   context "when successful" do    
     it "should receive at least one option when passing in the remote command" do
       @remote = Webbynode::Commands::Remote.new('ls')
-      @remote.options.should eql('ls')
+      @remote.params.should eql(['ls'])
     end
     
     it "multiple options will be joined together if multiple options are provided" do
       @remote = Webbynode::Commands::Remote.new('ls -la')
-      @remote.options.should eql('ls -la')
+      @remote.params.should eql(['ls -la'])
     end
     
     it "should establish a connection with the server" do
       @re.should_receive(:exec).with("ls -la")
       @remote.run
+    end
+    
+    it "should consider all parameters a single command" do
+      re = mock("RemoteExecutor")
+      re.as_null_object
+      re.should_receive(:exec).with("these are the params")
+
+      cmd = Webbynode::Commands::Remote.new('these', 'are', 'the', 'params')
+      cmd.should_receive(:remote_executor).any_number_of_times.and_return(re)
+      cmd.should_receive(:git).any_number_of_times.and_return(@git)
+      cmd.should_receive(:pushand).any_number_of_times.and_return(@pushand)
+      cmd.run
     end
     
     it "should parse the git config file for the server ip" do
@@ -60,7 +72,7 @@ describe Webbynode::Commands::Remote do
   context "when unsuccesful" do    
     it "should raise an error if no options are provided" do
       @remote = Webbynode::Commands::Remote.new
-      @remote.options.should be_empty
+      @remote.params.should be_empty
       @re.should_not_receive(:exec)
       lambda { @remote.run }.should raise_exception(Webbynode::Commands::NoOptionsProvided,
         'No remote options were provided.')

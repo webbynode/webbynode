@@ -1,5 +1,5 @@
 module Webbynode::Commands
-  class Init
+  class Init < Webbynode::Command
     attr_accessor :output
     
     def out(s)

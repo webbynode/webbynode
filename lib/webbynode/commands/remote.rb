@@ -2,16 +2,10 @@ module Webbynode
   module Commands
     class NoOptionsProvided < StandardError; end
     
-    class Remote
-      attr_accessor :options
-      
-      def initialize(*options)
-        @options = options.join('')
-      end
-      
+    class Remote < Webbynode::Command
       def run
         raise Webbynode::Commands::NoOptionsProvided,
-          "No remote options were provided." if @options.empty?
+          "No remote options were provided." if params.empty?
         raise Webbynode::GitNotRepoError,
           "Could not find a git repository." unless git.present?
         raise Webbynode::GitRemoteDoesNotExistError,
@@ -33,7 +27,7 @@ module Webbynode
         remote_executor.new(ip)
         
         # Executes the command on the remote server inside the application root folder
-        remote_executor.exec(@options)
+        remote_executor.exec(params.join(" "))
       end
     end
   end

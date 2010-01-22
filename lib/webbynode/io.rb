@@ -48,9 +48,9 @@ module Webbynode
       read_file File.join(templates_path, template)
     end
     
-    def create_from_template(template)
+    def create_from_template(file, template)
       contents = read_from_template(template)
-      create_file(template, contents)
+      create_file(file, contents)
     end
   end
 end

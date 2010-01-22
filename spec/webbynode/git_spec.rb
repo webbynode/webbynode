@@ -54,7 +54,7 @@ describe Webbynode::Git do
     context "when sucessful" do
       it "should create .gitignore from the template" do
         io = double("io")
-        io.should_receive(:create_from_template).with(".gitignore")
+        io.should_receive(:create_from_template).with(".gitignore", "gitignore")
         
         git = Webbynode::Git.new
         git.stub(:io).and_return(io)

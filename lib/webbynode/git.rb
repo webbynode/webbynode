@@ -5,7 +5,6 @@ module Webbynode
   class GitRemoteAlreadyExistsError < StandardError; end
 
   class Git
-    
     attr_accessor :config, :remote_ip
     
     def present?
@@ -24,7 +23,7 @@ module Webbynode
     end
     
     def add_git_ignore
-      io.create_from_template(".gitignore")
+      io.create_from_template(".gitignore", "gitignore")
     end
     
     def add(what)

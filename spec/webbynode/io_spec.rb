@@ -76,8 +76,8 @@ describe Webbynode::Io do
     it "should read the template and write a new file with its contents" do
       io = Webbynode::Io.new
       io.should_receive(:read_from_template).with("template_file").and_return("template_file_contents")
-      io.should_receive(:create_file).with("template_file", "template_file_contents")
-      io.create_from_template("template_file")
+      io.should_receive(:create_file).with("output_file", "template_file_contents")
+      io.create_from_template("output_file", "template_file")
     end
   end
   

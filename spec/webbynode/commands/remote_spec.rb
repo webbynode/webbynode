@@ -74,7 +74,7 @@ describe Webbynode::Commands::Remote do
       @remote = Webbynode::Commands::Remote.new
       @remote.params.should be_empty
       @re.should_not_receive(:exec)
-      lambda { @remote.run }.should raise_exception(Webbynode::Commands::NoOptionsProvided,
+      lambda { @remote.run }.should raise_error(Webbynode::Commands::NoOptionsProvided,
         'No remote options were provided.')
     end
     
@@ -85,26 +85,26 @@ describe Webbynode::Commands::Remote do
       
       it "should not have a git repository" do
         @git.should_receive(:present?).and_return(false)
-        lambda { @remote.run }.should raise_exception(Webbynode::GitNotRepoError,
+        lambda { @remote.run }.should raise_error(Webbynode::GitNotRepoError,
           "Could not find a git repository.")
       end
       
       it "should not have webbynode git remote" do
         @git.should_receive(:remote_present?).and_return(false)
-        lambda { @remote.run }.should raise_exception(Webbynode::GitRemoteDoesNotExistError,
+        lambda { @remote.run }.should raise_error(Webbynode::GitRemoteDoesNotExistError,
           "Webbynode has not been initialized for this git repository.")
       end
       
       it "should not have a pushand file" do
         @pushand.should_receive(:present?).and_return(false)
-        lambda { @remote.run }.should raise_exception(Webbynode::PushAndFileNotFound,
+        lambda { @remote.run }.should raise_error(Webbynode::PushAndFileNotFound,
           "Could not find .pushand file, has Webbynode been initialized for this repository?")
       end
       
       it "should not have the application pushed to the server" do
         @pushand.should_receive(:parse_remote_app_name).and_return('bdd.webbynode.com')
         @re.should_receive(:application_exists?).and_return(false)
-        lambda { @remote.run }.should raise_exception(Webbynode::ApplicationNotDeployed,
+        lambda { @remote.run }.should raise_error(Webbynode::ApplicationNotDeployed,
           "Before being able to run commands from your Webby, you must first push it.")
       end
     end

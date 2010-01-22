@@ -37,7 +37,7 @@ describe Webbynode::Server do
           @io.should_receive(:file_exists?).with("xyz").and_return(false)
           @io.should_receive(:create_local_key).and_raise(Webbynode::PermissionError)
 
-          lambda { @server.add_ssh_key "xyz" }.should raise_exception(Webbynode::PermissionError)
+          lambda { @server.add_ssh_key "xyz" }.should raise_error(Webbynode::PermissionError)
         end
       end
     end

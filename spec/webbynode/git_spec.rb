@@ -8,7 +8,7 @@ describe Webbynode::Git do
 
     git = Webbynode::Git.new
     git.should_receive(:io).and_return(io_handler)
-    lambda { yield git }.should raise_exception(exception)
+    lambda { yield git }.should raise_error(exception)
   end
 
   def should_raise(exception, command, &blk)
@@ -227,7 +227,7 @@ describe Webbynode::Git do
         git.should_receive(:present?).at_least(:once).and_return(false)
         git.stub!(:remote_webbynode?).and_return(true)
         File.should_not_receive(:open)
-        lambda {git.parse_config}.should raise_exception(Webbynode::GitNotRepoError, "Git repository does not exist.")
+        lambda {git.parse_config}.should raise_error(Webbynode::GitNotRepoError, "Git repository does not exist.")
       end
       
       it "should raise an exception if the git repository does exist, but does not have the git remote for webbynode" do
@@ -235,7 +235,7 @@ describe Webbynode::Git do
         git.should_receive(:present?).at_least(:once).and_return(true)
         git.stub!(:remote_webbynode?).and_return(false)
         File.should_not_receive(:open)
-        lambda {git.parse_config}.should raise_exception(Webbynode::GitRemoteDoesNotExistError, "Webbynode has not been initialized.")
+        lambda {git.parse_config}.should raise_error(Webbynode::GitRemoteDoesNotExistError, "Webbynode has not been initialized.")
       end
     end
   end

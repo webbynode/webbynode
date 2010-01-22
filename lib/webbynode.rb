@@ -22,10 +22,13 @@ module Webbynode
   class AppError < StandardError; end
   
   class Application
-    attr_reader :command, :command_class
+    attr_reader :command, :command_class, :params, :options
     
-    def initialize(command)
-      @command = command
+    def initialize(*args)
+      @command = args.shift
+      @params = []
+      @options = {}
+      parse_args(args)
     end
     
     def parse_command
@@ -40,26 +43,17 @@ module Webbynode
     
     def execute
       parse_command
-      command_class.run
+      command_class.run params, options
     end
     
-    # Parses user input (commands)
-    # Initial param is the command
-    # Other params are named parameters (like 'command --this=param')
-    # or options (like 'command param')
-    def parse_options
-      log_and_exit read_template('help') if @input.empty?
-      @command  = @input.shift
-      
-      while @input.any?
-        opt = @input.shift
-        
+    def parse_args(args)
+      while (opt = args.shift)
         if opt =~ /^--(\w+)(=("[^"]+"|[\w]+))*/
           name  = $1
           value = $3 ? $3.gsub(/"/, "") : true
-          @named_options[name] = value
+          @options[name.to_sym] = value
         else
-          @options << opt
+          @params << opt
         end
       end
     end

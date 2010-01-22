@@ -88,4 +88,12 @@ describe Webbynode::Io do
       end
     end
   end
+  
+  describe "#open_file" do
+    it "should open the file" do
+      io = Webbynode::Io.new
+      File.should_receive(:open).with("filename").and_return("file contents")
+      io.open_file("filename").should eql("file contents")
+    end
+  end
 end

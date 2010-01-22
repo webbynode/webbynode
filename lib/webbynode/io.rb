@@ -18,6 +18,10 @@ module Webbynode
       File.read(f)
     end
     
+    def open_file(f)
+      File.open(f)
+    end
+    
     def create_local_key(passphrase="")
       unless File.exists?(Webbynode::Commands::AddKey::LocalSshKey)
         exec "ssh-keygen -t rsa -N \"#{passphrase}\" -f #{Webbynode::Commands::AddKey::LocalSshKey}"

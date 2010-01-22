@@ -157,4 +157,50 @@ describe Webbynode::Git do
       end
     end
   end
+  
+  
+  describe "#parse_config" do
+    context "when successful" do
+      it "git should be present" do
+        git = Webbynode::Git.new
+        git.should_receive(:present?).and_return(true)
+        File.should_receive(:open).exactly(:once).with(".git/config").and_return(File.join(File.dirname(__FILE__), '..', 'fixtures', 'git', 'config', 'config'))
+        git.parse_config
+      end
+      
+      it "should open the git configuration file and parse it" do
+        io_handler = mock("io")
+        io_handler.as_null_object
+        
+        File.should_receive(:open).exactly(:once).with(".git/config").and_return(File.join(File.dirname(__FILE__), '..', 'fixtures', 'git', 'config', 'config'))
+        git = Webbynode::Git.new
+        git.should_receive(:io).any_number_of_times.and_return(io_handler)
+        git.parse_config
+      end
+    
+      it "should open the git configuration file and parse it only once" do
+        io_handler = mock("io")
+        io_handler.as_null_object
+
+        File.should_receive(:open).exactly(:once).with(".git/config").and_return(File.join(File.dirname(__FILE__), '..', 'fixtures', 'git', 'config', 'config'))
+        git = Webbynode::Git.new
+        git.should_receive(:io).any_number_of_times.and_return(io_handler)
+        5.times {git.parse_config}
+      end
+    end
+    
+    context "when unsuccessful" do
+      it "git should not parse if git is not present and raise an exception" do
+        git = Webbynode::Git.new
+        git.should_receive(:present?).and_return(false)
+        File.should_not_receive(:open)
+        lambda {git.parse_config}.should raise_exception(Webbynode::GitNotRepoError, "Git repository does not exist. Has Webbynode been initialized?")
+      end
+    end
+  end
+
+
+  describe "#parse_remote_ip" do
+  end
+
 end

@@ -1,4 +1,7 @@
 module Webbynode
+  
+  class ApplicationNotDeployed < StandardError; end
+  
   class RemoteExecutor
     attr_accessor :ip
     

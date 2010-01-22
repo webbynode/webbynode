@@ -1,6 +1,7 @@
 module Webbynode
   class GitError < StandardError; end
   class GitNotRepoError < StandardError; end
+  class GitRemoteDoesNotExistError < StandardError; end
   class GitRemoteAlreadyExistsError < StandardError; end
 
   class Git

@@ -10,9 +10,11 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'io')
 require File.join(File.dirname(__FILE__), 'webbynode', 'git')
 require File.join(File.dirname(__FILE__), 'webbynode', 'ssh')
 require File.join(File.dirname(__FILE__), 'webbynode', 'server')
+require File.join(File.dirname(__FILE__), 'webbynode', 'push_and')
 require File.join(File.dirname(__FILE__), 'webbynode', 'remote_executor')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'init')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'add_key')
+require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'remote')
 
 module Webbynode
   VERSION = '0.1.2'

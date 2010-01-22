@@ -52,7 +52,7 @@ describe Webbynode::Server do
         end
         
         it "should create the SSH folder on the server" do
-          @re.should_receive(:create_folder).with("~/.ssh", "700")        
+          @re.should_receive(:create_folder).with("~/.ssh", "700")
           @server.add_ssh_key "abc"
         end
 

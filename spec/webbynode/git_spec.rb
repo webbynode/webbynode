@@ -26,6 +26,10 @@ describe Webbynode::Git do
       "fatal: Not a git repository (or any of the parent directories): .git", &blk
   end
   
+  it "should have an io instance" do
+    Webbynode::Git.new.io.class.should == Webbynode::Io
+  end
+  
   describe "#present?" do
     it "should be true if folder .git exists" do
       io_handler = mock("io")

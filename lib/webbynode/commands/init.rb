@@ -6,7 +6,7 @@ module Webbynode::Commands
       (@output ||= "") << s
     end
     
-    def run
+    def execute
       unless params.any?
         out "Usage: webbynode init [webby]"
         return
@@ -23,6 +23,8 @@ module Webbynode::Commands
       end
       
       git.add_remote "webbynode", params[0], io.app_name
+    rescue Webbynode::GitRemoteAlreadyExistsError
+      puts "Webbynode already initialized for this application."
     end
   end
 end

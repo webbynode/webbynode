@@ -3,5 +3,5 @@ $:.unshift File.dirname(__FILE__)+"/../lib"
 require 'rubygems'
 require 'webbynode'
 
-application = Webbynode::Application.new(ARGV)
+application = Webbynode::Application.new(*ARGV)
 application.execute

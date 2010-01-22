@@ -11,10 +11,18 @@ describe Webbynode::Commands::Init do
     @command.should_receive(:io).any_number_of_times.and_return(@io_handler)
   end
   
+  it "should have a Git instance" do
+    Webbynode::Commands::Init.new.git.class.should == Webbynode::Git
+  end
+  
   it "should output usage if no params given" do
     command = Webbynode::Commands::Init.new
     command.run
     command.output.should =~ /Usage: webbynode init \[webby\]/
+  end
+  
+  it "should have an Io instance" do
+    Webbynode::Commands::Init.new.io.class.should == Webbynode::Io
   end
   
   context "when .gitignore is not present" do
@@ -88,6 +96,14 @@ describe Webbynode::Commands::Init do
       @git_handler.should_receive(:present?).and_return(true)
       @git_handler.should_receive(:add_remote)
 
+      @command.run
+    end
+    
+    it "should tell the user it's already initialized" do
+      @git_handler.should_receive(:present?).and_return(true)
+      @git_handler.should_receive(:add_remote).and_raise(Webbynode::GitRemoteAlreadyExistsError)
+      
+      @command.should_receive(:puts).with("Webbynode already initialized for this application.")
       @command.run
     end
   end

@@ -2,6 +2,29 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 
 describe Webbynode::Command do
+  describe "resolving commands" do
+    it "should allow adding aliases to child classes" do
+      class Zap < Webbynode::Command
+        add_alias "zip"
+      end
+      
+      Webbynode::Commands.should_receive(:const_get).with("Zap")
+      Webbynode::Command.for("zip")
+    end
+    
+    it "should look for a class with the name of the command" do
+      Webbynode::Commands.should_receive(:const_get).with("Zap")
+      Webbynode::Command.for("zap")
+    end
+    
+    context "when class exists" do
+      it "should translate words separated by underscore into capitalized parts" do
+        Webbynode::Commands.should_receive(:const_get).with("RandomThoughtsIHad")
+        Webbynode::Command.for("random_thoughts_i_had")
+      end
+    end
+  end
+  
   describe "parsing options" do
     it "should parse arguments as params" do
       cmd = Webbynode::Command.new("param1", "param2")

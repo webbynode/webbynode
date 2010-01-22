@@ -2,26 +2,18 @@ module Webbynode
   class AppError < StandardError; end
 
   class Application
-    attr_reader :command, :command_class, :params
+    attr_reader :command, :params, :aliases
     
     def initialize(*args)
       @command = args.shift
       @params = args
     end
     
-    def parse_command
-      @command_class = Webbynode::Commands.const_get(command_class_name)
-    rescue NameError
-      puts "Command \"#{command}\" doesn't exist"
-    end
-    
-    def command_class_name
-      command.split("_").inject([]) { |arr, item| arr << item.capitalize }.join("")
-    end
-    
     def execute
-      parse_command
-      command_class.new(params).run
+      if command_class = Webbynode::Command.for(command)
+        cmd = command_class.new(params)
+        cmd.run
+      end
     end
   end
 end

@@ -1,8 +1,12 @@
 module Webbynode::Commands
   class AddKey < Webbynode::Command
+    requires_initialization!
+
     LocalSshKey = "#{ENV['HOME']}/.ssh/id_rsa.pub"
     
-    def run(param=[], options={})
+    add_alias "addkey"
+    
+    def execute
       server.add_ssh_key LocalSshKey, options[:passphrase]
 
     rescue Webbynode::InvalidAuthentication

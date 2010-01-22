@@ -6,6 +6,11 @@ describe Webbynode::Commands::AddKey do
     Webbynode::Commands::AddKey::LocalSshKey.should == "#{ENV['HOME']}/.ssh/id_rsa.pub"
   end
   
+  it "should be aliased to addkey" do
+    Webbynode::Commands.should_receive(:const_get).with("AddKey")
+    Webbynode::Command.for("addkey")
+  end
+  
   context "when successful" do
     it "should upload the local ssh key into the server" do
       server = mock("server")
@@ -13,16 +18,16 @@ describe Webbynode::Commands::AddKey do
 
       cmd = Webbynode::Commands::AddKey.new
       cmd.should_receive(:server).any_number_of_times.and_return(server)
-      cmd.run
+      cmd.execute
     end
 
     it "should create an ssh key with a provided passphrase" do
       server = mock("server")
       server.should_receive(:add_ssh_key).with(Webbynode::Commands::AddKey::LocalSshKey, "my_passphrase")
 
-      cmd = Webbynode::Commands::AddKey.new
+      cmd = Webbynode::Commands::AddKey.new("--passphrase=my_passphrase")
       cmd.should_receive(:server).any_number_of_times.and_return(server)
-      cmd.run [], { :passphrase => "my_passphrase" }
+      cmd.execute
     end
   end
 
@@ -34,7 +39,7 @@ describe Webbynode::Commands::AddKey do
       cmd = Webbynode::Commands::AddKey.new
       cmd.should_receive(:server).any_number_of_times.and_return(server)
       cmd.should_receive(:puts).with("Could not connect to server: invalid authentication.")
-      cmd.run
+      cmd.execute
     end
 
     it "should report an error if the ssh key could not be added due to a permission error" do
@@ -44,7 +49,7 @@ describe Webbynode::Commands::AddKey do
       cmd = Webbynode::Commands::AddKey.new
       cmd.should_receive(:server).any_number_of_times.and_return(server)
       cmd.should_receive(:puts).with("Could not create an SSH key: permission error.")
-      cmd.run
+      cmd.execute
     end
   end
 end

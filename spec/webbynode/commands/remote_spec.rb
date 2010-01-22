@@ -90,7 +90,7 @@ describe Webbynode::Commands::Remote do
       end
       
       it "should not have webbynode git remote" do
-        @git.should_receive(:remote_present?).and_return(false)
+        @git.should_receive(:remote_webbynode?).and_return(false)
         lambda { @remote.run }.should raise_error(Webbynode::GitRemoteDoesNotExistError,
           "Webbynode has not been initialized for this git repository.")
       end

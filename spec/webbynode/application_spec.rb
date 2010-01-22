@@ -2,30 +2,30 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 
 describe Webbynode::Application do
+  describe "running commands" do
+    it "should instantiate the class" do
+      cmd = mock("Init")
+      cmd.as_null_object
+      
+      Webbynode::Commands::Init.should_receive(:new).and_return(cmd)
+      wn = Webbynode::Application.new("init")
+      wn.execute
+    end
+  end
+  
   describe "parsing commands" do
-    it "should look for a class with the name of the command" do
-      Webbynode::Commands.should_receive(:const_get).with("Zap")
-      wn = Webbynode::Application.new("zap")
-      wn.parse_command
-    end
-    
-    context "when class exists" do
-      it "should translate words separated by underscore into capitalized parts" do
-        Webbynode::Commands.should_receive(:const_get).with("RandomThoughtsIHad")
-
-        wn = Webbynode::Application.new("random_thoughts_i_had")
-        wn.parse_command
-        wn.command_class_name.should == "RandomThoughtsIHad"
-      end
-    end
-
     context "when class doesn't exist" do
       it "should translate words separated by underscore into capitalized parts" do
         Webbynode::Commands.should_receive(:const_get).and_raise(NameError)
         
+        cls = mock("UnknownClass")
+        cls.should_receive(:new).never
+        
         wn = Webbynode::Application.new("inexistent_command")
-        wn.should_receive(:puts).with('Command "inexistent_command" doesn\'t exist')
-        wn.parse_command
+        Webbynode::Command.should_receive(:puts).with('Command "inexistent_command" doesn\'t exist')
+        
+        wn.should_receive(:command_class).never
+        wn.execute
       end
     end
   end
@@ -34,6 +34,7 @@ describe Webbynode::Application do
     it "should run the command" do
       cmd = double("CommandInstance")
       cmd.should_receive(:run)
+      cmd.as_null_object
       
       cmd_class = double("CommandClass")
       cmd_class.should_receive(:new).and_return(cmd)

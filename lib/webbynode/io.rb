@@ -9,11 +9,15 @@ module Webbynode
     end
     
     def exec(s)
-      `#{s}`
+      `#{s} 2>&1`
     end
     
     def directory?(s)
       File.directory?(s)
+    end
+    
+    def file_exists?(f)
+      File.exists?(f)
     end
     
     def read_file(f)

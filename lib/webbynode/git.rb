@@ -12,6 +12,10 @@ module Webbynode
       io.directory?(".git")
     end
     
+    def io
+      @@io ||= Webbynode::Io.new
+    end
+    
     def init
       exec("git init") do |output|
         # this indicates init was properly executed

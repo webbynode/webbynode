@@ -2,6 +2,14 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 
 describe Webbynode::Server do
+  it "should have an Io instance" do
+    Webbynode::Server.new("1.2.3.4").io.class.should == Webbynode::Io
+  end
+
+  it "should have a RemoteExecutor instance" do
+    Webbynode::Server.new("1.2.3.4").remote_executor.class.should == Webbynode::RemoteExecutor
+  end
+
   describe "#add_ssh_key" do
     before(:each) do
       @io = mock("Io")
@@ -10,7 +18,7 @@ describe Webbynode::Server do
       @re = mock("RemoteExecutor")
       @re.as_null_object
     
-      @server = Webbynode::Server.new
+      @server = Webbynode::Server.new("1.2.3.4")
       @server.should_receive(:io).any_number_of_times.and_return(@io)
       @server.should_receive(:remote_executor).any_number_of_times.and_return(@re)
     end

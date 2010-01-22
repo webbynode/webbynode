@@ -1,11 +1,77 @@
 module Webbynode
   class Command
     attr_reader :params, :options
+    Aliases = {}
+    Settings = {}
+    
+    def self.inherited(child)
+      Settings[child] ||= {}
+    end
+    
+    class << self
+      # classes that requires checking
+      # for webbynode init must call
+      # this method
+      def requires_initialization!
+        Settings[self][:requires_initialization] = true
+      end
+      
+      def for(command)
+        Webbynode::Commands.const_get command_class_name(command)
+      rescue NameError
+        puts "Command \"#{command}\" doesn't exist"
+      end
+
+      def add_alias(alias_name)
+        Aliases[alias_name] = self.name.split("::").last
+      end
+
+      def command_class_name(command)
+        return Aliases[command] if Aliases[command]
+        class_name = command.split("_").inject([]) { |arr, item| arr << item.capitalize }.join("")
+      end
+    end
     
     def initialize(*args)
       @params = []
       @options = {}
       parse_args(args)
+    end
+    
+    def io
+      @@io ||= Webbynode::Io.new
+    end
+    
+    def git
+      @@git ||= Webbynode::Git.new
+    end
+    
+    def server
+      @server ||= Webbynode::Server.new(git.parse_remote_ip)
+    end
+    
+    def pushand
+      @pushand ||= PushAnd.new
+    end
+    
+    def validate
+      raise Webbynode::Commands::NoOptionsProvided,
+        "No remote options were provided." if params.empty?
+      raise Webbynode::GitNotRepoError,
+        "Could not find a git repository." unless git.present?
+      raise Webbynode::GitRemoteDoesNotExistError,
+        "Webbynode has not been initialized for this git repository." unless git.remote_webbynode?
+      raise Webbynode::PushAndFileNotFound,
+        "Could not find .pushand file, has Webbynode been initialized for this repository?" unless pushand.present?
+    end
+    
+    def settings
+      Settings[self.class]
+    end
+    
+    def run
+      validate if settings[:requires_initialization]
+      execute
     end
     
     private

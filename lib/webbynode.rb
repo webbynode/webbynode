@@ -6,10 +6,6 @@ require 'net/ssh'
 require 'highline/import'
 require 'pp'
 
-# %w[helpers ssh ssh_keys commands api_client io].each do |f|
-#   require File.join(File.dirname(__FILE__), 'webbynode', f)
-# end
-
 require File.join(File.dirname(__FILE__), 'webbynode', 'io')
 require File.join(File.dirname(__FILE__), 'webbynode', 'git')
 require File.join(File.dirname(__FILE__), 'webbynode', 'ssh')
@@ -25,18 +21,15 @@ module Webbynode
   class AppError < StandardError; end
   
   class Application
-    attr_accessor :input, :command, :options, :named_options
+    attr_reader :command
     
-    # include Webbynode::Helpers
-    # include Webbynode::SshKeys
-    # include Webbynode::Commands
-    # include Webbynode::ApiClient
+    def initialize(command)
+      @command = command
+      command_class = Webbynode::Commands.const_get(command_class_name)
+    end
     
-    # Initializes the Webbynode App
-    def initialize(*input)
-      @input = input.flatten
-      @named_options = {}
-      @options = []
+    def command_class_name
+      command.split("_").inject([]) { |arr, item| arr << item.capitalize }.join("")
     end
     
     # Parses user input (commands)
@@ -59,22 +52,5 @@ module Webbynode
         end
       end
     end
-    
-    # Executes the parsed command
-    def execute
-      parse_command
-      run_command(command)
-    end
-    
-    # Runs the command unless it's nil or doesn't exist
-    # If it fails, it will display the help screen
-    def run_command(command)
-      if command and respond_to?(command)
-        send(command)
-      else
-        log_and_exit read_template('help')
-      end
-    end
-    
   end
 end

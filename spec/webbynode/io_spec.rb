@@ -1,8 +1,8 @@
 # Load Spec Helper
-require File.join(File.expand_path(File.dirname(__FILE__)), 'spec_helper')
+require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 
 describe Webbynode::Io do
-  describe "app_name" do
+  describe "#app_name" do
     context "when successful" do
       it "should return the current folder" do
         Dir.should_receive(:pwd).and_return("/some/deep/folder/where/you/find/app_name")
@@ -16,7 +16,42 @@ describe Webbynode::Io do
     end
   end
   
-  describe "exec" do
+  describe '#create_local_key' do
+    describe "when key file missing" do
+      before(:each) do
+        File.should_receive(:exists?).with(Webbynode::Commands::AddKey::LocalSshKey).and_return(false)
+        @io = Webbynode::Io.new
+      end
+
+      context "with no passphrase" do
+        it "should create the key with an empty passphrase" do
+          @io.should_receive(:exec).with("ssh-keygen -t rsa -N \"\" -f #{Webbynode::Commands::AddKey::LocalSshKey}").and_return("")
+          @io.create_local_key
+        end
+      end
+      
+      context "with a passphrase" do
+        it "should create the key with the provided passphrase" do
+          @io.should_receive(:exec).with("ssh-keygen -t rsa -N \"passphrase\" -f #{Webbynode::Commands::AddKey::LocalSshKey}").and_return("")
+          @io.create_local_key("passphrase")
+        end
+      end
+    end
+    
+    describe "when key already exists" do
+      before(:each) do
+        File.should_receive(:exists?).with(Webbynode::Commands::AddKey::LocalSshKey).and_return(true)
+        @io = Webbynode::Io.new
+      end
+      
+      it "should just skip the creation" do
+        @io.should_receive(:exec).never
+        @io.create_local_key
+      end
+    end
+  end
+  
+  describe "#exec" do
     context "when successful" do
       it "should execute the command and retrieve the output" do
         io = Webbynode::Io.new
@@ -26,7 +61,7 @@ describe Webbynode::Io do
     end
   end
   
-  describe "read_file" do
+  describe "#read_file" do
     context "when successful" do
       it "should return file contents" do
         io = Webbynode::Io.new
@@ -36,7 +71,7 @@ describe Webbynode::Io do
     end
   end
   
-  describe "directory?" do
+  describe "#directory?" do
     context "when successful" do
       it "should return true when item is a directory" do
         File.should_receive(:directory?).with("dir").and_return(true)

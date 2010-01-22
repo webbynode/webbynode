@@ -1,8 +1,8 @@
 # Load Spec Helper
-require File.join(File.expand_path(File.dirname(__FILE__)), 'spec_helper')
+require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 
 describe Webbynode::Server do
-  describe "add_ssh_key" do
+  describe "#add_ssh_key" do
     before(:each) do
       @io = mock("Io")
       @io.as_null_object

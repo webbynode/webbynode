@@ -6,11 +6,15 @@ module Webbynode::Commands
       (@output ||= "") << s
     end
     
-    def run(params=[], options={})
+    def run
       unless params.any?
         out "Usage: webbynode init [webby]"
         return
       end
+      
+      git.add_git_ignore unless io.file_exists?(".gitignore")
+      
+      io.create_file(".pushand", "#! /bin/bash\nphd $0 #{io.app_name}\n") unless io.file_exists?(".pushand")
       
       unless git.present?
         git.init 
@@ -18,7 +22,7 @@ module Webbynode::Commands
         git.commit "Initial commit"
       end
       
-      git.add_remote "webbynode", "1.2.3.4", io.app_name
+      git.add_remote "webbynode", params[0], io.app_name
     end
   end
 end

@@ -2,6 +2,8 @@ module Webbynode
   class Io
     class KeyAlreadyExists < StandardError; end
     
+    TemplatesPath = File.join(File.dirname(__FILE__), '../../..', 'templates')
+    
     def app_name
       Dir.pwd.split("/").last.gsub(/[\.| ]/, "_")
     end
@@ -26,6 +28,25 @@ module Webbynode
       unless File.exists?(Webbynode::Commands::AddKey::LocalSshKey)
         exec "ssh-keygen -t rsa -N \"#{passphrase}\" -f #{Webbynode::Commands::AddKey::LocalSshKey}"
       end
+    end
+    
+    def create_file(file, contents)
+      File.open(file, "w") do |file|
+        file.write(contents)
+      end
+    end
+    
+    def templates_path
+      TemplatesPath
+    end
+    
+    def read_from_template(template)
+      read_file File.join(templates_path, template)
+    end
+    
+    def create_from_template(template)
+      contents = read_from_template(template)
+      create_file(template, contents)
     end
   end
 end

@@ -46,8 +46,21 @@ describe Webbynode::Git do
     end
   end
   
+  describe "#add_git_init" do
+    context "when sucessful" do
+      it "should create .gitignore from the template" do
+        io = double("io")
+        io.should_receive(:create_from_template).with(".gitignore")
+        
+        git = Webbynode::Git.new
+        git.stub(:io).and_return(io)
+        git.add_git_ignore
+      end
+    end
+  end
+  
   describe "#init" do
-    context "when successfull" do
+    context "when successful" do
       it "should return true" do
         io_handler = mock("io")
         io_handler.should_receive(:exec).with("git init").and_return("Initialized empty Git repository in /Users/fcoury/tmp/.git/")

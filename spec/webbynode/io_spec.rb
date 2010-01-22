@@ -38,6 +38,42 @@ describe Webbynode::Io do
       end
     end
     
+    describe '#templates_path' do
+      it "should return the contents of TemplatesPath" do
+        io = Webbynode::Io.new
+        io.templates_path.should == Webbynode::Io::TemplatesPath
+      end
+    end
+    
+    describe '#create_from_template' do
+      it "should read the template and write a new file with its contents" do
+        io = Webbynode::Io.new
+        io.should_receive(:read_from_template).with("template_file").and_return("template_file_contents")
+        io.should_receive(:create_file).with("template_file", "template_file_contents")
+        io.create_from_template("template_file")
+      end
+    end
+    
+    describe '#read_from_template' do
+      it "should read a file from the templates path" do
+        io = Webbynode::Io.new
+        io.should_receive(:templates_path).and_return("/templates")
+        io.should_receive(:read_file).with("/templates/template_file").and_return("template_contents")
+        io.read_from_template("template_file").should == "template_contents"
+      end
+    end
+    
+    describe '#create_file' do
+      it "should create a file with specified contents" do
+        file = double("File")
+        File.should_receive(:open).with("file_to_write", "w").and_yield(file)
+        file.should_receive(:write).with("file_contents")
+
+        io = Webbynode::Io.new
+        io.create_file("file_to_write", "file_contents")
+      end
+    end
+    
     describe "when key already exists" do
       before(:each) do
         File.should_receive(:exists?).with(Webbynode::Commands::AddKey::LocalSshKey).and_return(true)

@@ -2,14 +2,13 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), '../..', 'spec_helper')
 
 describe Webbynode::Commands::Init do
-  def run_with(options)
-    git_handler = options[:git_handler] || mock("dummy_git_handler").as_null_object
-    io_handler  = options[:io_handler]  || mock("dummy_io_handler").as_null_object
+  before(:each) do
+    @git_handler = mock("dummy_git_handler").as_null_object
+    @io_handler  = mock("dummy_io_handler").as_null_object
 
-    command = Webbynode::Commands::Init.new
-    command.should_receive(:git).any_number_of_times.and_return(git_handler) 
-    command.should_receive(:io).any_number_of_times.and_return(io_handler)
-    command.run "1.2.3.4"
+    @command = Webbynode::Commands::Init.new("4.3.2.1")
+    @command.should_receive(:git).any_number_of_times.and_return(@git_handler) 
+    @command.should_receive(:io).any_number_of_times.and_return(@io_handler)
   end
   
   it "should output usage if no params given" do
@@ -19,71 +18,77 @@ describe Webbynode::Commands::Init do
   end
   
   context "when .gitignore is not present" do
-    it "should create the standard .gitinit"
+    it "should create the standard .gitignore" do
+      @io_handler.should_receive(:file_exists?).with(".gitignore").and_return(false)
+      @git_handler.should_receive(:add_git_ignore)
+      
+      @command.run
+    end
   end
   
   context "when .pushand is not present" do
-    it "should be created"
+    it "should be created" do
+      @io_handler.should_receive(:file_exists?).with(".pushand").and_return(false)
+      @io_handler.should_receive(:app_name).twice.and_return("mah_app")
+      @io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 mah_app\n")
+      
+      @command.run
+    end
+  end
+  
+  context "when .pushand is present" do
+    it "should not be created" do
+      @io_handler.should_receive(:file_exists?).with(".pushand").and_return(true)
+      @io_handler.should_receive(:create_file).never
+      
+      @command.run
+    end
   end
   
   context "when git repo doesn't exist yet" do
     it "should create a new git repo" do
-      git_handler = mock("git_handler1")
-      git_handler.should_receive(:present?).and_return(false)
-      git_handler.should_receive(:init)
-      git_handler.as_null_object
-    
-      run_with(:git_handler => git_handler)
+      @git_handler.should_receive(:present?).and_return(false)
+      @git_handler.should_receive(:init)
+
+      @command.run
     end
     
     it "should add a new remote" do
-      io_handler = mock("io_handler")
-      io_handler.should_receive(:app_name).and_return("my_app")
-    
-      git_handler = mock("git_handler2")
-      git_handler.should_receive(:present?).and_return(false)
-      git_handler.should_receive(:add_remote).with("webbynode", "1.2.3.4", "my_app")
-      git_handler.as_null_object
+      @io_handler.should_receive(:app_name).any_number_of_times.and_return("my_app")
+      @git_handler.should_receive(:present?).and_return(false)
+      @git_handler.should_receive(:add_remote).with("webbynode", "4.3.2.1", "my_app")
 
-      run_with(:git_handler => git_handler, :io_handler => io_handler)
+      @command.run
     end
     
     it "should add everything" do
-      git_handler = mock("git_handler3")
-      git_handler.should_receive(:present?).and_return(false)
-      git_handler.should_receive(:add).with(".")
-      git_handler.as_null_object
+      @git_handler.should_receive(:present?).and_return(false)
+      @git_handler.should_receive(:add).with(".")
 
-      run_with(:git_handler => git_handler)    
+      @command.run
     end
   
     it "should create the initial commit" do
-      git_handler = mock("git_handler3")
-      git_handler.should_receive(:present?).and_return(false)
-      git_handler.should_receive(:commit).with("Initial commit")
-      git_handler.as_null_object
-
-      run_with(:git_handler => git_handler)
+      @git_handler.should_receive(:present?).and_return(false)
+      @git_handler.should_receive(:commit).with("Initial commit")
+      
+      @command.run
     end
   end
 
   context "when git repo is initialized" do
     it "should not create a commit" do
-      git_handler = mock("git_handler")
-      git_handler.should_receive(:present?).and_return(true)
-      git_handler.should_receive(:commit).never
-      git_handler.as_null_object
+      @git_handler.should_receive(:present?).and_return(true)
+      @git_handler.should_receive(:commit).never
 
-      run_with(:git_handler => git_handler)
+      @command.run
     end
 
     it "should try to add a remote" do
-      git_handler = mock("git_handler")
-      git_handler.should_receive(:present?).and_return(true)
-      git_handler.should_receive(:add_remote)
-      git_handler.as_null_object
+      @git_handler.should_receive(:present?).and_return(true)
+      @git_handler.should_receive(:add_remote)
 
-      run_with(:git_handler => git_handler)
+      @command.run
     end
   end
 end

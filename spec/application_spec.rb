@@ -6,23 +6,38 @@ describe Webbynode::Application do
     it "should look for a class with the name of the command" do
       Webbynode::Commands.should_receive(:const_get).with("Zap")
       wn = Webbynode::Application.new("zap")
+      wn.parse_command
     end
     
-    it "should translate words separated by underscore into capitalized parts" do
-      Webbynode::Commands.should_receive(:const_get).with("RandomThoughtsIHad")
-      
-      wn = Webbynode::Application.new("random_thoughts_i_had")
-      wn.command_class_name.should == "RandomThoughtsIHad"
-    end
-    
-    describe "#execute" do
-      it "should run the command" do
-        pending
-        cmd = double("cmd")
-        Class.should_receive(:for_name).with("Webbynode::Commands::DoIt").and_return(cmd)
+    context "when class exists" do
+      it "should translate words separated by underscore into capitalized parts" do
+        Webbynode::Commands.should_receive(:const_get).with("RandomThoughtsIHad")
 
-        wn = Webbynode::Application.new("do_it")
+        wn = Webbynode::Application.new("random_thoughts_i_had")
+        wn.parse_command
+        wn.command_class_name.should == "RandomThoughtsIHad"
       end
+    end
+
+    context "when class doesn't exist" do
+      it "should translate words separated by underscore into capitalized parts" do
+        Webbynode::Commands.should_receive(:const_get).and_raise(NameError)
+        
+        wn = Webbynode::Application.new("inexistent_command")
+        wn.should_receive(:puts).with('Command "inexistent_command" doesn\'t exist')
+        wn.parse_command
+      end
+    end
+  end
+
+  describe "#execute" do
+    it "should run the command" do
+      cmd = double("cmd")
+      cmd.should_receive(:run)
+      
+      Webbynode::Commands.should_receive(:const_get).with("DoIt").and_return(cmd)
+      wn = Webbynode::Application.new("do_it")
+      wn.execute
     end
   end
 end

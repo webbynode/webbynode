@@ -15,11 +15,11 @@ describe Webbynode::Server do
       @server.should_receive(:remote_executor).any_number_of_times.and_return(@re)
     end
   
-    describe "when local key is missing" do
+    describe "which local key missing" do
       context "when unsuccessful" do
-        it "should create a local SSH key if one is not found" do
+        it "should create a local SSH key with empty passphrase" do
           @io.should_receive(:file_exists?).with("xyz").and_return(false)
-          @io.should_receive(:create_local_key).with("xyz", nil)
+          @io.should_receive(:create_local_key).with("xyz", "")
       
           @server.add_ssh_key "xyz"
         end
@@ -42,7 +42,7 @@ describe Webbynode::Server do
       end
     end
     
-    describe "when local key is present" do
+    describe "with local key present" do
       context "when successful" do
         it "should not create a local key" do
           @io.should_receive(:file_exists?).with("xyz").and_return(true)

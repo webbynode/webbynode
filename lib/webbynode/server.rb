@@ -3,7 +3,7 @@ module Webbynode
   class PermissionError < StandardError; end
   
   class Server
-    def add_ssh_key(key_file, passphrase=nil)
+    def add_ssh_key(key_file, passphrase="")
       io.create_local_key(key_file, passphrase) unless io.file_exists?(key_file)
       remote_executor.create_folder("~/.ssh", "700")
       

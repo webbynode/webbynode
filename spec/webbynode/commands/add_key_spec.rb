@@ -1,5 +1,5 @@
 # Load Spec Helper
-require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
+require File.join(File.expand_path(File.dirname(__FILE__)), '../..', 'spec_helper')
 
 describe Webbynode::Commands::AddKey do
   it "should have a constant pointing to the ssh key location" do

@@ -1,5 +1,5 @@
 # Load Spec Helper
-require File.join(File.expand_path(File.dirname(__FILE__)), 'spec_helper')
+require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 
 describe Webbynode::Git do
   def should_raise_when_response(exception, command, response, &blk)
@@ -26,7 +26,7 @@ describe Webbynode::Git do
       "fatal: Not a git repository (or any of the parent directories): .git", &blk
   end
   
-  describe "present?" do
+  describe "#present?" do
     it "should be true if folder .git exists" do
       io_handler = mock("io")
       io_handler.should_receive(:directory?).with(".git").and_return(true)
@@ -46,7 +46,7 @@ describe Webbynode::Git do
     end
   end
   
-  describe "init" do
+  describe "#init" do
     context "when successfull" do
       it "should return true" do
         io_handler = mock("io")
@@ -69,7 +69,7 @@ describe Webbynode::Git do
     end
   end
   
-  describe "add_remote" do
+  describe "#add_remote" do
     context "when successfull" do
       it "should create a new remote" do
         io_handler = mock("io")
@@ -98,7 +98,7 @@ describe Webbynode::Git do
     end
   end
   
-  describe "add" do
+  describe "#add" do
     context "when successfull" do
       it "should add objects to git" do
         io_handler = mock("io")
@@ -130,7 +130,7 @@ describe Webbynode::Git do
     end
   end
 
-  describe "commit" do
+  describe "#commit" do
     context "when successfull" do
       it "should add objects to git" do
         io_handler = mock("io")

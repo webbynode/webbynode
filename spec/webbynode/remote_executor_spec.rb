@@ -16,14 +16,14 @@ describe Webbynode::RemoteExecutor do
     end
   end
   
-  describe "exec" do
+  describe "#exec" do
     it "should execute the raw command on the server" do
       @ssh.should_receive(:execute).with("the same string I pass")
       @re.exec "the same string I pass"
     end
   end
   
-  describe "create_folder" do
+  describe "#create_folder" do
     it "should create the folder on the server" do
       @ssh.should_receive(:execute).with("mkdir -p /var/new_folder")
       @re.create_folder "/var/new_folder"

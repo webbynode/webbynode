@@ -2,8 +2,8 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), '../..', 'spec_helper')
 
 describe Webbynode::Commands::Remote do
- 
-  before do
+  
+  def load_all_mocks
     @re = mock("RemoteExecutor")
     @re.as_null_object
     
@@ -17,6 +17,10 @@ describe Webbynode::Commands::Remote do
     @remote.should_receive(:remote_executor).any_number_of_times.and_return(@re)
     @remote.should_receive(:git).any_number_of_times.and_return(@git)
     @remote.should_receive(:pushand).any_number_of_times.and_return(@pushand)
+  end
+ 
+  before do
+    load_all_mocks
   end
  
   context "when successful" do    
@@ -57,19 +61,7 @@ describe Webbynode::Commands::Remote do
     
     context "from a webbynode uninitialized application" do
       before do
-        @re = mock("RemoteExecutor")
-        @re.as_null_object
-
-        @git = mock("Git")
-        @git.as_null_object
-
-        @pushand = mock("Pushand")
-        @pushand.as_null_object
-
-        @remote = Webbynode::Commands::Remote.new('ls -la')
-        @remote.should_receive(:remote_executor).any_number_of_times.and_return(@re)
-        @remote.should_receive(:git).any_number_of_times.and_return(@git)
-        @remote.should_receive(:pushand).any_number_of_times.and_return(@pushand)
+        load_all_mocks
       end
       
       it "should not have a git repository" do

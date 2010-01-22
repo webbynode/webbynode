@@ -17,6 +17,7 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'server')
 require File.join(File.dirname(__FILE__), 'webbynode', 'remote_executor')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'init')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'add_key')
+require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'remote')
 
 module Webbynode
   VERSION = '0.1.2'

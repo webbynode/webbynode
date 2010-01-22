@@ -25,7 +25,7 @@ module Webbynode
         raise GitRemoteAlreadyExistsError, output if output =~ /remote \w+ already exists/
         
         # success if output is empty
-        output.blank?
+        output.nil? or output.empty?
       end
     end
     
@@ -46,7 +46,7 @@ module Webbynode
       if blk
         raise GitError, output unless blk.call(output)
       else
-        raise GitError, output unless output.blank?
+        raise GitError, output unless output.nil? or output.empty?
       end
       
       true

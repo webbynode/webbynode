@@ -1,20 +1,19 @@
-require 'yaml'
-
 module Webbynode
-  module Io
-    def create_yaml_file(file, contents, for_real=true)
-      raise "Attempted to create #{file}" if $testing and for_real
-      File.open(file, "w") do |file|
-        file.write contents.to_yaml
-      end
+  class Io
+    def app_name
+      Dir.pwd.split("/").last.gsub(/[\.| ]/, "_")
     end
     
-    def read_yaml_file(file)
-      if File.exists?(file)
-        YAML.load(File.read(file))
-      else
-        yield if block_given?
-      end
+    def exec(s)
+      `#{s}`
+    end
+    
+    def directory?(s)
+      File.directory?(s)
+    end
+    
+    def read_file(f)
+      File.read(f)
     end
   end
 end

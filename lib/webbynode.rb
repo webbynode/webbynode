@@ -6,12 +6,15 @@ require 'net/ssh'
 require 'highline/import'
 require 'pp'
 
-%w[helpers ssh ssh_keys commands api_client io].each do |f|
-  require File.join(File.dirname(__FILE__), 'webbynode', f)
-end
+# %w[helpers ssh ssh_keys commands api_client io].each do |f|
+#   require File.join(File.dirname(__FILE__), 'webbynode', f)
+# end
 
+require File.join(File.dirname(__FILE__), 'webbynode', 'io')
 require File.join(File.dirname(__FILE__), 'webbynode', 'git')
+require File.join(File.dirname(__FILE__), 'webbynode', 'ssh')
 require File.join(File.dirname(__FILE__), 'webbynode', 'server')
+require File.join(File.dirname(__FILE__), 'webbynode', 'remote_executor')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'init_command')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'add_key_command')
 
@@ -23,11 +26,10 @@ module Webbynode
   class Application
     attr_accessor :input, :command, :options, :named_options
     
-    include Webbynode::Helpers
-    include Webbynode::SshKeys
-    include Webbynode::Commands
-    include Webbynode::ApiClient
-    include Webbynode::Io
+    # include Webbynode::Helpers
+    # include Webbynode::SshKeys
+    # include Webbynode::Commands
+    # include Webbynode::ApiClient
     
     # Initializes the Webbynode App
     def initialize(*input)

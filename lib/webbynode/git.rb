@@ -5,6 +5,9 @@ module Webbynode
   class GitRemoteAlreadyExistsError < StandardError; end
 
   class Git
+    
+    attr_accessor :config, :remote_ip
+    
     def present?
       io.directory?(".git")
     end
@@ -37,7 +40,7 @@ module Webbynode
 
     def parse_config
       return @config if defined?(@config)
-      if present?
+      if present? and remote_webbynode?
         config = {}
         current = {}
         File.open(".git/config").each_line do |line|
@@ -53,8 +56,19 @@ module Webbynode
         end
         @config = config
       else
-        raise Webbynode::GitNotRepoError, "Git repository does not exist. Has Webbynode been initialized?"
+        raise Webbynode::GitNotRepoError, "Git repository does not exist." unless present?
+        raise Webbynode::GitRemoteDoesNotExistError, "Webbynode has not been initialized." unless remote_webbynode?
       end
+    end
+    
+    def parse_remote_ip
+      @config     ||= parse_config
+      @remote_ip  ||= ($2 if @config["remote"]["webbynode"]["url"] =~ /^(\w+)@(.+):(.+)$/) if @config
+    end
+    
+    def remote_webbynode?
+      return true if io.exec('git remote') =~ /webbynode/
+      false 
     end
     
     private

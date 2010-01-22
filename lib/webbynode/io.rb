@@ -1,19 +1,30 @@
-require 'yaml'
-
 module Webbynode
-  module Io
-    def create_yaml_file(file, contents, for_real=true)
-      raise "Attempted to create #{file}" if $testing and for_real
-      File.open(file, "w") do |file|
-        file.write contents.to_yaml
-      end
+  class Io
+    class KeyAlreadyExists < StandardError; end
+    
+    def app_name
+      Dir.pwd.split("/").last.gsub(/[\.| ]/, "_")
     end
     
-    def read_yaml_file(file)
-      if File.exists?(file)
-        YAML.load(File.read(file))
-      else
-        yield if block_given?
+    def exec(s)
+      `#{s}`
+    end
+    
+    def directory?(s)
+      File.directory?(s)
+    end
+    
+    def read_file(f)
+      File.read(f)
+    end
+    
+    def open_file(f)
+      File.open(f)
+    end
+    
+    def create_local_key(passphrase="")
+      unless File.exists?(Webbynode::Commands::AddKey::LocalSshKey)
+        exec "ssh-keygen -t rsa -N \"#{passphrase}\" -f #{Webbynode::Commands::AddKey::LocalSshKey}"
       end
     end
   end

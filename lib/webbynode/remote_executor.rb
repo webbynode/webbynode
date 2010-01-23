@@ -5,7 +5,7 @@ module Webbynode
     def ssh
       @ssh
     end
-    
+        
     def initialize(ip)
       @ssh = Ssh.new(ip)
     end

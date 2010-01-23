@@ -48,18 +48,12 @@ describe Webbynode::Commands::Remote do
     end
     
     it "should consider all parameters a single command" do
-      pending
       @remote = Webbynode::Commands::Remote.new('these', 'are', 'the', 'params')
-
-      @remote.should_receive(:server).and_return(@server)
-      @remote.should_receive(:git).and_return(@git)
-      @remote.should_receive(:ssh).and_return(@ssh)
-      
-      @remote.stub!(:requires_initialization!).and_return(true)
-      @remote.stub!(:requires_pushed_application!).and_return(true)
-      
-      @re.should_receive(:exec).with("these are the params")
-      @pushand.should_receive(:parse_remote_app_name).and_return('test.webbynode.com')
+      @remote.should_receive(:server).any_number_of_times.and_return(@server)
+      @remote.should_receive(:remote_executor).any_number_of_times.and_return(@re)
+      @remote.should_receive(:git).any_number_of_times.and_return(@git)
+                  
+      @re.should_receive(:exec).with("cd webbynode these are the params")
       @remote.run
     end
     

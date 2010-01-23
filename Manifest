@@ -40,5 +40,6 @@ spec/webbynode/commands/init_spec.rb
 spec/webbynode/commands/remote_spec.rb
 spec/webbynode/git_spec.rb
 spec/webbynode/io_spec.rb
+spec/webbynode/push_and_spec.rb
 spec/webbynode/remote_executor_spec.rb
 spec/webbynode/server_spec.rb

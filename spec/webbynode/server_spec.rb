@@ -17,10 +17,14 @@ describe Webbynode::Server do
     
       @re = mock("RemoteExecutor")
       @re.as_null_object
+      
+      @pushand = mock("PushAnd")
+      @pushand.as_null_object
     
       @server = Webbynode::Server.new("1.2.3.4")
       @server.should_receive(:io).any_number_of_times.and_return(@io)
       @server.should_receive(:remote_executor).any_number_of_times.and_return(@re)
+      @server.should_receive(:pushand).any_number_of_times.and_return(@pushand)
     end
   
     describe "which local key missing" do
@@ -69,6 +73,26 @@ describe Webbynode::Server do
           @re.should_receive(:exec).with('echo "key_contents" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys')
 
           @server.add_ssh_key "abc"
+        end
+      end
+    end
+    
+    describe "#application_pushed?" do
+      context "when successful" do
+        it "should check if the application has been pushed" do
+          @pushand.should_receive(:parse_remote_app_name).and_return('test.webbynode.com')
+          @re.should_receive(:exec).with("cd test.webbynode.com")
+          @server.application_pushed?
+        end
+      end
+      
+      context "when unsuccessful" do
+        it "should check if the application has been pushed" do
+          @pushand.should_receive(:parse_remote_app_name).and_return('test.webbynode.com')
+          error_message = "bash: line 0: cd: test.webbynode.com: No such file or directory"
+          @re.should_receive(:exec).with("cd test.webbynode.com").and_return(error_message)
+          error_message.should =~ /No such file or directory/
+          @server.application_pushed?
         end
       end
     end

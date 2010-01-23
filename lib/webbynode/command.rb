@@ -13,7 +13,15 @@ module Webbynode
       # for webbynode init must call
       # this method
       def requires_initialization!
-        Settings[self][:requires_initialization] = true
+        Settings[self][:requires_initialization!] = true
+      end
+      
+      def requires_options!
+        Settings[self][:requires_options!] = true
+      end
+      
+      def requires_pushed_application!
+        Settings[self][:requires_pushed_application!] = true
       end
       
       def for(command)
@@ -50,13 +58,15 @@ module Webbynode
       @server ||= Webbynode::Server.new(git.parse_remote_ip)
     end
     
+    def remote_executor
+      @remote_executor ||= Webbynode::RemoteExecutor.new(git.parse_remote_ip)
+    end
+    
     def pushand
       @pushand ||= PushAnd.new
     end
     
-    def validate
-      raise Webbynode::Commands::NoOptionsProvided,
-        "No remote options were provided." if params.empty?
+    def validate_initialization
       raise Webbynode::GitNotRepoError,
         "Could not find a git repository." unless git.present?
       raise Webbynode::GitRemoteDoesNotExistError,
@@ -65,12 +75,24 @@ module Webbynode
         "Could not find .pushand file, has Webbynode been initialized for this repository?" unless pushand.present?
     end
     
+    def validate_options
+      raise Webbynode::Commands::NoOptionsProvided,
+        "No remote options were provided." if params.empty?
+    end
+    
+    def validate_remote_application_availability
+      raise Webbynode::ApplicationNotDeployed,
+        "Before being able to run remote commands from your Webby, you must first push your application to it." unless server.application_pushed?
+    end
+    
     def settings
       Settings[self.class]
     end
     
     def run
-      validate if settings[:requires_initialization]
+      validate_initialization                   if settings[:requires_initialization!]
+      validate_options                          if settings[:requires_options!]
+      validate_remote_application_availability  if settings[:requires_pushed_application!]
       execute
     end
     

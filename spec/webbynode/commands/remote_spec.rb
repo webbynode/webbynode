@@ -12,11 +12,18 @@ describe Webbynode::Commands::Remote do
 
     @pushand = mock("Pushand")
     @pushand.as_null_object
+    
+    @server = mock("Server")
+    @server.as_null_object
+    
+    @ssh = mock("Ssh")
+    @ssh.as_null_object
 
     @remote = Webbynode::Commands::Remote.new('ls -la')
     @remote.should_receive(:remote_executor).any_number_of_times.and_return(@re)
     @remote.should_receive(:git).any_number_of_times.and_return(@git)
     @remote.should_receive(:pushand).any_number_of_times.and_return(@pushand)
+    @remote.should_receive(:server).any_number_of_times.and_return(@server)
   end
  
   before do
@@ -35,30 +42,24 @@ describe Webbynode::Commands::Remote do
     end
     
     it "should establish a connection with the server" do
-      @re.should_receive(:exec).with("ls -la")
+      @pushand.should_receive(:parse_remote_app_name).and_return('test.webbynode.com')
+      @re.should_receive(:exec).with("cd test.webbynode.com ls -la")
       @remote.run
     end
     
     it "should consider all parameters a single command" do
-      re = mock("RemoteExecutor")
-      re.as_null_object
-      re.should_receive(:exec).with("these are the params")
+      pending
+      @remote = Webbynode::Commands::Remote.new('these', 'are', 'the', 'params')
 
-      cmd = Webbynode::Commands::Remote.new('these', 'are', 'the', 'params')
-      cmd.should_receive(:remote_executor).any_number_of_times.and_return(re)
-      cmd.should_receive(:git).any_number_of_times.and_return(@git)
-      cmd.should_receive(:pushand).any_number_of_times.and_return(@pushand)
-      cmd.run
-    end
-    
-    it "should parse the git config file for the server ip" do
-      @git.should_receive(:parse_remote_ip).and_return('1.2.3.4')
-      @remote.run
-    end
-    
-    it "should initialize the remote executor with an IP" do
-      @git.should_receive(:parse_remote_ip).and_return('5.6.7.8')
-      @re.should_receive(:new).with('5.6.7.8')
+      @remote.should_receive(:server).and_return(@server)
+      @remote.should_receive(:git).and_return(@git)
+      @remote.should_receive(:ssh).and_return(@ssh)
+      
+      @remote.stub!(:requires_initialization!).and_return(true)
+      @remote.stub!(:requires_pushed_application!).and_return(true)
+      
+      @re.should_receive(:exec).with("these are the params")
+      @pushand.should_receive(:parse_remote_app_name).and_return('test.webbynode.com')
       @remote.run
     end
     
@@ -72,6 +73,7 @@ describe Webbynode::Commands::Remote do
   context "when unsuccesful" do    
     it "should raise an error if no options are provided" do
       @remote = Webbynode::Commands::Remote.new
+      @remote.stub!(:validate_initialization)
       @remote.params.should be_empty
       @re.should_not_receive(:exec)
       lambda { @remote.run }.should raise_error(Webbynode::Commands::NoOptionsProvided,
@@ -102,10 +104,9 @@ describe Webbynode::Commands::Remote do
       end
       
       it "should not have the application pushed to the server" do
-        @pushand.should_receive(:parse_remote_app_name).and_return('bdd.webbynode.com')
-        @re.should_receive(:application_exists?).and_return(false)
+        @server.should_receive(:application_pushed?).and_return(false)
         lambda { @remote.run }.should raise_error(Webbynode::ApplicationNotDeployed,
-          "Before being able to run commands from your Webby, you must first push it.")
+          "Before being able to run remote commands from your Webby, you must first push your application to it.")
       end
     end
     

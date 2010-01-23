@@ -1,6 +1,7 @@
 module Webbynode
   class InvalidAuthentication < StandardError; end
   class PermissionError < StandardError; end
+  class ApplicationNotDeployed < StandardError; end
   
   class Server
     attr_accessor :ip
@@ -16,6 +17,10 @@ module Webbynode
     def remote_executor
       @remote_executor ||= RemoteExecutor.new(ip)
     end
+    
+    def pushand
+      @pushand ||= PushAnd.new
+    end
 
     def add_ssh_key(key_file, passphrase="")
       io.create_local_key(key_file, passphrase) unless io.file_exists?(key_file)
@@ -23,6 +28,12 @@ module Webbynode
       
       key_contents = io.read_file(key_file)
       remote_executor.exec "echo \"#{key_contents}\" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys"
+    end
+    
+    def application_pushed?
+      remote_app_name = pushand.parse_remote_app_name
+      return false if remote_executor.exec("cd #{remote_app_name}") =~ /No such file or directory/
+      true
     end
   end
 end

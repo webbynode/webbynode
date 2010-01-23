@@ -1,9 +1,10 @@
-module Webbynode
-  
-  class ApplicationNotDeployed < StandardError; end
-  
+module Webbynode  
   class RemoteExecutor
     attr_accessor :ip
+    
+    def ssh
+      @ssh
+    end
     
     def initialize(ip)
       @ssh = Ssh.new(ip)

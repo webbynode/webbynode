@@ -12,9 +12,11 @@ module Webbynode::Commands
         return
       end
       
+      app_name = params[1] || io.app_name
+      
       git.add_git_ignore unless io.file_exists?(".gitignore")
       
-      io.create_file(".pushand", "#! /bin/bash\nphd $0 #{io.app_name}\n") unless io.file_exists?(".pushand")
+      io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name}\n") unless io.file_exists?(".pushand")
       
       unless git.present?
         git.init 

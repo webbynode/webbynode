@@ -9,7 +9,7 @@ module Webbynode
       base.base_uri "https://manager.webbynode.com/api/yaml"
     end
     
-    def webby_ip(hostname)
+    def ip_for(hostname)
       (webbies[hostname] || {})[:ip]
     end
     

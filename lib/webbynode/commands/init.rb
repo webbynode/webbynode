@@ -1,5 +1,6 @@
 module Webbynode::Commands
   class Init < Webbynode::Command
+    include Webbynode::ApiClient
     attr_accessor :output
     
     def out(s)
@@ -12,7 +13,14 @@ module Webbynode::Commands
         return
       end
       
+      webby = params[0]
       app_name = params[1] || io.app_name
+      
+      if webby =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/
+        webby_ip = webby
+      else
+        webby_ip = api.ip_for(webby)
+      end
       
       git.add_git_ignore unless io.file_exists?(".gitignore")
       
@@ -24,7 +32,7 @@ module Webbynode::Commands
         git.commit "Initial commit"
       end
       
-      git.add_remote "webbynode", params[0], io.app_name
+      git.add_remote "webbynode", webby_ip, io.app_name
     rescue Webbynode::GitRemoteAlreadyExistsError
       puts "Webbynode already initialized for this application."
     end

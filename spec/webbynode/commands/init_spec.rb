@@ -19,6 +19,10 @@ describe Webbynode::Commands::Init do
     Webbynode::Commands::Init.new.git.class.should == Webbynode::Git
   end
   
+  it "should include ApiClient" do
+    Webbynode::Commands::Init.new.respond_to?(:ip_for).should be_true
+  end
+  
   it "should output usage if no params given" do
     command = Webbynode::Commands::Init.new
     command.run
@@ -27,6 +31,19 @@ describe Webbynode::Commands::Init do
   
   it "should have an Io instance" do
     Webbynode::Commands::Init.new.io.class.should == Webbynode::Io
+  end
+  
+  it "should try to get Webby's IP if no IP given" do
+    api = double("ApiClient")
+    api.should_receive(:ip_for).with("my_webby_name").and_return("1.2.3.4")
+    
+    io_handler.should_receive(:app_name).any_number_of_times.and_return("my_app")
+    git_handler.should_receive(:present?).and_return(false)
+    git_handler.should_receive(:add_remote).with("webbynode", "1.2.3.4", "my_app")
+
+    create_init("my_webby_name")
+    @command.should_receive(:api).and_return(api)
+    @command.run
   end
   
   context "determining host" do

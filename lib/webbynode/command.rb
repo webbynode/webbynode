@@ -4,7 +4,7 @@ module Webbynode
     Aliases = {}
     Settings = {}
     
-    def self.inherited(child)
+    def Command.inherited(child)
       Settings[child] ||= {}
     end
     
@@ -24,6 +24,18 @@ module Webbynode
         Settings[self][:requires_pushed_application!] = true
       end
       
+      def description(s)
+        Settings[self][:description] = s
+      end
+      
+      def parameter(*args)
+        (Settings[self][:parameters] ||= []) << Parameter.new(*args)
+      end
+      
+      def option(*args)
+        (Settings[self][:options] ||= []) << Option.new(*args)
+      end
+      
       def for(command)
         Webbynode::Commands.const_get command_class_name(command)
       rescue NameError
@@ -39,11 +51,65 @@ module Webbynode
         class_name = command.split("_").inject([]) { |arr, item| arr << item.capitalize }.join("")
       end
     end
-    
+
     def initialize(*args)
       @params = []
       @options = {}
       parse_args(args)
+    end
+
+    def command
+      str = ""
+      self.class.name.each_char do |ch| 
+        str << "_" if ch.match(/[A-Z]/) and !str.empty?
+        str << ch.downcase
+      end
+      str
+    end
+    
+    def parameters
+      settings[:parameters]
+    end
+    
+    def usage
+      help = "Usage: wn #{command}"
+      parameters.each do |p|
+        help << " #{p.to_s}"
+      end
+      
+      help << " [options]" if settings[:options].any?
+      help
+    end
+    
+    def params_help
+      help = []
+      if parameters
+        help << "Parameters:"
+        parameters.each do |p|
+          help << "    #{p.name.to_s.ljust(25)}   #{p.desc}#{p.required? ? "" : ", optional"}"
+        end
+      end
+      help.join("\n")
+    end
+    
+    def options_help
+      help = []
+      if settings[:options]
+        help << "Options:"
+        settings[:options].each do |p|
+          help << "    #{p.to_s.ljust(25)}   #{p.desc}#{p.required? ? "" : ", optional"}"
+        end
+      end
+      help.join("\n")
+    end
+    
+    def help
+      help = []
+      help << usage
+      help << params_help
+      help << options_help
+      
+      help.join("\n")
     end
     
     def io

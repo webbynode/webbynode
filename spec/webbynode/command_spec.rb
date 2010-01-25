@@ -25,6 +25,40 @@ describe Webbynode::Command do
     end
   end
   
+  describe "#command" do
+    it "should return the string representation of the command" do
+      AwfulCommand = Class.new(Webbynode::Command)
+      AwfulCommand.new.command.should == "awful_command"
+      Amazing = Class.new(Webbynode::Command)
+      Amazing.new.command.should == "amazing"
+      SomeStrangeStuff = Class.new(Webbynode::Command)
+      SomeStrangeStuff.new.command.should == "some_strange_stuff"
+    end
+  end
+  
+  describe "help for commands" do
+    class NewCommand < Webbynode::Command
+      description "Initializes the current folder as a deployable application"
+      parameter :webby, String, "Name or IP of the Webby to deploy to"
+      parameter :dns, String, "The DNS used for this application", :required => false
+      
+      option :passphrase, String, "If present, passphrase will be used when creating a new SSH key", :value => :words
+    end
+    
+    before(:each) do
+      @cmd = NewCommand.new
+    end
+    
+    it "should provide help for parameters" do
+      @cmd.help.should =~ /Usage: wn new_command webby \[dns\] \[options\]/
+      @cmd.help.should =~ /Parameters:/
+      @cmd.help.should =~ /    webby                       Name or IP of the Webby to deploy to/
+      @cmd.help.should =~ /    dns                         The DNS used for this application, optional/
+      @cmd.help.should =~ /Options:/
+      @cmd.help.should =~ /    --passphrase=words          If present, passphrase will be used when creating a new SSH key/
+    end
+  end
+  
   describe "parsing options" do
     it "should parse arguments as params" do
       cmd = Webbynode::Command.new("param1", "param2")

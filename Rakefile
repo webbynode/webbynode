@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'rake'  
 require 'rake/testtask'
-require File.join(File.expand_path(File.dirname(__FILE__)), 'devver.rake')
 
 require 'echoe'  
   

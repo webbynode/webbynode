@@ -6,6 +6,7 @@ require 'net/ssh'
 require 'highline/import'
 require 'pp'
 
+require File.join(File.dirname(__FILE__), 'webbynode', 'helpers')
 require File.join(File.dirname(__FILE__), 'webbynode', 'io')
 require File.join(File.dirname(__FILE__), 'webbynode', 'git')
 require File.join(File.dirname(__FILE__), 'webbynode', 'ssh')
@@ -19,6 +20,7 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'remote_executor')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'init')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'add_key')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'remote')
+require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'help')
 
 require File.join(File.dirname(__FILE__), 'webbynode', 'application')
 

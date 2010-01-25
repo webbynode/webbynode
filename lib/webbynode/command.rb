@@ -1,3 +1,5 @@
+require 'jcode'
+
 module Webbynode
   class Command
     attr_reader :params, :options

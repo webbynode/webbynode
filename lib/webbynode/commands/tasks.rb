@@ -39,12 +39,13 @@ module Webbynode::Commands
   
     def read_tasks(file, index = false)
       tasks = []
+      @selected_tasks = []
       io.read_file(file).each_line {|line| tasks << line.gsub(/\n/,'') unless line.blank? }
       tasks.each_with_index do |task, index|
         if index
-          selected_tasks << "[#{index}] #{task}"
+          @selected_tasks << "[#{index}] #{task}"
         else
-          selected_tasks << task
+          @selected_tasks << task
         end
       end
     end
@@ -60,10 +61,13 @@ module Webbynode::Commands
 
       # Gets invoked if the user specified [remove] for @action    
       def remove
+        delete_task(command.to_i)
+        write_tasks
+        show_tasks
       end
       
       def append_task(cmd)
-        selected_tasks << cmd
+        @selected_tasks << cmd
       end
       
       def write_tasks
@@ -75,11 +79,19 @@ module Webbynode::Commands
         end
       end
       
-      def show_tasks
-        read_tasks(selected_file, true)
+      def delete_task(i)
+        filtered_tasks = []
+        selected_tasks.each_with_index do |task, index|
+          filtered_tasks << task unless index.eql?(i)
+        end
+        @selected_tasks = filtered_tasks
+      end
+      
+      def show_tasks(from_file = false)
+        read_tasks(selected_file, true) if from_file
         puts "These are the current tasks for \"#{type.gsub('_',' ').capitalize}\":"
-        selected_tasks.each do |task|
-          puts "- #{task}"
+        selected_tasks.each_with_index do |task, index|
+          puts "[#{index}] #{task}"
         end
       end
       

@@ -96,40 +96,74 @@ describe Webbynode::Commands::Tasks do
   end
   
   describe "adding tasks to a file" do
-    
-    let(:add_task)    { Webbynode::Commands::Tasks.new(['add', 'after_push', 'rake', 'db:migrate', 'RAILS_ENV=production']) }
-    let(:remove_task) { Webbynode::Commands::Tasks.new(['remove', 'after_push', 'rake', 'db:migrate', 'RAILS_ENV=production']) }
-    
     before(:each) do
-      add_task.should_receive(:io).any_number_of_times.and_return(io)
+      task.should_receive(:io).any_number_of_times.and_return(io)
     end
     
     context "when successful" do
       it "should read the specified file" do
-        add_task.should_receive(:read_tasks).with('.webbynode/tasks/after_push')
-        add_task.stub!(:send)
-        add_task.execute
+        task.should_receive(:read_tasks).with('.webbynode/tasks/after_push')
+        task.stub!(:send)
+        task.execute
       end
       
       it "should append the new task to the array" do
-        add_task.should_receive(:append_task).with('rake db:migrate RAILS_ENV=production')
-        add_task.execute
+        task.should_receive(:append_task).with('rake db:migrate RAILS_ENV=production')
+        task.execute
       end
       
       it "should have appended the new task to the array" do
-        add_task.execute
-        add_task.selected_tasks.should include('rake db:migrate RAILS_ENV=production')
+        task.execute
+        task.selected_tasks.should include('rake db:migrate RAILS_ENV=production')
       end
       
       it "should write a new file with the updated task list" do
-        add_task.should_receive(:write_tasks)
-        add_task.execute
+        task.should_receive(:write_tasks)
+        task.execute
       end
       
       it "should display the updated list of tasks" do
-        add_task.should_receive(:puts).with("These are the current tasks for \"After push\":")
-        add_task.should_receive(:puts).with("- rake db:migrate RAILS_ENV=production")
-        add_task.execute
+        task.should_receive(:puts).with("These are the current tasks for \"After push\":")
+        task.should_receive(:puts).with("[0] rake db:migrate RAILS_ENV=production")
+        task.execute
+      end
+    end
+  end
+  
+  describe "removing tasks from a file" do
+    let(:rtask) { Webbynode::Commands::Tasks.new(['remove', 'after_push', 1]) }
+    
+    before(:each) do
+      rtask.should_receive(:io).any_number_of_times.and_return(io)
+    end
+    
+    context "when successful" do
+      it "should initialize the [remove] method" do
+        rtask.should_receive(:send).with('remove')
+        rtask.execute
+      end
+      
+      it "should remove the task from the list of available tasks" do
+        rtask.should_receive(:delete_task).with(1)
+        rtask.execute
+      end
+      
+      it "should write the new tasks" do
+        rtask.should_receive(:write_tasks)
+        rtask.execute
+      end
+      
+      it "should display the updated list of tasks" do
+        3.times {|num| rtask.selected_tasks << "task#{num}" }
+        rtask.stub(:read_tasks)
+        rtask.should_receive(:puts).with("These are the current tasks for \"After push\":")
+        rtask.should_receive(:puts).with("[0] task0")
+        rtask.should_not_receive(:puts).with("[1] task1")
+        rtask.should_receive(:puts).with("[1] task2")
+        rtask.execute
+        rtask.selected_tasks.should include("task0")
+        rtask.selected_tasks.should_not include("task1")
+        rtask.selected_tasks.should include("task2")
       end
     end
   end

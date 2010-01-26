@@ -6,6 +6,7 @@ describe Webbynode::Commands::Remote do
   def load_all_mocks
     remote.should_receive(:remote_executor).any_number_of_times.and_return(re)
     remote.should_receive(:git).any_number_of_times.and_return(git)
+    remote.should_receive(:io).any_number_of_times.and_return(io)
     remote.should_receive(:pushand).any_number_of_times.and_return(pushand)
     remote.should_receive(:server).any_number_of_times.and_return(server)
   end
@@ -15,6 +16,7 @@ describe Webbynode::Commands::Remote do
   let(:pushand) { double("Pushand").as_null_object }
   let(:server)  { double("Server").as_null_object }
   let(:ssh)     { double("SSh").as_null_object }
+  let(:io)      { double("Io").as_null_object }
   let(:remote)  { Webbynode::Commands::Remote.new('ls -la') }
  
   before do
@@ -33,6 +35,7 @@ describe Webbynode::Commands::Remote do
     end
     
     it "should establish a connection with the server" do
+      remote.stub(:validate_initialization)
       pushand.should_receive(:parse_remote_app_name).and_return('test.webbynode.com')
       re.should_receive(:exec).with("cd test.webbynode.com ls -la")
       remote.run
@@ -43,12 +46,14 @@ describe Webbynode::Commands::Remote do
       remote.should_receive(:server).any_number_of_times.and_return(server)
       remote.should_receive(:remote_executor).any_number_of_times.and_return(re)
       remote.should_receive(:git).any_number_of_times.and_return(git)
+      remote.stub(:validate_initialization)
                   
       re.should_receive(:exec).with("cd webbynode these are the params")
       remote.run
     end
     
     it "should parse the pushand file for the application folder name on the remote server" do
+      remote.stub(:validate_initialization)
       pushand.should_receive(:parse_remote_app_name).and_return("dummy_app")
       remote.run
     end
@@ -64,36 +69,5 @@ describe Webbynode::Commands::Remote do
       lambda { remote.run }.should raise_error(Webbynode::Commands::NoOptionsProvided,
         'No remote options were provided.')
     end
-    
-    context "from a webbynode uninitialized application" do
-      before do
-        load_all_mocks
-      end
-      
-      it "should not have a git repository" do
-        git.should_receive(:present?).and_return(false)
-        lambda { remote.run }.should raise_error(Webbynode::GitNotRepoError,
-          "Could not find a git repository.")
-      end
-      
-      it "should not have webbynode git remote" do
-        git.should_receive(:remote_webbynode?).and_return(false)
-        lambda { remote.run }.should raise_error(Webbynode::GitRemoteDoesNotExistError,
-          "Webbynode has not been initialized for this git repository.")
-      end
-      
-      it "should not have a pushand file" do
-        pushand.should_receive(:present?).and_return(false)
-        lambda { remote.run }.should raise_error(Webbynode::PushAndFileNotFound,
-          "Could not find .pushand file, has Webbynode been initialized for this repository?")
-      end
-      
-      it "should not have the application pushed to the server" do
-        server.should_receive(:application_pushed?).and_return(false)
-        lambda { remote.run }.should raise_error(Webbynode::ApplicationNotDeployed,
-          "Before being able to run remote commands from your Webby, you must first push your application to it.")
-      end
-    end
-    
   end
 end

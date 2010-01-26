@@ -94,4 +94,47 @@ describe Webbynode::Command do
       wn.params.should == ["param1", "param2"]
     end
   end
+
+    
+  context "with a webbynode uninitialized application" do
+    class NewCommand < Webbynode::Command
+      requires_initialization!
+    end
+
+    before do
+      command.should_receive(:remote_executor).any_number_of_times.and_return(re)
+      command.should_receive(:git).any_number_of_times.and_return(git)
+      command.should_receive(:io).any_number_of_times.and_return(io)
+      command.should_receive(:pushand).any_number_of_times.and_return(pushand)
+      command.should_receive(:server).any_number_of_times.and_return(server)
+    end
+    
+    let(:command) { NewCommand.new }
+    let(:re)      { double("RemoteExecutor").as_null_object }
+    let(:git)     { double("Git").as_null_object }
+    let(:pushand) { double("Pushand").as_null_object }
+    let(:server)  { double("Server").as_null_object }
+    let(:ssh)     { double("SSh").as_null_object }
+    let(:io)      { double("Io").as_null_object }
+    
+    it "should not have a git repository" do
+      git.should_receive(:present?).and_return(false)
+      lambda { command.run }.should raise_error(Webbynode::GitNotRepoError,
+        "Could not find a git repository.")
+    end
+    
+    it "should not have webbynode git remote" do
+      git.should_receive(:remote_webbynode?).and_return(false)
+      lambda { command.run }.should raise_error(Webbynode::GitRemoteDoesNotExistError,
+        "Webbynode has not been initialized for this git repository.")
+    end
+    
+    it "should not have a pushand file" do
+      git.should_receive(:present?).and_return(true)
+      io.should_receive(:directory?).with(".webbynode").and_return(true)
+      pushand.should_receive(:present?).and_return(false)
+      lambda { command.run }.should raise_error(Webbynode::PushAndFileNotFound,
+        "Could not find .pushand file, has Webbynode been initialized for this repository?")
+    end
+  end
 end

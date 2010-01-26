@@ -38,7 +38,7 @@ describe Webbynode::Commands::Tasks do
   end
   
   it "should set the current path for the specified task interaction type" do
-    task.should_receive(:set_selected_file)
+    task.should_receive(:set_session_file)
     task.execute
   end
   
@@ -57,22 +57,22 @@ describe Webbynode::Commands::Tasks do
     
     it "should be the before_create path" do
       selectable_helper('before_create')
-      @task.selected_file.should eql(@tasks_class::BeforeCreateTasksFile)
+      @task.session_file.should eql(@tasks_class::BeforeCreateTasksFile)
     end
     
     it "should be the before_create path" do
       selectable_helper('after_create')
-      @task.selected_file.should eql(@tasks_class::AfterCreateTasksFile)
+      @task.session_file.should eql(@tasks_class::AfterCreateTasksFile)
     end
     
     it "should be the before_create path" do
       selectable_helper('before_push')
-      @task.selected_file.should eql(@tasks_class::BeforePushTasksFile)
+      @task.session_file.should eql(@tasks_class::BeforePushTasksFile)
     end
     
     it "should be the before_create path" do
       selectable_helper('after_push')
-      @task.selected_file.should eql(@tasks_class::AfterPushTasksFile)
+      @task.session_file.should eql(@tasks_class::AfterPushTasksFile)
     end
   end
   
@@ -117,18 +117,18 @@ describe Webbynode::Commands::Tasks do
       stask.should_receive(:puts).with("These are the current tasks for \"After push\":")
       stask.should_not_receive(:puts)
       stask.execute
-      stask.should have(0).selected_tasks
+      stask.should have(0).session_tasks
     end
     
     it "should display 3 tasks: task0 task1 task2" do
-      3.times {|num| stask.selected_tasks << "task#{num}"}
+      3.times {|num| stask.session_tasks << "task#{num}"}
       stask.should_receive(:puts).with("These are the current tasks for \"After push\":")
       stask.stub(:read_tasks)
       stask.should_receive(:puts).with("[0] task0")
       stask.should_receive(:puts).with("[1] task1")
       stask.should_receive(:puts).with("[2] task2")
       stask.execute
-      stask.should have(3).selected_tasks
+      stask.should have(3).session_tasks
     end
   end
   
@@ -151,7 +151,7 @@ describe Webbynode::Commands::Tasks do
       
       it "should have appended the new task to the array" do
         task.execute
-        task.selected_tasks.should include('rake db:migrate RAILS_ENV=production')
+        task.session_tasks.should include('rake db:migrate RAILS_ENV=production')
       end
       
       it "should write a new file with the updated task list" do
@@ -191,16 +191,16 @@ describe Webbynode::Commands::Tasks do
       end
       
       it "should display the updated list of tasks" do
-        3.times {|num| rtask.selected_tasks << "task#{num}" }
+        3.times {|num| rtask.session_tasks << "task#{num}" }
         rtask.stub(:read_tasks)
         rtask.should_receive(:puts).with("These are the current tasks for \"After push\":")
         rtask.should_receive(:puts).with("[0] task0")
         rtask.should_not_receive(:puts).with("[1] task1")
         rtask.should_receive(:puts).with("[1] task2")
         rtask.execute
-        rtask.selected_tasks.should include("task0")
-        rtask.selected_tasks.should_not include("task1")
-        rtask.selected_tasks.should include("task2")
+        rtask.session_tasks.should include("task0")
+        rtask.session_tasks.should_not include("task1")
+        rtask.session_tasks.should include("task2")
       end
     end
   end

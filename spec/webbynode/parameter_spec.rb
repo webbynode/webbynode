@@ -5,6 +5,12 @@ describe Webbynode::Parameter do
   it "should require the name" do
     lambda { Webbynode::Parameter.new }.should raise_error
   end
+  
+  it "should allow setting a value" do
+    param = Webbynode::Parameter.new(:param1)
+    param.value = "hello"
+    param.value.should == "hello"
+  end
 
   it "should parse the name" do
     Webbynode::Parameter.new(:param1).name.should == :param1

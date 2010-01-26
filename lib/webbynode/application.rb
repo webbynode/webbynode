@@ -11,7 +11,7 @@ module Webbynode
     
     def execute
       if command_class = Webbynode::Command.for(command)
-        cmd = command_class.new(params)
+        cmd = command_class.new(*params)
         cmd.run
       end
     end

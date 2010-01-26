@@ -13,7 +13,7 @@ describe Webbynode::Commands::Tasks do
   end
   
   let(:io)    { double('io').as_null_object }
-  let(:task)  { Webbynode::Commands::Tasks.new(['add', 'after_push', 'rake', 'db:migrate', 'RAILS_ENV=production']) }
+  let(:task)  { Webbynode::Commands::Tasks.new('add', 'after_push', 'rake', 'db:migrate', 'RAILS_ENV=production') }
   
   before(:each) do
     task.should_receive(:io).any_number_of_times.and_return(io)
@@ -232,7 +232,7 @@ describe Webbynode::Commands::Tasks do
   end
   
   describe "removing tasks from a file" do
-    let(:rtask) { Webbynode::Commands::Tasks.new(['remove', 'after_push', 1]) }
+    let(:rtask) { Webbynode::Commands::Tasks.new('remove', 'after_push', 1) }
     
     before(:each) do
       rtask.should_receive(:io).any_number_of_times.and_return(io)

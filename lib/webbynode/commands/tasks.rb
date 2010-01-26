@@ -1,9 +1,13 @@
 module Webbynode::Commands
   class Tasks < Webbynode::Command
-    
     requires_initialization!
+    parameter :params, Array, "Command to execute"
     
     attr_accessor :action, :type, :command, :session_file, :session_tasks
+    
+    def params
+      param(:params)
+    end
     
     # Constants
     # Paths to the webbynode task files

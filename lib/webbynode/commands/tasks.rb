@@ -32,22 +32,9 @@ module Webbynode::Commands
       # Reads out the currently set tasks
       read_tasks(selected_file)
       
-      # Initializes either [add] or [remove] depending on user input
+      # Initializes either [add], [remove] or [show] depending on user input
       send(action)
       
-    end
-  
-    def read_tasks(file, index = false)
-      tasks = []
-      @selected_tasks = []
-      io.read_file(file).each_line {|line| tasks << line.gsub(/\n/,'') unless line.blank? }
-      tasks.each_with_index do |task, index|
-        if index
-          @selected_tasks << "[#{index}] #{task}"
-        else
-          @selected_tasks << task
-        end
-      end
     end
   
     private
@@ -66,10 +53,18 @@ module Webbynode::Commands
         show_tasks
       end
       
-      def append_task(cmd)
-        @selected_tasks << cmd
+      # Gets invoked if the user specified [show] for @action
+      def show
+        show_tasks  
       end
       
+      # Appends a task to the selected_tasks method.
+      def append_task(task)
+        @selected_tasks << task
+      end
+      
+      # Overwrites the existing file with the new tasks list
+      # This will always be done from the selected_tasks.
       def write_tasks
         io.open_file(selected_file, "w") do |file|
           selected_tasks.each_with_index do |task, index|
@@ -79,6 +74,9 @@ module Webbynode::Commands
         end
       end
       
+      # Removes a task based on the number(index) provided.
+      # delete_task(2)
+      # This will remove whatever task is 3rd in the selected_tasks array.
       def delete_task(i)
         filtered_tasks = []
         selected_tasks.each_with_index do |task, index|
@@ -87,6 +85,9 @@ module Webbynode::Commands
         @selected_tasks = filtered_tasks
       end
       
+      # Reads out each task (in order) either from the selected_tasks method
+      # or straight from the physical file on the filesystem and outputs it directly
+      # in the console to the user for feedback.
       def show_tasks(from_file = false)
         read_tasks(selected_file, true) if from_file
         puts "These are the current tasks for \"#{type.gsub('_',' ').capitalize}\":"
@@ -95,9 +96,13 @@ module Webbynode::Commands
         end
       end
       
+      # TODO
+      # Felipe's Validation Thingy
       def validate_parameters
       end
       
+      # Determines the selected file that will be used for the current session.
+      # This will be stored inside the selected_file method.
       def set_selected_file
         case @type
         when 'before_create'  then cp = BeforeCreateTasksFile
@@ -107,7 +112,22 @@ module Webbynode::Commands
         end
         @selected_file = cp
       end
-    
+      
+      # Reads the tasks straight from the specified file and stores them inside (in order)
+      # the selected_tasks method.
+      def read_tasks(file)
+        tasks = []
+        @selected_tasks = []
+        io.read_file(file).each_line {|line| tasks << line.gsub(/\n/,'') unless line.blank? }
+        tasks.each_with_index do |task, index|
+          @selected_tasks << "[#{index}] #{task}"
+        end
+      end
+      
+      # Parses the parameters and stores the params inside 3 different methods
+      # [action]  represents: [add/remove/show]
+      # [type]    represents: [before/after_create before/after_push]
+      # [command] represents: The remote command that should get executed
       def parse_parameters
         params.flatten!
         @action   = params.shift

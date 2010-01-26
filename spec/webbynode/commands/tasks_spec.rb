@@ -95,6 +95,43 @@ describe Webbynode::Commands::Tasks do
     end
   end
   
+  describe "displaying tasks from a file" do
+    
+    let(:stask) { Webbynode::Commands::Tasks.new(['show', 'after_push']) }
+    
+    before(:each) do
+      stask.should_receive(:io).any_number_of_times.and_return(io)
+    end
+    
+    it "should invoke the [show] method" do
+      stask.should_receive(:send).with('show')
+      stask.execute
+    end
+    
+    it "should read out the specified file" do
+      stask.should_receive(:show_tasks)
+      stask.execute
+    end
+    
+    it "should display no tasks, since there are none initially" do
+      stask.should_receive(:puts).with("These are the current tasks for \"After push\":")
+      stask.should_not_receive(:puts)
+      stask.execute
+      stask.should have(0).selected_tasks
+    end
+    
+    it "should display 3 tasks: task0 task1 task2" do
+      3.times {|num| stask.selected_tasks << "task#{num}"}
+      stask.should_receive(:puts).with("These are the current tasks for \"After push\":")
+      stask.stub(:read_tasks)
+      stask.should_receive(:puts).with("[0] task0")
+      stask.should_receive(:puts).with("[1] task1")
+      stask.should_receive(:puts).with("[2] task2")
+      stask.execute
+      stask.should have(3).selected_tasks
+    end
+  end
+  
   describe "adding tasks to a file" do
     before(:each) do
       task.should_receive(:io).any_number_of_times.and_return(io)

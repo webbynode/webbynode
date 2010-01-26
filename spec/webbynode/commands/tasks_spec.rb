@@ -32,11 +32,6 @@ describe Webbynode::Commands::Tasks do
       end
       
       it "should create the webbynode folder" do
-        io.should_receive(:exec).with('mkdir .webbynode')
-        task.execute
-      end
-      
-      it "should create the webbynode folder" do
         io.should_receive(:exec).with('mkdir .webbynode/tasks')
         task.execute
       end

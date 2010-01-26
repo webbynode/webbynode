@@ -139,6 +139,8 @@ module Webbynode
         "Could not find a git repository." unless git.present?
       raise Webbynode::GitRemoteDoesNotExistError,
         "Webbynode has not been initialized for this git repository." unless git.remote_webbynode?
+      raise Webbynode::DirectoryNotFound
+        "Could not find .webbynode folder, has Webbynode been initialized for this repository?" unless io.directory?('.webbynode')
       raise Webbynode::PushAndFileNotFound,
         "Could not find .pushand file, has Webbynode been initialized for this repository?" unless pushand.present?
     end

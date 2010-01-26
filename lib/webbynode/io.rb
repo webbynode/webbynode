@@ -1,4 +1,6 @@
 module Webbynode
+  class DirectoryNotFound < StandardError; end
+  
   class Io
     class KeyAlreadyExists < StandardError; end
     

@@ -1,7 +1,7 @@
 module Webbynode::Commands
   class Tasks < Webbynode::Command
     
- #   requires_initialization!
+    requires_initialization!
     
     attr_accessor :action, :type, :command, :session_file, :session_tasks
     
@@ -134,7 +134,6 @@ module Webbynode::Commands
       # Ensures the presence of the .webbynode/tasks folder
       # Will create the necessary task files when they are not available
       def ensure_tasks_folder
-        io.exec('mkdir .webbynode') unless io.directory?(".webbynode")
         io.exec('mkdir .webbynode/tasks') unless io.directory?(".webbynode/tasks")
         %w[before_create after_create before_push after_push].each do |file|
           io.exec("touch ./webbynode/tasks/#{file}") unless io.file_exists?("./webbynode/tasks/#{file}")

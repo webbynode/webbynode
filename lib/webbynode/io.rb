@@ -1,4 +1,6 @@
 module Webbynode
+  class DirectoryNotFound < StandardError; end
+  
   class Io
     class KeyAlreadyExists < StandardError; end
     
@@ -26,6 +28,15 @@ module Webbynode
     
     def open_file(f, a)
       File.open(f, a)
+    end
+    
+    def log(text)
+      puts text
+    end
+
+    def log_and_exit(text)
+      puts text
+      exit
     end
     
     def create_local_key(passphrase="")

@@ -20,6 +20,10 @@ module Webbynode::Commands
     
     def execute
       
+      # Ensures that the tasks folder (.webbynode/tasks) is present
+      # Will create the task files if they are not present
+      ensure_tasks_folder
+      
       # Should validate the parameters
       validate_parameters
       
@@ -75,7 +79,7 @@ module Webbynode::Commands
       end
       
       # Removes a task based on the number(index) provided.
-      # delete_task(2)
+      # example: delete_task(2)
       # This will remove whatever task is 3rd in the session_tasks array.
       def delete_task(i)
         filtered_tasks = []
@@ -90,9 +94,12 @@ module Webbynode::Commands
       # in the console to the user for feedback.
       def show_tasks(from_file = false)
         read_tasks(session_file, true) if from_file
-        puts "These are the current tasks for \"#{type.gsub('_',' ').capitalize}\":"
+        if session_tasks.empty?
+          io.log_and_exit "You haven't set up any tasks for \"#{type.gsub('_',' ').capitalize}\"."
+        end
+        io.log "These are the current tasks for \"#{type.gsub('_',' ').capitalize}\":"
         session_tasks.each_with_index do |task, index|
-          puts "[#{index}] #{task}"
+          io.log "[#{index}] #{task}"
         end
       end
       
@@ -105,12 +112,12 @@ module Webbynode::Commands
       # This will be stored inside the session_file method.
       def set_session_file
         case @type
-        when 'before_create'  then cp = BeforeCreateTasksFile
-        when 'after_create'   then cp = AfterCreateTasksFile
-        when 'before_push'    then cp = BeforePushTasksFile
-        when 'after_push'     then cp = AfterPushTasksFile
+        when 'before_create'  then sf = BeforeCreateTasksFile
+        when 'after_create'   then sf = AfterCreateTasksFile
+        when 'before_push'    then sf = BeforePushTasksFile
+        when 'after_push'     then sf = AfterPushTasksFile
         end
-        @session_file = cp
+        @session_file = sf
       end
       
       # Reads the tasks straight from the specified file and stores them inside (in order)
@@ -121,6 +128,15 @@ module Webbynode::Commands
         io.read_file(file).each_line {|line| tasks << line.gsub(/\n/,'') unless line.blank? }
         tasks.each_with_index do |task, index|
           @session_tasks << "[#{index}] #{task}"
+        end
+      end
+      
+      # Ensures the presence of the .webbynode/tasks folder
+      # Will create the necessary task files when they are not available
+      def ensure_tasks_folder
+        io.exec('mkdir .webbynode/tasks') unless io.directory?(".webbynode/tasks")
+        %w[before_create after_create before_push after_push].each do |file|
+          io.exec("touch ./webbynode/tasks/#{file}") unless io.file_exists?("./webbynode/tasks/#{file}")
         end
       end
       

@@ -19,6 +19,63 @@ describe Webbynode::Commands::Tasks do
     task.should_receive(:io).any_number_of_times.and_return(io)
   end
   
+  describe "webbynode tasks folder and files" do
+    context "when not available" do
+      before(:each) do
+        io.stub!(:directory?).with('.webbynode').and_return(false)
+        io.stub!(:directory?).with('.webbynode/tasks').and_return(false)
+      end
+      
+      it "should ensure the availability of the required webbynode files" do
+        task.should_receive(:ensure_tasks_folder)
+        task.execute
+      end
+      
+      it "should create the webbynode folder" do
+        io.should_receive(:exec).with('mkdir .webbynode/tasks')
+        task.execute
+      end
+      
+      it "should create the 4 files required by the tasks command" do
+        %w[before_create after_create before_push after_push].each do |file|
+          io.should_receive(:file_exists?).with("./webbynode/tasks/#{file}").and_return(false)
+          io.should_receive(:exec).with("touch ./webbynode/tasks/#{file}")
+        end
+        task.execute
+      end
+    end
+    
+    context "when available" do
+      before(:each) do
+        io.stub!(:directory?).with('.webbynode').and_return(true)
+        io.stub!(:directory?).with('.webbynode/tasks').and_return(true)
+      end
+      
+      it "should ensure the availability of the required webbynode files" do
+        task.should_receive(:ensure_tasks_folder)
+        task.execute
+      end
+      
+      it "should create the webbynode folder" do
+        io.should_not_receive(:exec).with('mkdir .webbynode')
+        task.execute
+      end
+      
+      it "should create the webbynode folder" do
+        io.should_not_receive(:exec).with('mkdir .webbynode/tasks')
+        task.execute
+      end
+      
+      it "should create the 4 files required by the tasks command" do
+        %w[before_create after_create before_push after_push].each do |file|
+          io.should_receive(:file_exists?).with("./webbynode/tasks/#{file}").and_return(true)
+          io.should_not_receive(:exec).with("touch ./webbynode/tasks/#{file}")
+        end
+        task.execute
+      end
+    end
+  end
+  
   it "should parse the params provided by the user" do
     task.should_receive(:parse_parameters)
     task.stub!(:send)
@@ -96,7 +153,6 @@ describe Webbynode::Commands::Tasks do
   end
   
   describe "displaying tasks from a file" do
-    
     let(:stask) { Webbynode::Commands::Tasks.new(['show', 'after_push']) }
     
     before(:each) do
@@ -114,8 +170,6 @@ describe Webbynode::Commands::Tasks do
     end
     
     it "should display no tasks, since there are none initially" do
-      # stask.should_receive(:puts).with("These are the current tasks for \"After push\":")
-      # stask.should_not_receive(:puts)
       stask.execute
       stask.should have(0).session_tasks
       stdout.should =~ /These are the current tasks for "After push":/
@@ -130,6 +184,13 @@ describe Webbynode::Commands::Tasks do
       stdout.should =~ /\[0\] task0/
       stdout.should =~ /\[1\] task1/
       stdout.should =~ /\[2\] task2/
+    end
+    
+    it "should tell the user that there are no tasks if there aren't any" do
+      stask.stub!(:read_tasks)
+      io.should_receive(:log_and_exit).with("You haven't set up any tasks for \"After push\".")
+      io.should_not_receive(:log).with("These are the current tasks for \"After push\".")
+      stask.execute
     end
   end
   
@@ -161,8 +222,8 @@ describe Webbynode::Commands::Tasks do
       end
       
       it "should display the updated list of tasks" do
-        task.should_receive(:puts).with("These are the current tasks for \"After push\":")
-        task.should_receive(:puts).with("[0] rake db:migrate RAILS_ENV=production")
+        io.should_receive(:log).with("These are the current tasks for \"After push\":")
+        io.should_receive(:log).with("[0] rake db:migrate RAILS_ENV=production")
         task.execute
       end
     end
@@ -194,10 +255,10 @@ describe Webbynode::Commands::Tasks do
       it "should display the updated list of tasks" do
         3.times {|num| rtask.session_tasks << "task#{num}" }
         rtask.stub(:read_tasks)
-        rtask.should_receive(:puts).with("These are the current tasks for \"After push\":")
-        rtask.should_receive(:puts).with("[0] task0")
-        rtask.should_not_receive(:puts).with("[1] task1")
-        rtask.should_receive(:puts).with("[1] task2")
+        io.should_receive(:log).with("These are the current tasks for \"After push\":")
+        io.should_receive(:log).with("[0] task0")
+        io.should_not_receive(:log).with("[1] task1")
+        io.should_receive(:log).with("[1] task2")
         rtask.execute
         rtask.session_tasks.should include("task0")
         rtask.session_tasks.should_not include("task1")

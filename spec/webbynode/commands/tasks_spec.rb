@@ -49,6 +49,36 @@ describe Webbynode::Commands::Tasks do
         task.execute
       end
     end
+    
+    context "when available" do
+      before(:each) do
+        io.stub!(:directory?).with('.webbynode').and_return(true)
+        io.stub!(:directory?).with('.webbynode/tasks').and_return(true)
+      end
+      
+      it "should ensure the availability of the required webbynode files" do
+        task.should_receive(:ensure_tasks_folder)
+        task.execute
+      end
+      
+      it "should create the webbynode folder" do
+        io.should_not_receive(:exec).with('mkdir .webbynode')
+        task.execute
+      end
+      
+      it "should create the webbynode folder" do
+        io.should_not_receive(:exec).with('mkdir .webbynode/tasks')
+        task.execute
+      end
+      
+      it "should create the 4 files required by the tasks command" do
+        %w[before_create after_create before_push after_push].each do |file|
+          io.should_receive(:file_exists?).with("./webbynode/tasks/#{file}").and_return(true)
+          io.should_not_receive(:exec).with("touch ./webbynode/tasks/#{file}")
+        end
+        task.execute
+      end
+    end
   end
   
   it "should parse the params provided by the user" do

@@ -109,26 +109,27 @@ describe Webbynode::Commands::Tasks do
     end
     
     it "should read out the specified file" do
-      stask.should_receive(:show_tasks)
       stask.execute
+      stdout.should =~ /These are the current tasks for "After push":/
     end
     
     it "should display no tasks, since there are none initially" do
-      stask.should_receive(:puts).with("These are the current tasks for \"After push\":")
-      stask.should_not_receive(:puts)
+      # stask.should_receive(:puts).with("These are the current tasks for \"After push\":")
+      # stask.should_not_receive(:puts)
       stask.execute
       stask.should have(0).session_tasks
+      stdout.should =~ /These are the current tasks for "After push":/
     end
     
     it "should display 3 tasks: task0 task1 task2" do
       3.times {|num| stask.session_tasks << "task#{num}"}
-      stask.should_receive(:puts).with("These are the current tasks for \"After push\":")
       stask.stub(:read_tasks)
-      stask.should_receive(:puts).with("[0] task0")
-      stask.should_receive(:puts).with("[1] task1")
-      stask.should_receive(:puts).with("[2] task2")
       stask.execute
       stask.should have(3).session_tasks
+      stdout.should =~ /These are the current tasks for "After push":/
+      stdout.should =~ /\[0\] task0/
+      stdout.should =~ /\[1\] task1/
+      stdout.should =~ /\[2\] task2/
     end
   end
   

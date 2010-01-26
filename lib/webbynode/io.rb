@@ -24,8 +24,8 @@ module Webbynode
       File.read(f)
     end
     
-    def open_file(f)
-      File.open(f)
+    def open_file(f, a)
+      File.open(f, a)
     end
     
     def create_local_key(passphrase="")

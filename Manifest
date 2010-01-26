@@ -6,6 +6,7 @@ README.rdoc
 Rakefile
 bin/webbynode
 bin/wn
+devver.rake
 lib/templates/gitignore
 lib/templates/help
 lib/webbynode.rb
@@ -17,9 +18,12 @@ lib/webbynode/commands/add_key.rb
 lib/webbynode/commands/help.rb
 lib/webbynode/commands/init.rb
 lib/webbynode/commands/remote.rb
+lib/webbynode/commands/tasks.rb
 lib/webbynode/git.rb
 lib/webbynode/helpers.rb
 lib/webbynode/io.rb
+lib/webbynode/option.rb
+lib/webbynode/parameter.rb
 lib/webbynode/push_and.rb
 lib/webbynode/remote_executor.rb
 lib/webbynode/server.rb
@@ -27,6 +31,7 @@ lib/webbynode/ssh.rb
 lib/webbynode/ssh_keys.rb
 spec/fixtures/api/credentials
 spec/fixtures/api/webbies
+spec/fixtures/commands/tasks/after_push
 spec/fixtures/fixture_helpers
 spec/fixtures/git/config/210.11.13.12
 spec/fixtures/git/config/67.23.79.31
@@ -41,8 +46,11 @@ spec/webbynode/commands/add_key_spec.rb
 spec/webbynode/commands/help_spec.rb
 spec/webbynode/commands/init_spec.rb
 spec/webbynode/commands/remote_spec.rb
+spec/webbynode/commands/tasks_spec.rb
 spec/webbynode/git_spec.rb
 spec/webbynode/io_spec.rb
+spec/webbynode/option_spec.rb
+spec/webbynode/parameter_spec.rb
 spec/webbynode/push_and_spec.rb
 spec/webbynode/remote_executor_spec.rb
 spec/webbynode/server_spec.rb

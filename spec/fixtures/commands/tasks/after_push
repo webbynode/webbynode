@@ -1,0 +1,3 @@
+rake db:migrate RAILS_ENV=production
+rake db:seed
+rake db:create RAILS_ENV=test

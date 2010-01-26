@@ -19,6 +19,38 @@ describe Webbynode::Commands::Tasks do
     task.should_receive(:io).any_number_of_times.and_return(io)
   end
   
+  describe "webbynode tasks folder and files" do
+    context "when not available" do
+      before(:each) do
+        io.stub!(:directory?).with('.webbynode').and_return(false)
+        io.stub!(:directory?).with('.webbynode/tasks').and_return(false)
+      end
+      
+      it "should ensure the availability of the required webbynode files" do
+        task.should_receive(:ensure_tasks_folder)
+        task.execute
+      end
+      
+      it "should create the webbynode folder" do
+        io.should_receive(:exec).with('mkdir .webbynode')
+        task.execute
+      end
+      
+      it "should create the webbynode folder" do
+        io.should_receive(:exec).with('mkdir .webbynode/tasks')
+        task.execute
+      end
+      
+      it "should create the 4 files required by the tasks command" do
+        %w[before_create after_create before_push after_push].each do |file|
+          io.should_receive(:file_exists?).with("./webbynode/tasks/#{file}").and_return(false)
+          io.should_receive(:exec).with("touch ./webbynode/tasks/#{file}")
+        end
+        task.execute
+      end
+    end
+  end
+  
   it "should parse the params provided by the user" do
     task.should_receive(:parse_parameters)
     task.stub!(:send)
@@ -96,7 +128,6 @@ describe Webbynode::Commands::Tasks do
   end
   
   describe "displaying tasks from a file" do
-    
     let(:stask) { Webbynode::Commands::Tasks.new(['show', 'after_push']) }
     
     before(:each) do

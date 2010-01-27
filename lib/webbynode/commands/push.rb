@@ -3,9 +3,54 @@ module Webbynode::Commands
     
     requires_initialization!
     
-    def execute
-      io.log("Pushing application to your Webby.")
-      io.exec("git push webbynode master")
+    attr_accessor :before_tasks, :after_tasks
+    
+    def initialize(*args)
+      super
+      @before_tasks = Webbynode::Commands::Tasks.new("show", "before_tasks")
+      @after_tasks  = Webbynode::Commands::Tasks.new("show", "after_tasks")
     end
+    
+    def execute
+      # Ensures there are Task Files to read from
+      before_tasks.ensure_tasks_folder
+      
+      # Reads out the "before push" tasks file to see if there are any tasks that must be performed
+      # It will perform the "before push" tasks if there are any available
+      before_tasks.read_tasks(Webbynode::Commands::Tasks::BeforePushTasksFile)
+      perform_before_tasks if before_tasks.has_tasks?
+      
+      # Logs a initialization message to the user
+      # Pushes the application to Webbynode
+      io.log("Pushing your application to Webbynode!")
+      io.exec("git push webbynode master")
+      
+      # Reads out the "after push" tasks file to see if there are any tasks that must be performed
+      # It will perform the "after push" tasks if there are any available
+      after_tasks.read_tasks(Webbynode::Commands::Tasks::AfterPushTasksFile)
+      perform_after_tasks if after_tasks.has_tasks?
+    end
+    
+    
+    private
+      
+      # Performs the before push tasks locally
+      def perform_before_tasks
+        io.log("Performing Before Push Tasks..")
+        before_tasks.session_tasks.each do |task|
+          io.log("Performing Task: #{task}")
+          io.exec(task)
+        end
+      end
+      
+      # Performs the after push tasks remotely from the application root
+      def perform_after_tasks
+        io.log("Performing After Push Tasks..")
+        after_tasks.session_tasks.each do |task|
+          io.log("Performing Task: #{task}")
+          remote_executor.exec("cd #{pushand.parse_remote_app_name}; #{task}", true)
+        end
+      end
+      
   end
 end

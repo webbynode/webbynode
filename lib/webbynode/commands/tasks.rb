@@ -38,7 +38,31 @@ module Webbynode::Commands
       send(action)
       
     end
-  
+    
+    # Checks to see if the session_tasks has any tasks
+    def has_tasks?
+      return true unless session_tasks.empty?
+      false
+    end
+    
+    # Reads the tasks straight from the specified file and stores them inside (in order)
+    # the session_tasks method.
+    def read_tasks(file)
+      @session_tasks = []
+      io.read_file(file).each_line do |line|
+        @session_tasks << line.gsub(/\n/,'') unless line.blank?
+      end
+    end
+    
+    # Ensures the presence of the .webbynode/tasks folder
+    # Will create the necessary task files when they are not available
+    def ensure_tasks_folder
+      io.exec('mkdir .webbynode/tasks') unless io.directory?(".webbynode/tasks")
+      %w[before_push after_push].each do |file|
+        io.exec("touch .webbynode/tasks/#{file}") unless io.file_exists?(".webbynode/tasks/#{file}")
+      end
+    end
+    
     private
       
       # Gets invoked if the user specified [add] for @action
@@ -108,26 +132,6 @@ module Webbynode::Commands
         when 'after_push'     then sf = AfterPushTasksFile
         end
         @session_file = sf
-      end
-      
-      # Reads the tasks straight from the specified file and stores them inside (in order)
-      # the session_tasks method.
-      def read_tasks(file)
-        tasks = []
-        @session_tasks = []
-        io.read_file(file).each_line {|line| tasks << line.gsub(/\n/,'') unless line.blank? }
-        tasks.each_with_index do |task, index|
-          @session_tasks << "#{task}"
-        end
-      end
-      
-      # Ensures the presence of the .webbynode/tasks folder
-      # Will create the necessary task files when they are not available
-      def ensure_tasks_folder
-        io.exec('mkdir .webbynode/tasks') unless io.directory?(".webbynode/tasks")
-        %w[before_push after_push].each do |file|
-          io.exec("touch .webbynode/tasks/#{file}") unless io.file_exists?(".webbynode/tasks/#{file}")
-        end
       end
       
       # Parses the parameters and stores the params inside 3 different methods

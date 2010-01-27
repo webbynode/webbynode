@@ -74,6 +74,18 @@ describe Webbynode::Commands::Tasks do
     end
   end
   
+  describe "#has_tasks?" do
+    it "should not have any tasks" do
+      task.session_tasks = []
+      task.has_tasks?.should be_false
+    end
+    
+    it "should have 2 tasks" do
+      2.times { task.session_tasks << "foo" }
+      task.has_tasks?.should be_true 
+    end
+  end
+  
   it "should parse the params provided by the user" do
     task.should_receive(:parse_parameters)
     task.stub!(:send)

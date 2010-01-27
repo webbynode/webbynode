@@ -102,7 +102,7 @@ module Webbynode
     end
 
     def param_values
-      settings[:parameters].map(&:value)
+      settings[:parameters].map { |p| p.value }
     end
     
     def self.usage

@@ -225,13 +225,12 @@ module Webbynode
         else
           raise InvalidCommand, "command '#{self.class.command}' takes no parameters" if settings[:parameters].empty?
           
-          if settings[:parameters].first.array?
-            settings[:parameters].first.value << opt
+          if settings[:parameters][i].array?
+            settings[:parameters][i].value << opt
           else
             settings[:parameters][i].value = opt
+            i += 1
           end
-          
-          i += 1
         end
       end
       

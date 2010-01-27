@@ -156,6 +156,21 @@ describe Webbynode::Command do
     end
   end
     
+  describe "parsing array parameters" do
+    class ArrayCmd < Webbynode::Command
+      parameter :param1, String, "param1"
+      parameter :param2, String, "param2"
+      parameter :param_array, Array, "array"
+    end
+    
+    it "should parse params and all remaining as the array param" do
+      cmd = ArrayCmd.new("param1", "param2", "arr1", "arr2", "arr3", "arr4")
+      cmd.param(:param1).should == "param1"
+      cmd.param(:param2).should == "param2"
+      cmd.param(:param_array).should == ["arr1", "arr2", "arr3", "arr4"]
+    end
+  end
+    
   context "with a webbynode uninitialized application" do
     class NewCommand < Webbynode::Command
       requires_initialization!

@@ -6,6 +6,8 @@ module Webbynode::Commands
     requires_options!
     requires_pushed_application!
     
+    parameter :command, Array, "Commands to execute"
+    
     def execute
       # Parses Pushand File and returns remote application name
       remote_app_name = pushand.parse_remote_app_name

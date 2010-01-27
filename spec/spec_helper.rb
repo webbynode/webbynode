@@ -28,9 +28,6 @@ module Webbynode::IoStub
   def debug(s)
     @orig_stdout.puts s
   end
-  
-  def d(x); $stderr.puts x; end
-  def ppd(x); $stderr.puts x.pretty_inspect; end
 end
 
 # Reads out a file from the fixtures directory
@@ -42,6 +39,9 @@ module Kernel
   def ask(*params)
     raise "Unexpected ask with: #{params.inspect}"
   end
+
+  def d(x); $stderr.puts x; end
+  def ppd(x); $stderr.puts x.pretty_inspect; end
 end
 
 Spec::Runner.configure do |config|

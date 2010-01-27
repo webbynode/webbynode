@@ -63,5 +63,13 @@ module Webbynode
       contents = read_from_template(template)
       create_file(file, contents)
     end
+    
+    def read_config(config_file)
+      read_file(config_file).split("\n").inject({}) do |hash, line|
+        line_parts = line.split("=")
+        hash[line_parts.first.strip.to_sym] = line_parts.last.strip
+        hash
+      end
+    end
   end
 end

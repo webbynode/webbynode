@@ -146,4 +146,16 @@ describe Webbynode::Io do
       io.open_file("filename", anything).should eql("file contents")
     end
   end
+  
+  describe "#read_config" do
+    it "should parse value = key pairs" do
+      io = Webbynode::Io.new
+      io.should_receive(:read_file).with("config").and_return("a = b\nc = d\nother = rest")
+      
+      cfg = io.read_config("config")
+      cfg[:a].should == "b"
+      cfg[:c].should == "d"
+      cfg[:other].should == "rest"
+    end
+  end
 end

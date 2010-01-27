@@ -1,20 +1,18 @@
 module Webbynode::Commands
   class Init < Webbynode::Command
-    include Webbynode::ApiClient
-    attr_accessor :output
-    
-    def out(s)
-      (@output ||= "") << s
-    end
+    description "Initializes the current folder as a deployable application"
+    parameter :webby, String, "Name or IP of the Webby to deploy to"
+    parameter :dns, String, "The DNS used for this application", :required => false
+    option :passphrase, String, "If present, passphrase will be used when creating a new SSH key", :value => :words
     
     def execute
       unless params.any?
-        out "Usage: webbynode init [webby]"
+        io.log help
         return
       end
       
-      webby = params[0]
-      app_name = params[1] || io.app_name
+      webby = param(:webby)
+      app_name = param(:dns) || io.app_name
       
       if webby =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/
         webby_ip = webby

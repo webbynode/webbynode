@@ -36,21 +36,44 @@ describe Webbynode::Command do
     end
   end
   
+  describe "array of parameters" do
+    class ArrayCommand < Webbynode::Command
+      description "Initializes the current folder as a deployable application"
+      parameter :params, Array, "Name or IP of the Webby to deploy to"      
+      option :passphrase, String, "If present, passphrase will be used when creating a new SSH key", :take => :words
+    end
+    
+    it "should return an array of parameters" do
+      cmd = ArrayCommand.new("a", "b", "--passphrase=abc", "c", "d")
+      cmd.params.first.should == ["a", "b", "c", "d"]
+      cmd.option(:passphrase).should == "abc"
+    end
+  end
+  
+  describe "with no params" do
+    class Brief < Webbynode::Command
+    end
+    
+    it "should refuse any param" do
+      lambda { cmd = Brief.new("test") }.should raise_error(Webbynode::Command::InvalidCommand, "command 'brief' takes no parameters")
+    end
+  end
+  
   describe "help for commands" do
     class NewCommand < Webbynode::Command
       description "Initializes the current folder as a deployable application"
       parameter :webby, String, "Name or IP of the Webby to deploy to"
       parameter :dns, String, "The DNS used for this application", :required => false
       
-      option :passphrase, String, "If present, passphrase will be used when creating a new SSH key", :value => :words
+      option :passphrase, String, "If present, passphrase will be used when creating a new SSH key", :take => :words
     end
     
     before(:each) do
-      @cmd = NewCommand.new
+      @cmd = NewCommand.new("what!")
     end
     
     it "should provide help for parameters" do
-      @cmd.help.should =~ /Usage: wn new_command webby \[dns\] \[options\]/
+      @cmd.help.should =~ /Usage: webbynode new_command webby \[dns\] \[options\]/
       @cmd.help.should =~ /Parameters:/
       @cmd.help.should =~ /    webby                       Name or IP of the Webby to deploy to/
       @cmd.help.should =~ /    dns                         The DNS used for this application, optional/
@@ -61,40 +84,64 @@ describe Webbynode::Command do
   
   describe "parsing options" do
     it "should parse arguments as params" do
-      cmd = Webbynode::Command.new("param1", "param2")
-      cmd.params.should == ["param1", "param2"]
+      Sample1 = Class.new(Webbynode::Command)
+      Sample1.parameter :param1, ""
+      Sample1.parameter :param2, ""
+      
+      cmd = Sample1.new("param1", "param2")
+      cmd.params.first.should == "param1"
+      cmd.params.last.should == "param2"
     end
   
     it "should parse arguments starting with -- as options" do
-      cmd = Webbynode::Command.new("--provided=auto")
-      cmd.options[:provided].should == "auto"
+      Sample2 = Class.new(Webbynode::Command)
+      Sample2.option :provided, ""
+      
+      cmd = Sample2.new("--provided=auto")
+      cmd.option(:provided).should == "auto"
     end
     
     it "should parse arguments without values as true" do
-      wn = Webbynode::Command.new("command", "--force")
-      wn.options[:force].should be_true
+      Sample3 = Class.new(Webbynode::Command)
+      Sample3.option :force, ""
+      
+      wn = Sample3.new("--force")
+      wn.option(:force).should be_true
     end
     
     it "should provide option names as symbols" do
-      wn = Webbynode::Command.new("command", "--provided=auto")
-      wn.options[:provided].should == "auto"
+      Sample4 = Class.new(Webbynode::Command)
+      Sample4.option :provided, ""
+      
+      wn = Sample4.new("--provided=auto")
+      wn.option(:provided).should == "auto"
     end
     
     it "should parse quoted values" do
-      wn = Webbynode::Command.new("--name=\"Felipe Coury\"")
-      wn.options[:name].should == "Felipe Coury"
+      Sample5 = Class.new(Webbynode::Command)
+      Sample5.option :name, ""
+
+      wn = Sample5.new("--name=\"Felipe Coury\"")
+      wn.option(:name).should == "Felipe Coury"
     end
   end
   
   describe "parsing mixed options and parameters" do
+    class Cmd < Webbynode::Command
+      parameter :param1, String, "param1"
+      parameter :param2, String, "param2"
+      option :provided, "option1"
+      option :force, "option2"
+    end
+    
     it "should provide option names as strings and symbols" do
-      wn = Webbynode::Command.new("--provided=auto", "param1", "--force", "param2")
-      wn.options[:provided].should == "auto"
-      wn.options[:force].should be_true
+      wn = Cmd.new("--provided=auto", "param1", "--force", "param2")
+      wn.option(:provided) == "auto"
+      wn.option(:force).should be_true
+      lambda { wn.option(:another) }.should raise_error(Webbynode::Command::InvalidOption)
       wn.params.should == ["param1", "param2"]
     end
   end
-
     
   context "with a webbynode uninitialized application" do
     class NewCommand < Webbynode::Command
@@ -109,7 +156,7 @@ describe Webbynode::Command do
       command.should_receive(:server).any_number_of_times.and_return(server)
     end
     
-    let(:command) { NewCommand.new }
+    let(:command) { NewCommand.new("some") }
     let(:re)      { double("RemoteExecutor").as_null_object }
     let(:git)     { double("Git").as_null_object }
     let(:pushand) { double("Pushand").as_null_object }

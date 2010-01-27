@@ -1,12 +1,14 @@
 require 'httparty'
 
 module Webbynode
-  module ApiClient
+  class ApiClient
+    include HTTParty
+    base_uri "https://manager.webbynode.com/api/yaml"
+
     CREDENTIALS_FILE = "#{ENV['HOME']}/.webbynode"
     
-    def self.included(base)
-      base.send(:include, HTTParty)
-      base.base_uri "https://manager.webbynode.com/api/yaml"
+    def io
+      @io ||= Io.new
     end
     
     def ip_for(hostname)
@@ -19,14 +21,21 @@ module Webbynode
     end
     
     def credentials
-      @credentials || init_credentials
+      @credentials ||= init_credentials
     end
     
     def init_credentials
-      @credentials = read_yaml_file(Webbynode::ApiClient::CREDENTIALS_FILE) do
-        creds = { :email => ask("Login email: "), :token => ask("API Token:   ") }
-        create_yaml_file Webbynode::ApiClient::CREDENTIALS_FILE, creds
-        creds
+      # @credentials = io.read_file(Webbynode::ApiClient::CREDENTIALS_FILE) do
+      #   creds = { :email => ask("Login email: "), :token => ask("API Token:   ") }
+      #   create_yaml_file Webbynode::ApiClient::CREDENTIALS_FILE, creds
+      #   creds
+      # end
+      creds = if io.file_exists?(CREDENTIALS_FILE)
+        io.read_config(CREDENTIALS_FILE)
+      else
+        email = ask("Login email: ")
+        token = ask("API token:   ")
+        io.create_file(CREDENTIALS_FILE, "email = #{email}\ntoken = #{token}\n")
       end
     end
     

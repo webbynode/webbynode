@@ -31,7 +31,7 @@ describe Webbynode::Option do
   
   describe "#to_s" do
     it "should parse use the name and the value option" do
-      Webbynode::Option.new(:param1, "My param", :value => :value).to_s.should == "--param1=value"
+      Webbynode::Option.new(:param1, "My param", :take => :value).to_s.should == "--param1=value"
       Webbynode::Option.new(:param1, "My param").to_s.should == "--param1"
     end
   end

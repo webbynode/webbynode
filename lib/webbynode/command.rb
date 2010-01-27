@@ -2,12 +2,19 @@ require 'jcode'
 
 module Webbynode
   class Command
-    attr_reader :params, :options
     Aliases = {}
     Settings = {}
     
+    InvalidOption = Class.new(StandardError)
+    InvalidCommand = Class.new(StandardError)
+    
     def Command.inherited(child)
-      Settings[child] ||= {}
+      Settings[child] ||= { 
+        :parameters_hash => {}, 
+        :options_hash => {}, 
+        :parameters => [], 
+        :options => [] 
+      }
     end
     
     class << self
@@ -31,11 +38,15 @@ module Webbynode
       end
       
       def parameter(*args)
-        (Settings[self][:parameters] ||= []) << Parameter.new(*args)
+        param = Parameter.new(*args)
+        Settings[self][:parameters] << param
+        Settings[self][:parameters_hash][param.name] = param
       end
       
       def option(*args)
-        (Settings[self][:options] ||= []) << Option.new(*args)
+        option = Option.new(*args)
+        Settings[self][:options] << option
+        Settings[self][:options_hash][option.name] = option
       end
       
       def for(command)
@@ -55,39 +66,56 @@ module Webbynode
     end
 
     def initialize(*args)
-      @params = []
-      @options = {}
       parse_args(args)
     end
 
     def command
       str = ""
-      self.class.name.each_char do |ch| 
+      self.class.name.split("::").last.each_char do |ch| 
         str << "_" if ch.match(/[A-Z]/) and !str.empty?
         str << ch.downcase
       end
       str
     end
     
-    def parameters
-      settings[:parameters]
+    def param(p)
+      params_hash[p].value if params_hash[p]
+    end
+    
+    def option(p)
+      raise InvalidOption, "Unknown option: #{p}" unless options[p]
+      options[p].value if options[p]
+    end
+    
+    def params_hash
+      settings[:parameters_hash]
+    end
+    
+    def options
+      settings[:options_hash]
+    end
+    
+    def params
+      settings[:parameters].map(&:value)
     end
     
     def usage
-      help = "Usage: wn #{command}"
-      parameters.each do |p|
-        help << " #{p.to_s}"
+      help = "Usage: webbynode #{command}"
+      if settings[:parameters]
+        settings[:parameters].each do |p|
+          help << " #{p.to_s}"
+        end
       end
       
-      help << " [options]" if settings[:options].any?
+      help << " [options]" if options and options.any?
       help
     end
     
     def params_help
       help = []
-      if parameters
+      if settings[:parameters]
         help << "Parameters:"
-        parameters.each do |p|
+        settings[:parameters].each do |p|
           help << "    #{p.name.to_s.ljust(25)}   #{p.desc}#{p.required? ? "" : ", optional"}"
         end
       end
@@ -134,6 +162,10 @@ module Webbynode
       @pushand ||= PushAnd.new
     end
     
+    def api
+      @@api ||= Webbynode::ApiClient.new
+    end
+    
     def validate_initialization
       raise Webbynode::GitNotRepoError,
         "Could not find a git repository." unless git.present?
@@ -156,7 +188,7 @@ module Webbynode
     end
     
     def settings
-      Settings[self.class]
+      Settings[self.class] || {}
     end
     
     def run
@@ -169,15 +201,30 @@ module Webbynode
     private
 
     def parse_args(args)
+      settings[:options].each { |o| o.reset! }
+      settings[:parameters].each { |p| p.reset! }
+
+      i = 0
       while (opt = args.shift)
-        if opt =~ /^--(\w+)(=("[^"]+"|[\w]+))*/
-          name  = $1
-          value = $3 ? $3.gsub(/"/, "") : true
-          @options[name.to_sym] = value
+        name = Option.name(opt)
+        if (name = Option.name(opt))
+          option = settings[:options_hash][name.to_sym]
+          raise Webbynode::Command::InvalidOption, "Unknown option: #{name.to_sym}" unless option
+          option.parse(opt)
         else
-          @params << opt
+          raise InvalidCommand, "command '#{command}' takes no parameters" if settings[:parameters].empty?
+          
+          if settings[:parameters].first.array?
+            settings[:parameters].first.value << opt
+          else
+            settings[:parameters][i].value = opt
+          end
+          
+          i += 1
         end
       end
+      
+      settings[:parameters].each { |p| p.validate! }
     end
   end
 end

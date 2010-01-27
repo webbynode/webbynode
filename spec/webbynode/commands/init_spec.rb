@@ -15,22 +15,11 @@ describe Webbynode::Commands::Init do
     create_init
   end
   
-  it "should have a Git instance" do
-    Webbynode::Commands::Init.new.git.class.should == Webbynode::Git
-  end
-  
-  it "should include ApiClient" do
-    Webbynode::Commands::Init.new.respond_to?(:ip_for).should be_true
-  end
-  
   it "should output usage if no params given" do
+    pending "improve handling of missing commands"
     command = Webbynode::Commands::Init.new
     command.run
-    command.output.should =~ /Usage: webbynode init \[webby\]/
-  end
-  
-  it "should have an Io instance" do
-    Webbynode::Commands::Init.new.io.class.should == Webbynode::Io
+    stdout.should =~ /Usage: webbynode init webby \[dns\]/
   end
   
   it "should try to get Webby's IP if no IP given" do
@@ -77,9 +66,11 @@ describe Webbynode::Commands::Init do
   
   context "when .pushand is not present" do
     it "should be created" do
+      d "Here"
       io_handler.should_receive(:file_exists?).with(".pushand").and_return(false)
       io_handler.should_receive(:app_name).any_number_of_times.and_return("mah_app")
       io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 mah_app\n")
+      d "End"
       
       @command.run
     end

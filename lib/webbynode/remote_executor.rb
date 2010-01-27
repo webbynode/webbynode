@@ -11,7 +11,7 @@ module Webbynode
     end
     
     def create_folder(folder)
-      exec "mkdir -p #{folder}"
+      ssh.execute "mkdir -p #{folder}"
     end
     
     def exec(cmd, echo=false)

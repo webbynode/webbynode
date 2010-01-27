@@ -18,7 +18,7 @@ describe Webbynode::RemoteExecutor do
   
   describe "#create_folder" do
     it "should create the folder on the server" do
-      @ssh.should_receive(:execute).with("mkdir -p /var/new_folder", false)
+      @ssh.should_receive(:execute).with("mkdir -p /var/new_folder")
       @re.create_folder "/var/new_folder"
     end
   end

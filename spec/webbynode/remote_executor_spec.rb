@@ -9,23 +9,16 @@ describe Webbynode::RemoteExecutor do
     @re.should_receive(:ssh).any_number_of_times.and_return(@ssh)
   end
   
-  describe "instantiating" do
-    it "should connect to the ip" do
-      Webbynode::Ssh.should_receive(:new).with("1.2.3.4").and_return(@ssh)
-      Webbynode::RemoteExecutor.new("1.2.3.4")
-    end
-  end
-  
   describe "#exec" do
     it "should execute the raw command on the server" do
-      @ssh.should_receive(:execute).with("the same string I pass")
+      @ssh.should_receive(:execute).with("the same string I pass", false)
       @re.exec "the same string I pass"
     end
   end
   
   describe "#create_folder" do
     it "should create the folder on the server" do
-      @ssh.should_receive(:execute).with("mkdir -p /var/new_folder")
+      @ssh.should_receive(:execute).with("mkdir -p /var/new_folder", false)
       @re.create_folder "/var/new_folder"
     end
   end

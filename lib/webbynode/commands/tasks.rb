@@ -1,19 +1,18 @@
 module Webbynode::Commands
   class Tasks < Webbynode::Command
     requires_initialization!
-    parameter :params, Array, "Command to execute"
     
     attr_accessor :action, :type, :command, :session_file, :session_tasks
     
-    def params
-      param(:params)
-    end
+    # @ Felipe
+    # This
+    parameter :action,  String, "add, remove or show.",       :required => true
+    parameter :type,    String, "before_push or after_push.", :required => true
+    parameter :command, String, "Task to perform.",           :required => true
     
     # Constants
     # Paths to the webbynode task files
     TasksPath               = ".webbynode/tasks"
-    BeforeCreateTasksFile   = ".webbynode/tasks/before_create"
-    AfterCreateTasksFile    = ".webbynode/tasks/after_create"
     BeforePushTasksFile     = ".webbynode/tasks/before_push"
     AfterPushTasksFile      = ".webbynode/tasks/after_push"
     
@@ -115,8 +114,6 @@ module Webbynode::Commands
       # This will be stored inside the session_file method.
       def set_session_file
         case @type
-        when 'before_create'  then sf = BeforeCreateTasksFile
-        when 'after_create'   then sf = AfterCreateTasksFile
         when 'before_push'    then sf = BeforePushTasksFile
         when 'after_push'     then sf = AfterPushTasksFile
         end
@@ -138,20 +135,23 @@ module Webbynode::Commands
       # Will create the necessary task files when they are not available
       def ensure_tasks_folder
         io.exec('mkdir .webbynode/tasks') unless io.directory?(".webbynode/tasks")
-        %w[before_create after_create before_push after_push].each do |file|
+        %w[before_push after_push].each do |file|
           io.exec("touch .webbynode/tasks/#{file}") unless io.file_exists?(".webbynode/tasks/#{file}")
         end
       end
+      
+      
+      # @ Felipe
+      # And This
       
       # Parses the parameters and stores the params inside 3 different methods
       # [action]  represents: [add/remove/show]
       # [type]    represents: [before/after_create before/after_push]
       # [command] represents: The remote command that should get executed
       def parse_parameters
-        params.flatten!
-        @action   = params.shift
-        @type     = params.shift
-        @command  = params.join(" ")
+        @action   = param(:action)  #params.shift
+        @type     = param(:type)    #params.shift
+        @command  = param(:command) #params.join(" ")
       end
         
   end

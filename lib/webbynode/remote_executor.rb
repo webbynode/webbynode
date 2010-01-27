@@ -1,21 +1,21 @@
 module Webbynode  
   class RemoteExecutor
     attr_accessor :ip
-    
-    def ssh
-      @ssh
-    end
         
     def initialize(ip)
-      @ssh = Ssh.new(ip)
+      @ip = ip
     end
     
-    def create_folder(f)
-      exec "mkdir -p #{f}"
+    def ssh
+      @ssh ||= Ssh.new(ip)
     end
     
-    def exec(s)
-      ssh.execute s
+    def create_folder(folder)
+      exec "mkdir -p #{folder}"
+    end
+    
+    def exec(cmd, echo=false)
+      ssh.execute(cmd, echo)
     end
   end
 end

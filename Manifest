@@ -6,7 +6,12 @@ README.rdoc
 Rakefile
 bin/webbynode
 bin/wn
+cucumber.yml
 devver.rake
+features/bootstrap.feature
+features/step_definitions/command_steps.rb
+features/support/env.rb
+features/support/hooks.rb
 lib/templates/gitignore
 lib/templates/help
 lib/webbynode.rb

@@ -22,6 +22,7 @@ lib/webbynode/commands.rb
 lib/webbynode/commands/add_key.rb
 lib/webbynode/commands/help.rb
 lib/webbynode/commands/init.rb
+lib/webbynode/commands/push.rb
 lib/webbynode/commands/remote.rb
 lib/webbynode/commands/tasks.rb
 lib/webbynode/commands/version.rb
@@ -51,6 +52,7 @@ spec/webbynode/command_spec.rb
 spec/webbynode/commands/add_key_spec.rb
 spec/webbynode/commands/help_spec.rb
 spec/webbynode/commands/init_spec.rb
+spec/webbynode/commands/push_spec.rb
 spec/webbynode/commands/remote_spec.rb
 spec/webbynode/commands/tasks_spec.rb
 spec/webbynode/commands/version_spec.rb

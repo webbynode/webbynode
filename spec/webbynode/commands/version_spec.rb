@@ -7,7 +7,7 @@ describe Webbynode::Commands::Version do
   let(:io) { double('io').as_null_object }
 
   before(:each) do
-    version.should_receive(:io).and_return(io)
+    version.should_receive(:io).any_number_of_times.and_return(io)
   end
   
   it "should return the version of the gem" do

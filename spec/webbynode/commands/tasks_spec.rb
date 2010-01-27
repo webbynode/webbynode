@@ -87,11 +87,6 @@ describe Webbynode::Commands::Tasks do
     task.command.should eql("rake db:migrate RAILS_ENV=production")
   end
   
-  it "should invoke the validate_parameters method" do
-    task.should_receive(:validate_parameters)
-    task.execute
-  end
-  
   it "should set the current path for the specified task interaction type" do
     task.should_receive(:set_session_file)
     task.execute

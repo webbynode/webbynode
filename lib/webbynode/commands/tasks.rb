@@ -6,7 +6,7 @@ module Webbynode::Commands
     
     parameter :action,  String, "add, remove or show.",       :required => true
     parameter :type,    String, "before_push or after_push.", :required => true
-    parameter :command, Array, "Task to perform.",            :required => true
+    parameter :command, Array, "Task to perform.",            :required => false
     
     # Constants
     # Paths to the webbynode task files
@@ -24,10 +24,7 @@ module Webbynode::Commands
       # Ensures that the tasks folder (.webbynode/tasks) is present
       # Will create the task files if they are not present
       ensure_tasks_folder
-      
-      # Should validate the parameters
-      validate_parameters
-      
+
       # Should parse the parameters
       parse_parameters
       
@@ -101,11 +98,6 @@ module Webbynode::Commands
         session_tasks.each_with_index do |task, index|
           io.log "[#{index}] #{task}"
         end
-      end
-      
-      # TODO
-      # Felipe's Validation Thingy
-      def validate_parameters
       end
       
       # Determines the selected file that will be used for the current session.

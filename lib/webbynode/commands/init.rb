@@ -34,7 +34,7 @@ module Webbynode::Commands
         io.exec("mkdir .webbynode")
       end
       
-      git.add_remote "webbynode", webby_ip, io.app_name
+      git.add_remote "webbynode", webby_ip, app_name
     rescue Webbynode::GitRemoteAlreadyExistsError
       puts "Webbynode already initialized for this application."
     end

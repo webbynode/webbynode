@@ -31,11 +31,11 @@ module Webbynode
     end
     
     def log(text)
-      puts text
+      puts "[Webbynode] #{text}"
     end
 
     def log_and_exit(text)
-      puts text
+      log(text)
       exit
     end
     

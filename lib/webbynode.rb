@@ -22,6 +22,7 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'add_key')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'remote')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'tasks')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'help')
+require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'version')
 
 require File.join(File.dirname(__FILE__), 'webbynode', 'application')
 

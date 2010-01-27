@@ -24,6 +24,7 @@ lib/webbynode/commands/help.rb
 lib/webbynode/commands/init.rb
 lib/webbynode/commands/remote.rb
 lib/webbynode/commands/tasks.rb
+lib/webbynode/commands/version.rb
 lib/webbynode/git.rb
 lib/webbynode/helpers.rb
 lib/webbynode/io.rb
@@ -52,6 +53,7 @@ spec/webbynode/commands/help_spec.rb
 spec/webbynode/commands/init_spec.rb
 spec/webbynode/commands/remote_spec.rb
 spec/webbynode/commands/tasks_spec.rb
+spec/webbynode/commands/version_spec.rb
 spec/webbynode/git_spec.rb
 spec/webbynode/io_spec.rb
 spec/webbynode/option_spec.rb

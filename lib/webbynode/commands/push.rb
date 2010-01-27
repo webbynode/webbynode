@@ -7,8 +7,8 @@ module Webbynode::Commands
     
     def initialize(*args)
       super
-      @before_tasks = Webbynode::Commands::Tasks.new("show", "before_tasks")
-      @after_tasks  = Webbynode::Commands::Tasks.new("show", "after_tasks")
+      @before_tasks = Webbynode::Commands::Tasks.new
+      @after_tasks  = Webbynode::Commands::Tasks.new
     end
     
     def execute

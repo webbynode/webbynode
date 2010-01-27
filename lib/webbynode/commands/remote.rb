@@ -13,7 +13,7 @@ module Webbynode::Commands
       remote_app_name = pushand.parse_remote_app_name
       
       # Executes the command on the remote server inside the application root folder
-      remote_executor.exec("cd #{remote_app_name} #{params.join(" ")}")
+      remote_executor.exec("cd #{remote_app_name} #{param_values.join(" ")}")
     end
   end
 end

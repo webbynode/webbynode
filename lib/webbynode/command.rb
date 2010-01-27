@@ -67,11 +67,13 @@ module Webbynode
 
     def initialize(*args)
       parse_args(args)
+    rescue InvalidCommand
+      @parse_error = $!.message
     end
 
-    def command
+    def self.command
       str = ""
-      self.class.name.split("::").last.each_char do |ch| 
+      self.name.split("::").last.each_char do |ch| 
         str << "_" if ch.match(/[A-Z]/) and !str.empty?
         str << ch.downcase
       end
@@ -96,44 +98,48 @@ module Webbynode
     end
     
     def params
+      settings[:parameters]
+    end
+
+    def param_values
       settings[:parameters].map(&:value)
     end
     
-    def usage
+    def self.usage
       help = "Usage: webbynode #{command}"
-      if settings[:parameters]
-        settings[:parameters].each do |p|
+      if (params = Settings[self][:parameters])
+        params.each do |p|
           help << " #{p.to_s}"
         end
       end
       
-      help << " [options]" if options and options.any?
+      help << " [options]" if (Settings[self][:options] || []).any?
       help
     end
     
-    def params_help
+    def self.params_help
       help = []
-      if settings[:parameters]
+      if (params = Settings[self][:parameters])
         help << "Parameters:"
-        settings[:parameters].each do |p|
+        params.each do |p|
           help << "    #{p.name.to_s.ljust(25)}   #{p.desc}#{p.required? ? "" : ", optional"}"
         end
       end
       help.join("\n")
     end
     
-    def options_help
+    def self.options_help
       help = []
-      if settings[:options]
+      if (options = Settings[self][:options] || []).any?
         help << "Options:"
-        settings[:options].each do |p|
+        options.each do |p|
           help << "    #{p.to_s.ljust(25)}   #{p.desc}#{p.required? ? "" : ", optional"}"
         end
       end
       help.join("\n")
     end
     
-    def help
+    def self.help
       help = []
       help << usage
       help << params_help
@@ -192,6 +198,12 @@ module Webbynode
     end
     
     def run
+      if @parse_error
+        puts "#{@parse_error}. Use \"webbynode help #{self.class.command}\" for more information."
+        puts self.class.usage
+        return
+      end
+      
       validate_initialization                   if settings[:requires_initialization!]
       validate_options                          if settings[:requires_options!]
       validate_remote_application_availability  if settings[:requires_pushed_application!]
@@ -206,13 +218,12 @@ module Webbynode
 
       i = 0
       while (opt = args.shift)
-        name = Option.name(opt)
         if (name = Option.name(opt))
           option = settings[:options_hash][name.to_sym]
           raise Webbynode::Command::InvalidOption, "Unknown option: #{name.to_sym}" unless option
           option.parse(opt)
         else
-          raise InvalidCommand, "command '#{command}' takes no parameters" if settings[:parameters].empty?
+          raise InvalidCommand, "command '#{self.class.command}' takes no parameters" if settings[:parameters].empty?
           
           if settings[:parameters].first.array?
             settings[:parameters].first.value << opt

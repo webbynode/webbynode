@@ -75,11 +75,9 @@ describe Webbynode::Commands::Init do
   
   context "when .pushand is not present" do
     it "should be created" do
-      d "Here"
       io_handler.should_receive(:file_exists?).with(".pushand").and_return(false)
       io_handler.should_receive(:app_name).any_number_of_times.and_return("mah_app")
       io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 mah_app\n")
-      d "End"
       
       @command.run
     end

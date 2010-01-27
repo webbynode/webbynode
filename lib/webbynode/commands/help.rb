@@ -1,10 +1,9 @@
 module Webbynode::Commands
   class Help < Webbynode::Command
-    
-    include Webbynode::Helpers
+    parameter :command, "Command to get help on"
     
     def execute
-      log_and_exit read_template('help')
+      puts Help.for(param(:command)).help
     end
   end
 end

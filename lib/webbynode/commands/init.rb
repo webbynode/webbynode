@@ -3,7 +3,7 @@ module Webbynode::Commands
     description "Initializes the current folder as a deployable application"
     parameter :webby, String, "Name or IP of the Webby to deploy to"
     parameter :dns, String, "The DNS used for this application", :required => false
-    option :passphrase, String, "If present, passphrase will be used when creating a new SSH key", :value => :words
+    option :passphrase, String, "If present, passphrase will be used when creating a new SSH key", :take => :words
     
     def execute
       unless params.any?

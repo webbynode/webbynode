@@ -28,11 +28,11 @@ describe Webbynode::Command do
   describe "#command" do
     it "should return the string representation of the command" do
       AwfulCommand = Class.new(Webbynode::Command)
-      AwfulCommand.new.command.should == "awful_command"
+      AwfulCommand.command.should == "awful_command"
       Amazing = Class.new(Webbynode::Command)
-      Amazing.new.command.should == "amazing"
+      Amazing.command.should == "amazing"
       SomeStrangeStuff = Class.new(Webbynode::Command)
-      SomeStrangeStuff.new.command.should == "some_strange_stuff"
+      SomeStrangeStuff.command.should == "some_strange_stuff"
     end
   end
   
@@ -45,7 +45,7 @@ describe Webbynode::Command do
     
     it "should return an array of parameters" do
       cmd = ArrayCommand.new("a", "b", "--passphrase=abc", "c", "d")
-      cmd.params.first.should == ["a", "b", "c", "d"]
+      cmd.params.first.value.should == ["a", "b", "c", "d"]
       cmd.option(:passphrase).should == "abc"
     end
   end
@@ -55,7 +55,9 @@ describe Webbynode::Command do
     end
     
     it "should refuse any param" do
-      lambda { cmd = Brief.new("test") }.should raise_error(Webbynode::Command::InvalidCommand, "command 'brief' takes no parameters")
+      cmd = Brief.new("test")
+      cmd.run
+      stdout.should =~ /command 'brief' takes no parameters/
     end
   end
   
@@ -73,24 +75,35 @@ describe Webbynode::Command do
     end
     
     it "should provide help for parameters" do
-      @cmd.help.should =~ /Usage: webbynode new_command webby \[dns\] \[options\]/
-      @cmd.help.should =~ /Parameters:/
-      @cmd.help.should =~ /    webby                       Name or IP of the Webby to deploy to/
-      @cmd.help.should =~ /    dns                         The DNS used for this application, optional/
-      @cmd.help.should =~ /Options:/
-      @cmd.help.should =~ /    --passphrase=words          If present, passphrase will be used when creating a new SSH key/
+      NewCommand.help.should =~ /Usage: webbynode new_command webby \[dns\] \[options\]/
+      NewCommand.help.should =~ /Parameters:/
+      NewCommand.help.should =~ /    webby                       Name or IP of the Webby to deploy to/
+      NewCommand.help.should =~ /    dns                         The DNS used for this application, optional/
+      NewCommand.help.should =~ /Options:/
+      NewCommand.help.should =~ /    --passphrase=words          If present, passphrase will be used when creating a new SSH key/
     end
   end
   
   describe "parsing options" do
+    it "should complain about missing params and show usage" do
+      Sample = Class.new(Webbynode::Command)
+      Sample.parameter :param1, "Teste"
+      
+      cmd = Sample.new
+      cmd.run
+      
+      stdout.should =~ /Missing 'param1' parameter. Use "webbynode help sample" for more information./
+      stdout.should =~ /Usage: webbynode sample param1/
+    end
+    
     it "should parse arguments as params" do
       Sample1 = Class.new(Webbynode::Command)
       Sample1.parameter :param1, ""
       Sample1.parameter :param2, ""
       
       cmd = Sample1.new("param1", "param2")
-      cmd.params.first.should == "param1"
-      cmd.params.last.should == "param2"
+      cmd.params.first.value.should == "param1"
+      cmd.params.last.value.should == "param2"
     end
   
     it "should parse arguments starting with -- as options" do
@@ -139,7 +152,7 @@ describe Webbynode::Command do
       wn.option(:provided) == "auto"
       wn.option(:force).should be_true
       lambda { wn.option(:another) }.should raise_error(Webbynode::Command::InvalidOption)
-      wn.params.should == ["param1", "param2"]
+      wn.param_values.should == ["param1", "param2"]
     end
   end
     

@@ -26,16 +26,18 @@ describe Webbynode::Commands::Remote do
   context "when successful" do    
     it "should receive at least one option when passing in the remote command" do
       remote = Webbynode::Commands::Remote.new('ls')
-      remote.params.first.should eql(['ls'])
+      remote.params.first.value.should eql(['ls'])
     end
     
     it "multiple options will be joined together if multiple options are provided" do
       remote = Webbynode::Commands::Remote.new('ls -la')
-      remote.params.first.should eql(['ls -la'])
+      remote.params.first.value.should eql(['ls -la'])
     end
     
     it "should establish a connection with the server" do
+      remote = Webbynode::Commands::Remote.new('ls -la')
       remote.stub(:validate_initialization)
+      load_all_mocks(remote)
       pushand.should_receive(:parse_remote_app_name).and_return('test.webbynode.com')
       re.should_receive(:exec).with("cd test.webbynode.com ls -la")
       remote.run
@@ -62,8 +64,8 @@ describe Webbynode::Commands::Remote do
   
   context "when unsuccesful" do    
     it "should raise an error if no options are provided" do
-      lambda { Webbynode::Commands::Remote.new }.should raise_error(Webbynode::Command::InvalidCommand,
-        "Missing 'command' parameter")
+      Webbynode::Commands::Remote.new.run
+      stdout.should =~ /Missing 'command' parameter/
     end
   end
 end

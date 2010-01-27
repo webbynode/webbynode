@@ -6,7 +6,7 @@ module Webbynode::Commands
     
     parameter :action,  String, "add, remove or show.",       :required => true
     parameter :type,    String, "before_push or after_push.", :required => true
-    parameter :command, String, "Task to perform.",           :required => true
+    parameter :command, Array, "Task to perform.",            :required => true
     
     # Constants
     # Paths to the webbynode task files
@@ -145,7 +145,7 @@ module Webbynode::Commands
       def parse_parameters
         @action   = param(:action)
         @type     = param(:type)
-        @command  = param(:command)
+        @command  = param(:command).join(" ")
       end
         
   end

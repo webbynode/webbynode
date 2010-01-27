@@ -7,19 +7,20 @@ module Webbynode
     attr_accessor :ip
     
     def initialize(ip)
-      @ssh = Ssh.new(ip)
+      @ssh  = Ssh.new(ip)
+      @ip   = ip
     end
     
     def io
-      @io ||= Io.new
+      @io ||= Webbynode::Io.new
     end
    
     def remote_executor
-      @remote_executor ||= RemoteExecutor.new(ip)
+      @remote_executor ||= Webbynode::RemoteExecutor.new(ip)
     end
     
     def pushand
-      @pushand ||= PushAnd.new
+      @pushand ||= Webbynode::PushAnd.new
     end
 
     def add_ssh_key(key_file, passphrase="")
@@ -31,8 +32,7 @@ module Webbynode
     end
     
     def application_pushed?
-      remote_app_name = pushand.parse_remote_app_name
-      return false if remote_executor.exec("cd #{remote_app_name}") =~ /No such file or directory/
+      return false if remote_executor.exec("cd #{pushand.parse_remote_app_name}") =~ /No such file or directory/
       true
     end
   end

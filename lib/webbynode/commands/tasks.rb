@@ -12,8 +12,6 @@ module Webbynode::Commands
     # Constants
     # Paths to the webbynode task files
     TasksPath               = ".webbynode/tasks"
-    BeforeCreateTasksFile   = ".webbynode/tasks/before_create"
-    AfterCreateTasksFile    = ".webbynode/tasks/after_create"
     BeforePushTasksFile     = ".webbynode/tasks/before_push"
     AfterPushTasksFile      = ".webbynode/tasks/after_push"
     
@@ -115,8 +113,6 @@ module Webbynode::Commands
       # This will be stored inside the session_file method.
       def set_session_file
         case @type
-        when 'before_create'  then sf = BeforeCreateTasksFile
-        when 'after_create'   then sf = AfterCreateTasksFile
         when 'before_push'    then sf = BeforePushTasksFile
         when 'after_push'     then sf = AfterPushTasksFile
         end
@@ -138,7 +134,7 @@ module Webbynode::Commands
       # Will create the necessary task files when they are not available
       def ensure_tasks_folder
         io.exec('mkdir .webbynode/tasks') unless io.directory?(".webbynode/tasks")
-        %w[before_create after_create before_push after_push].each do |file|
+        %w[before_push after_push].each do |file|
           io.exec("touch .webbynode/tasks/#{file}") unless io.file_exists?(".webbynode/tasks/#{file}")
         end
       end

@@ -6,8 +6,6 @@ describe Webbynode::Commands::Tasks do
   it "should have constants defining the paths to the task files" do
     tasks_class = Webbynode::Commands::Tasks
     tasks_class::TasksPath.should             eql(".webbynode/tasks")
-    tasks_class::BeforeCreateTasksFile.should eql(".webbynode/tasks/before_create")
-    tasks_class::AfterCreateTasksFile.should  eql(".webbynode/tasks/after_create")
     tasks_class::BeforePushTasksFile.should   eql(".webbynode/tasks/before_push")
     tasks_class::AfterPushTasksFile.should    eql(".webbynode/tasks/after_push")
   end
@@ -36,8 +34,8 @@ describe Webbynode::Commands::Tasks do
         task.execute
       end
       
-      it "should create the 4 files required by the tasks command" do
-        %w[before_create after_create before_push after_push].each do |file|
+      it "should create the 2 files required by the tasks command" do
+        %w[before_push after_push].each do |file|
           io.should_receive(:file_exists?).with(".webbynode/tasks/#{file}").and_return(false)
           io.should_receive(:exec).with("touch .webbynode/tasks/#{file}")
         end
@@ -67,7 +65,7 @@ describe Webbynode::Commands::Tasks do
       end
       
       it "should create the 4 files required by the tasks command" do
-        %w[before_create after_create before_push after_push].each do |file|
+        %w[before_push after_push].each do |file|
           io.should_receive(:file_exists?).with(".webbynode/tasks/#{file}").and_return(true)
           io.should_not_receive(:exec).with("touch .webbynode/tasks/#{file}")
         end
@@ -110,16 +108,6 @@ describe Webbynode::Commands::Tasks do
     
     before(:each) do
       @tasks_class = Webbynode::Commands::Tasks
-    end
-    
-    it "should be the before_create path" do
-      selectable_helper('before_create')
-      @task.session_file.should eql(@tasks_class::BeforeCreateTasksFile)
-    end
-    
-    it "should be the before_create path" do
-      selectable_helper('after_create')
-      @task.session_file.should eql(@tasks_class::AfterCreateTasksFile)
     end
     
     it "should be the before_create path" do

@@ -59,6 +59,18 @@ describe Webbynode::Commands::Push do
         push.before_tasks.should_receive(:ensure_tasks_folder)
         push.execute
       end
+      
+      it "should not initialize the before_tasks if there aren't any tasks to perform" do
+        push.before_tasks.should_receive(:has_tasks?).and_return(false)
+        push.should_not_receive(:perform_before_tasks)
+        push.execute
+      end
+      
+      it "should not initialize the after_tasks if there aren't any tasks to perform" do
+        push.after_tasks.should_receive(:has_tasks?).and_return(false)
+        push.should_not_receive(:perform_after_tasks)
+        push.execute
+      end
     end
     
     describe "before_push tasks" do

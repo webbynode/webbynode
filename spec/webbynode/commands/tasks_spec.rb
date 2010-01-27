@@ -38,8 +38,8 @@ describe Webbynode::Commands::Tasks do
       
       it "should create the 4 files required by the tasks command" do
         %w[before_create after_create before_push after_push].each do |file|
-          io.should_receive(:file_exists?).with("./webbynode/tasks/#{file}").and_return(false)
-          io.should_receive(:exec).with("touch ./webbynode/tasks/#{file}")
+          io.should_receive(:file_exists?).with(".webbynode/tasks/#{file}").and_return(false)
+          io.should_receive(:exec).with("touch .webbynode/tasks/#{file}")
         end
         task.execute
       end
@@ -68,8 +68,8 @@ describe Webbynode::Commands::Tasks do
       
       it "should create the 4 files required by the tasks command" do
         %w[before_create after_create before_push after_push].each do |file|
-          io.should_receive(:file_exists?).with("./webbynode/tasks/#{file}").and_return(true)
-          io.should_not_receive(:exec).with("touch ./webbynode/tasks/#{file}")
+          io.should_receive(:file_exists?).with(".webbynode/tasks/#{file}").and_return(true)
+          io.should_not_receive(:exec).with("touch .webbynode/tasks/#{file}")
         end
         task.execute
       end
@@ -206,6 +206,7 @@ describe Webbynode::Commands::Tasks do
         task.should_receive(:read_tasks).with('.webbynode/tasks/after_push')
         task.stub!(:send)
         task.execute
+        task.session_file.should eql('.webbynode/tasks/after_push')
       end
       
       it "should append the new task to the array" do

@@ -64,6 +64,15 @@ describe Webbynode::Commands::Init do
     end
   end
   
+  context "when .webbynode is not present" do
+    it "should create the .webbynode system folder" do
+      io_handler.should_receive(:directory?).with(".webbynode").and_return(false)
+      io_handler.should_receive(:exec).with("mkdir .webbynode")
+      
+      @command.run
+    end
+  end
+  
   context "when .pushand is not present" do
     it "should be created" do
       d "Here"

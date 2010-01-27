@@ -75,9 +75,8 @@ module Webbynode::Commands
       # This will always be done from the session_tasks.
       def write_tasks
         io.open_file(session_file, "w") do |file|
-          session_tasks.each_with_index do |task, index|
-            file << task if index.eql?(0)
-            file << "\n#{task}" unless index.eql?(0)
+          session_tasks.each do |task|
+            file.write "#{task}\n"
           end
         end
       end
@@ -131,7 +130,7 @@ module Webbynode::Commands
         @session_tasks = []
         io.read_file(file).each_line {|line| tasks << line.gsub(/\n/,'') unless line.blank? }
         tasks.each_with_index do |task, index|
-          @session_tasks << "[#{index}] #{task}"
+          @session_tasks << "#{task}"
         end
       end
       
@@ -140,7 +139,7 @@ module Webbynode::Commands
       def ensure_tasks_folder
         io.exec('mkdir .webbynode/tasks') unless io.directory?(".webbynode/tasks")
         %w[before_create after_create before_push after_push].each do |file|
-          io.exec("touch ./webbynode/tasks/#{file}") unless io.file_exists?("./webbynode/tasks/#{file}")
+          io.exec("touch .webbynode/tasks/#{file}") unless io.file_exists?(".webbynode/tasks/#{file}")
         end
       end
       

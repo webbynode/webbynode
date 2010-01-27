@@ -26,8 +26,8 @@ module Webbynode
       File.read(f)
     end
     
-    def open_file(f, a)
-      File.open(f, a)
+    def open_file(f, a, &blk)
+      File.open(f, a, &blk)
     end
     
     def log(text)

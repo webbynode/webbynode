@@ -11,7 +11,7 @@ describe Webbynode::Commands::Tasks do
   end
   
   let(:io)    { double('io').as_null_object }
-  let(:task)  { Webbynode::Commands::Tasks.new('add', 'after_push', 'rake', 'db:migrate', 'RAILS_ENV=production') }
+  let(:task)  { Webbynode::Commands::Tasks.new('add', 'after_push', 'rake db:migrate RAILS_ENV=production') }
   
   before(:each) do
     task.should_receive(:io).any_number_of_times.and_return(io)
@@ -99,7 +99,7 @@ describe Webbynode::Commands::Tasks do
   
   describe "selectable paths" do
     def selectable_helper(type)
-      @task = @tasks_class.new(["add", type])
+      @task = @tasks_class.new("add", type)
       @task.stub!(:validate_parameters)
       @task.stub!(:send)
       @task.should_receive(:io).any_number_of_times.and_return(io)
@@ -133,7 +133,7 @@ describe Webbynode::Commands::Tasks do
     end
     
     it "should initialize the [remove] method" do
-      task = Webbynode::Commands::Tasks.new(['remove', 'after_push', 'rake', 'db:migrate', 'RAILS_ENV=production'])
+      task = Webbynode::Commands::Tasks.new('remove', 'after_push', 'rake db:migrate RAILS_ENV=production')
       task.should_receive(:send).with('remove')
       task.stub!(:read_tasks)
       task.execute
@@ -141,7 +141,7 @@ describe Webbynode::Commands::Tasks do
   end
   
   describe "displaying tasks from a file" do
-    let(:stask) { Webbynode::Commands::Tasks.new(['show', 'after_push']) }
+    let(:stask) { Webbynode::Commands::Tasks.new('show', 'after_push') }
     
     before(:each) do
       stask.should_receive(:io).any_number_of_times.and_return(io)

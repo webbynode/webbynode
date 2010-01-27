@@ -4,8 +4,6 @@ module Webbynode::Commands
     
     attr_accessor :action, :type, :command, :session_file, :session_tasks
     
-    # @ Felipe
-    # This
     parameter :action,  String, "add, remove or show.",       :required => true
     parameter :type,    String, "before_push or after_push.", :required => true
     parameter :command, String, "Task to perform.",           :required => true
@@ -140,18 +138,14 @@ module Webbynode::Commands
         end
       end
       
-      
-      # @ Felipe
-      # And This
-      
       # Parses the parameters and stores the params inside 3 different methods
       # [action]  represents: [add/remove/show]
       # [type]    represents: [before/after_create before/after_push]
       # [command] represents: The remote command that should get executed
       def parse_parameters
-        @action   = param(:action)  #params.shift
-        @type     = param(:type)    #params.shift
-        @command  = param(:command) #params.join(" ")
+        @action   = param(:action)
+        @type     = param(:type)
+        @command  = param(:command)
       end
         
   end

@@ -92,6 +92,11 @@ describe Webbynode::Commands::Alias do
         a.execute
         a.session_aliases.size.should eql(0)
       end
+      
+      it "should display the current list of aliases after adding the new one" do
+        a.should_receive(:show_aliases)
+        a.execute
+      end
     end
     
     context "when removing from the file" do
@@ -126,6 +131,37 @@ describe Webbynode::Commands::Alias do
         a.should_receive(:write_aliases)
         a.execute
       end
+      
+      it "should display the current list of aliases after removing the old one" do
+        a.should_receive(:show_aliases)
+        a.execute
+      end
+    end
+    
+    context "reading from the file" do
+      before(:each) do
+        a = Webbynode::Commands::Alias.new("show")
+        a.should_receive(:io).any_number_of_times.and_return(io)
+      end
+      
+      it "should invoke the show method" do
+        a.should_receive(:send).with("show")
+        a.execute
+      end
+      
+      it "should show the aliases" do
+        a.should_receive(:show_aliases)
+        a.execute
+      end
+      
+      it "should display all the aliases to the user" do
+        a.stub!(:read_aliases_file)
+        a.session_aliases << "[my_alias] rake db:migrate"
+        io.should_receive(:log).with("These are your current aliases..")
+        io.should_receive(:log).with("[my_alias] rake db:migrate")
+        a.execute
+      end
+      
     end
   end
   

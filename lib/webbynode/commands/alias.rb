@@ -1,13 +1,15 @@
 module Webbynode::Commands
   class Alias < Webbynode::Command
+  
+    attr_accessor :action, :alias, :command, :session_aliases
+    
+    add_alias "aliases"
     
     requires_initialization!
     
-    attr_accessor :action, :alias, :command, :session_aliases
-    
     parameter :action,  String, "add, remove or show.", :required => true
-    parameter :alias,   String, "The custom alias.",    :required => true
-    parameter :command, Array,  "Task to perform.",     :required => false
+    parameter :alias,   String, "The custom alias.",    :required => false # true if action == add or remove
+    parameter :command, Array,  "Task to perform.",     :required => false # true if action == add
     
     FilePath = ".webbynode/aliases"
     
@@ -55,11 +57,17 @@ module Webbynode::Commands
       def add
         append_alias
         write_aliases
+        show_aliases
       end
       
       def remove
         remove_alias
         write_aliases
+        show_aliases
+      end
+      
+      def show
+        show_aliases
       end
       
       def write_aliases
@@ -83,6 +91,13 @@ module Webbynode::Commands
           if a =~ /\[(.+)\] .+/
             @session_aliases << a unless $1.eql?(@alias)
           end
+        end
+      end
+      
+      def show_aliases
+        io.log "These are your current aliases.."
+        session_aliases.each do |a|
+          io.log a
         end
       end
 

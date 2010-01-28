@@ -192,14 +192,21 @@ describe Webbynode::Commands::Alias do
         a.execute
       end
       
-      it "should display all the aliases to the user" do
+      it "should display all the aliases to the user if there are any" do
         a.stub!(:read_aliases_file)
         a.session_aliases << "[my_alias] rake db:migrate"
         io.should_receive(:log).with("These are your current aliases..")
         io.should_receive(:log).with("[my_alias] rake db:migrate")
+        a.session_aliases.should_receive(:any?).and_return(true)
         a.execute
       end
       
+      it "it should not display any aliases since there are none. Will display a friendly message instead." do
+        a.stub!(:read_aliases_file)
+        a.session_aliases.should_receive(:any?).and_return(false)
+        io.should_receive(:log).with("You have not yet set up any aliases.")
+        a.execute
+      end
     end
   end
   

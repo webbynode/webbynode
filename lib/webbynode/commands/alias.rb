@@ -134,9 +134,13 @@ module Webbynode::Commands
       
       # Outputs every alias from the session_aliases to the user
       def show_aliases
-        io.log "These are your current aliases.."
-        session_aliases.each do |a|
-          io.log a
+        if session_aliases.any?
+          io.log "These are your current aliases.."
+          session_aliases.each do |a|
+            io.log a
+          end
+        else
+          io.log "You have not yet set up any aliases."
         end
       end
       

@@ -12,6 +12,8 @@ features/bootstrap.feature
 features/step_definitions/command_steps.rb
 features/support/env.rb
 features/support/hooks.rb
+features/support/io_features.rb
+features/support/mocha.rb
 lib/templates/gitignore
 lib/templates/help
 lib/webbynode.rb
@@ -21,6 +23,7 @@ lib/webbynode/command.rb
 lib/webbynode/commands.rb
 lib/webbynode/commands/add_key.rb
 lib/webbynode/commands/alias.rb
+lib/webbynode/commands/delete.rb
 lib/webbynode/commands/help.rb
 lib/webbynode/commands/init.rb
 lib/webbynode/commands/push.rb
@@ -53,6 +56,7 @@ spec/webbynode/application_spec.rb
 spec/webbynode/command_spec.rb
 spec/webbynode/commands/add_key_spec.rb
 spec/webbynode/commands/alias_spec.rb
+spec/webbynode/commands/delete_spec.rb
 spec/webbynode/commands/help_spec.rb
 spec/webbynode/commands/init_spec.rb
 spec/webbynode/commands/push_spec.rb

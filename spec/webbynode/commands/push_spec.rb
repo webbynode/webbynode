@@ -24,7 +24,7 @@ describe Webbynode::Commands::Push do
     end
     
     it "should push the application to the webby" do
-      io.should_receive(:exec).with("git push webbynode master")
+      io.should_receive(:exec).with("git push webbynode master", false)
       push.execute
     end
     

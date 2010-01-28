@@ -23,7 +23,7 @@ module Webbynode::Commands
       # Logs a initialization message to the user
       # Pushes the application to Webbynode
       io.log("Pushing your application to Webbynode!")
-      io.exec("git push webbynode master")
+      io.exec("git push webbynode master", false)
       
       # Reads out the "after push" tasks file to see if there are any tasks that must be performed
       # It will perform the "after push" tasks if there are any available

@@ -10,8 +10,8 @@ module Webbynode
       Dir.pwd.split("/").last.gsub(/[\.| ]/, "_")
     end
     
-    def exec(s)
-      `#{s} 2>&1`
+    def exec(s, redirect_stderr=true)
+      `#{s}#{redirect_stderr ? " 2>&1" : ""}`
     end
     
     def directory?(s)

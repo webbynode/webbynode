@@ -2,6 +2,8 @@ module Webbynode::Commands
   class NoOptionsProvided < StandardError; end
   
   class Remote < Webbynode::Command
+    summary "Executes commands remotely on your Webby where the app is deployed"
+    
     requires_initialization!
     requires_options!
     requires_pushed_application!

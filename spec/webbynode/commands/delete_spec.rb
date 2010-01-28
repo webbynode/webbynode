@@ -1,0 +1,56 @@
+# Load Spec Helper
+require File.join(File.expand_path(File.dirname(__FILE__)), '../..', 'spec_helper')
+
+describe Webbynode::Commands::Delete do
+  let(:cmd)     { Webbynode::Commands::Delete.new }
+  let(:pushand) { double("PushAnd").as_null_object }
+  let(:re)      { double("RemoteExecutor").as_null_object }
+  
+  def setup_mocks(cmd)
+    cmd.should_receive(:pushand).any_number_of_times.and_return(pushand)
+    cmd.should_receive(:remote_executor).any_number_of_times.and_return(re)
+  end
+  
+  before do
+    setup_mocks(cmd)
+  end
+  
+  it "should run delete_app for the current application" do
+    pushand.should_receive(:parse_remote_app_name).and_return("myapp")
+    re.should_receive(:exec).with("delete_app myapp --force", true)
+    cmd.should_receive(:ask).with("Do you really want to delete application myapp (y/n)? ").and_return("y") 
+    cmd.run
+  end
+  
+  it "should delete if user responds Y" do
+    pushand.should_receive(:parse_remote_app_name).and_return("myapp")
+    re.should_receive(:exec).with("delete_app myapp --force", true)
+    cmd.should_receive(:ask).with("Do you really want to delete application myapp (y/n)? ").and_return("Y") 
+    cmd.run
+  end
+  
+  it "should delete if force option is given" do
+    cmd = Webbynode::Commands::Delete.new("--force")
+    pushand.should_receive(:parse_remote_app_name).and_return("myapp")
+    re.should_receive(:exec).with("delete_app myapp --force", true)
+    setup_mocks(cmd)
+    
+    cmd.run
+  end
+  
+  it "should ask for confirmation" do
+    pushand.should_receive(:parse_remote_app_name).and_return("myapp")
+    re.should_receive(:exec).never
+    cmd.should_receive(:puts).with("Aborted.")
+    cmd.should_receive(:ask).with("Do you really want to delete application myapp (y/n)? ").and_return("n")
+    cmd.run
+  end
+  
+  it "abort if user didn't respond y" do
+    pushand.should_receive(:parse_remote_app_name).and_return("myapp")
+    re.should_receive(:exec).never
+    cmd.should_receive(:puts).with("Aborted.")
+    cmd.should_receive(:ask).with("Do you really want to delete application myapp (y/n)? ").and_return("X")
+    cmd.run
+  end
+end

@@ -50,11 +50,29 @@ module Webbynode
       end
       
       def for(command)
-        Webbynode::Commands.const_get command_class_name(command)
-      rescue NameError
-        puts "Command \"#{command}\" doesn't exist"
+        begin
+          Webbynode::Commands.const_get command_class_name(command)
+        rescue NameError
+          
+          # Assumes Command Not Found
+          # Will attempt to find/read possible aliases that might
+          # have been set up by the user
+          if File.directory?('.webbynode')
+            a = Webbynode::Commands::Alias.new 
+            a.read_aliases_file
+            if a.exists?(command)
+              remote_command = a.extract_command(command)
+              r = Webbynode::Commands::Remote.new(remote_command)
+              r.execute
+              exit
+            end
+          end  
+          
+          # If no aliases:
+          puts "Command \"#{command}\" doesn't exist"
+        end
       end
-
+      
       def add_alias(alias_name)
         Aliases[alias_name] = self.name.split("::").last
       end

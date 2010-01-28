@@ -37,6 +37,10 @@ module Webbynode
         Settings[self][:description] = s
       end
       
+      def summary(s)
+        Settings[self][:summary] = s
+      end
+      
       def parameter(*args)
         param = Parameter.new(*args)
         Settings[self][:parameters] << param
@@ -123,6 +127,10 @@ module Webbynode
       settings[:parameters].map { |p| p.value }
     end
     
+    def self.summary_help
+      Settings[self][:summary]
+    end
+    
     def self.usage
       help = "Usage: webbynode #{command}"
       if (params = Settings[self][:parameters])
@@ -159,9 +167,10 @@ module Webbynode
     
     def self.help
       help = []
+      help << summary_help if summary_help
       help << usage
-      help << params_help
-      help << options_help
+      help << params_help if Settings[self][:parameters].any?
+      help << options_help if (Settings[self][:options] || []).any?
       
       help.join("\n")
     end

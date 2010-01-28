@@ -161,10 +161,19 @@ describe Webbynode::Command do
       parameter :param1, String, "param1"
       parameter :param2, String, "param2"
       parameter :param_array, Array, "array"
+      option :option, String, "descr"
     end
     
     it "should parse params and all remaining as the array param" do
       cmd = ArrayCmd.new("param1", "param2", "arr1", "arr2", "arr3", "arr4")
+      cmd.param(:param1).should == "param1"
+      cmd.param(:param2).should == "param2"
+      cmd.param(:param_array).should == ["arr1", "arr2", "arr3", "arr4"]
+    end
+
+    it "should ignore options" do
+      cmd = ArrayCmd.new("param1", "param2", "--option=tough", "arr1", "arr2", "arr3", "arr4")
+      cmd.option(:option).should == "tough"
       cmd.param(:param1).should == "param1"
       cmd.param(:param2).should == "param2"
       cmd.param(:param_array).should == ["arr1", "arr2", "arr3", "arr4"]

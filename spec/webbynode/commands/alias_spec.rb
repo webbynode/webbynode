@@ -47,12 +47,27 @@ describe Webbynode::Commands::Alias do
     end
   end
   
+  describe "#extract_command" do
+    it "should extract the command from the session_aliases based on the given alias if it exists" do
+      a = Webbynode::Commands::Alias.new
+      a.stub!(:read_aliases_file)
+      a.session_aliases << "[my_alias] rake db:migrate"
+      a.extract_command('my_alias').should eql("rake db:migrate")
+    end
+    
+    it "should return false because the requested alias does not exist" do
+      a = Webbynode::Commands::Alias.new
+      a.stub!(:read_aliases_file)
+      a.extract_command('my_alias').should be_false
+    end
+  end
+  
   describe "aliases file availability" do
     context "when the aliases file is not present" do
       it "should create it" do
         io.should_receive(:file_exists?).with(Webbynode::Commands::Alias::FilePath).and_return(false)
         io.should_receive(:exec).with("touch #{Webbynode::Commands::Alias::FilePath}")
-        a.execute
+        a.ensure_aliases_file_exists
       end
     end
     
@@ -60,7 +75,7 @@ describe Webbynode::Commands::Alias do
       it "should not create it, nor overwrite it" do
         io.should_receive(:file_exists?).with(Webbynode::Commands::Alias::FilePath).and_return(true)
         io.should_not_receive(:exec).with("touch #{Webbynode::Commands::Alias::FilePath}")
-        a.execute
+        a.ensure_aliases_file_exists
       end
     end
   end

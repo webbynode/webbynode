@@ -16,12 +16,12 @@ module Webbynode::Commands
     def initialize(*args)
       super
       @session_aliases = Array.new
+
+      # Ensures that the aliases file exists inside the .webbynode/ folder
+      ensure_aliases_file_exists
     end
     
     def execute
-      
-      # Ensures that the aliases file exists inside the .webbynode/ folder
-      ensure_aliases_file_exists
       
       # Reads out the aliases from the aliases file and stores them in session_aliases
       read_aliases_file
@@ -53,16 +53,25 @@ module Webbynode::Commands
       end
       false
     end
+
+    # Ensures that the aliases file exists
+    # If the file does not exist, it will be created
+    def ensure_aliases_file_exists
+      unless io.file_exists?(FilePath)
+        io.exec("touch #{FilePath}")
+      end
+    end
     
-    private
-      
-      # Ensures that the aliases file exists
-      # If the file does not exist, it will be created
-      def ensure_aliases_file_exists
-        unless io.file_exists?(FilePath)
-          io.exec("touch #{FilePath}")
+    def extract_command(a)
+      session_aliases.each do |session_alias|
+        if session_alias =~ /\[(.+)\] (.+)/
+          return $2 if a.eql?($1)
         end
       end
+      false
+    end
+    
+    private
       
       # Parses the paramters provided by the user
       def parse_parameters

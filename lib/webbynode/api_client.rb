@@ -25,11 +25,6 @@ module Webbynode
     end
     
     def init_credentials
-      # @credentials = io.read_file(Webbynode::ApiClient::CREDENTIALS_FILE) do
-      #   creds = { :email => ask("Login email: "), :token => ask("API Token:   ") }
-      #   create_yaml_file Webbynode::ApiClient::CREDENTIALS_FILE, creds
-      #   creds
-      # end
       creds = if io.file_exists?(CREDENTIALS_FILE)
         io.read_config(CREDENTIALS_FILE)
       else

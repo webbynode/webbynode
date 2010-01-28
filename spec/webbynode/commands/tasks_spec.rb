@@ -17,6 +17,27 @@ describe Webbynode::Commands::Tasks do
     task.should_receive(:io).any_number_of_times.and_return(io)
   end
   
+  describe "invalid parameters" do
+    before(:each) do
+      io.stub!(:directory?).with('.webbynode').and_return(true)
+      io.stub!(:directory?).with('.webbynode/tasks').and_return(true)
+    end
+    
+    it "should should report an invalid action" do
+      task = Webbynode::Commands::Tasks.new('undefined_op', 'after', 'abc')
+      task.should_receive(:io).any_number_of_times.and_return(io)
+      task.run
+      stdout.should =~ /Invalid value 'undefined_op' for parameter 'action'. It should be one of 'add', 'remove' or 'show'./
+    end
+    
+    it "should should report an invalid type" do
+      task = Webbynode::Commands::Tasks.new('add', 'nah_way', 'abc')
+      task.should_receive(:io).any_number_of_times.and_return(io)
+      task.run
+      stdout.should =~ /Invalid value 'nah_way' for parameter 'type'. It should be one of 'before_push' or 'after_push'./
+    end
+  end
+  
   describe "webbynode tasks folder and files" do
     context "when not available" do
       before(:each) do

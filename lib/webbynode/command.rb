@@ -226,7 +226,7 @@ module Webbynode
     
     def run
       if @parse_error
-        puts "#{@parse_error}. Use \"webbynode help #{self.class.command}\" for more information."
+        puts "#{@parse_error} Use \"webbynode help #{self.class.command}\" for more information."
         puts self.class.usage
         return
       end
@@ -245,7 +245,7 @@ module Webbynode
 
       i = 0
       while (opt = args.shift)
-        if (name = Option.name(opt))
+        if (name = Option.name_for(opt))
           option = settings[:options_hash][name.to_sym]
           raise Webbynode::Command::InvalidOption, "Unknown option: #{name.to_sym}" unless option
           option.parse(opt)

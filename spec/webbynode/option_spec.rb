@@ -35,4 +35,14 @@ describe Webbynode::Option do
       Webbynode::Option.new(:param1, "My param").to_s.should == "--param1"
     end
   end
+  
+  describe "validating" do
+    it "should validate against values if :in passed" do
+      opt = Webbynode::Option.new(:option1, "My option", :validate => { :in => ['a', 'b'] })
+      opt.value = 'c'
+      opt.should_not be_valid
+      opt.errors.should be_include("Invalid value 'c' for option 'option1'. It should be one of 'a' or 'b'.")
+      lambda { opt.validate! }.should raise_error(Webbynode::Command::InvalidCommand, "Invalid value 'c' for option 'option1'. It should be one of 'a' or 'b'.")
+    end
+  end
 end

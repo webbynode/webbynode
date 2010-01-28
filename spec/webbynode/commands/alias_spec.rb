@@ -36,6 +36,17 @@ describe Webbynode::Commands::Alias do
     end
   end
   
+  describe "#exists?" do
+    it "should determine whether the specified alias already exists" do
+      a.exists?("my_alias").should be_false
+    end
+    
+    it "should determine whether the specified alias already exists" do
+      a.session_aliases << "[my_alias] rake db:migrate"
+      a.exists?("my_alias").should be_true
+    end
+  end
+  
   describe "aliases file availability" do
     context "when the aliases file is not present" do
       it "should create it" do
@@ -79,11 +90,23 @@ describe Webbynode::Commands::Alias do
       end
       
       it "should not add the alias to session_aliases if the command is blank" do
-        a = Webbynode::Commands::Alias.new("add", "my_alias", "custom command")
-        a.stub!(:write_aliases)
+        a = Webbynode::Commands::Alias.new("add", "my_alias")
+        a.should_receive(:io).any_number_of_times.and_return(io)
+        io.should_receive(:log).with("You must provide a remote command for the alias.")
         a.execute
-        a.session_aliases.size.should eql(1)
-        a.session_aliases[0].should eql("[my_alias] custom command")
+        a.session_aliases.size.should eql(0)
+      end
+      
+      it "should not add the alias if it already exists" do
+        a = Webbynode::Commands::Alias.new("add", "my_alias", "custom command")
+        a.should_receive(:io).any_number_of_times.and_return(io)
+        a.stub!(:write_aliases)
+        a.stub!(:read_aliases_file)
+        a.session_aliases << "[my_alias] foo"
+        a.session_aliases << "[mah_alias] bar"
+        io.should_receive(:log).with("You already have an alias named [my_alias].")
+        a.execute
+        a.should have(2).session_aliases
       end
       
       it "should not add the alias to session_aliases if the command is blank" do

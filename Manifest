@@ -20,6 +20,7 @@ lib/webbynode/application.rb
 lib/webbynode/command.rb
 lib/webbynode/commands.rb
 lib/webbynode/commands/add_key.rb
+lib/webbynode/commands/alias.rb
 lib/webbynode/commands/help.rb
 lib/webbynode/commands/init.rb
 lib/webbynode/commands/push.rb
@@ -36,6 +37,7 @@ lib/webbynode/remote_executor.rb
 lib/webbynode/server.rb
 lib/webbynode/ssh.rb
 lib/webbynode/ssh_keys.rb
+spec/fixtures/aliases
 spec/fixtures/api/credentials
 spec/fixtures/api/webbies
 spec/fixtures/commands/tasks/after_push
@@ -50,6 +52,7 @@ spec/webbynode/api_client_spec.rb
 spec/webbynode/application_spec.rb
 spec/webbynode/command_spec.rb
 spec/webbynode/commands/add_key_spec.rb
+spec/webbynode/commands/alias_spec.rb
 spec/webbynode/commands/help_spec.rb
 spec/webbynode/commands/init_spec.rb
 spec/webbynode/commands/push_spec.rb

@@ -57,10 +57,15 @@ module Webbynode::Commands
         write_aliases
       end
       
+      def remove
+        remove_alias
+        write_aliases
+      end
+      
       def write_aliases
         io.open_file(FilePath, "w") do |file|
           session_aliases.each do |a|
-            file << a
+            file << a + "\n"
           end
         end
       end
@@ -68,6 +73,16 @@ module Webbynode::Commands
       def append_alias
         unless command.blank?
           @session_aliases << "[#{@alias}] #{command}"
+        end
+      end
+      
+      def remove_alias
+        tmp_aliases = @session_aliases
+        @session_aliases = Array.new
+        tmp_aliases.each do |a|
+          if a =~ /\[(.+)\] .+/
+            @session_aliases << a unless $1.eql?(@alias)
+          end
         end
       end
 

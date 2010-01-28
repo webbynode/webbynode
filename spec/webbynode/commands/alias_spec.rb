@@ -63,9 +63,6 @@ describe Webbynode::Commands::Alias do
   
   describe "aliases file interaction" do
     context "when writing to the file" do
-      before(:each) do
-      end
-      
       it "should invoke the add method" do
         a.should_receive(:send).with('add')
         a.execute
@@ -94,6 +91,40 @@ describe Webbynode::Commands::Alias do
         a.stub!(:write_aliases)
         a.execute
         a.session_aliases.size.should eql(0)
+      end
+    end
+    
+    context "when removing from the file" do
+      before(:each) do
+        a = Webbynode::Commands::Alias.new("remove", "my_alias")
+        a.should_receive(:io).any_number_of_times.and_return(io)
+      end
+      
+      it "should invoke the remove method" do
+        a.should_receive(:send).with('remove')
+        a.execute
+      end
+      
+      it "should remove the alias if it exists" do
+        a.should_receive(:remove_alias)
+        a.execute
+      end
+      
+      it "should remove the specified alias from the array of aliases to write" do
+        a.stub!(:read_aliases_file)
+        3.times { |n| a.session_aliases << "[alias_#{n}] my_custom_alias_#{n}" }
+        a.should have(3).session_aliases
+        a.session_aliases << "[my_alias] what a nice alias"
+        a.should have(4).session_aliases
+        a.session_aliases.should include("[my_alias] what a nice alias")
+        a.execute
+        a.session_aliases.should_not include("[my_alias] what a nice alias")
+        a.should have(3).session_aliases
+      end
+      
+      it "should write to the aliases file to apply the changes" do
+        a.should_receive(:write_aliases)
+        a.execute
       end
     end
   end

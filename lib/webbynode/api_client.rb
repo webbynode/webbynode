@@ -35,7 +35,7 @@ module Webbynode
     end
     
     def post(uri, options={})
-      self.class.post(uri, { :body => credentials }.merge(options)) 
+      self.class.post(uri, { :body => credentials }.merge(options))
     end
   end
 end

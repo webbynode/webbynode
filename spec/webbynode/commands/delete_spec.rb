@@ -5,10 +5,12 @@ describe Webbynode::Commands::Delete do
   let(:cmd)     { Webbynode::Commands::Delete.new }
   let(:pushand) { double("PushAnd").as_null_object }
   let(:re)      { double("RemoteExecutor").as_null_object }
+  let(:io)      { double("Io").as_null_object }
   
   def setup_mocks(cmd)
     cmd.should_receive(:pushand).any_number_of_times.and_return(pushand)
     cmd.should_receive(:remote_executor).any_number_of_times.and_return(re)
+    cmd.should_receive(:io).any_number_of_times.and_return(io)
   end
   
   before do
@@ -20,6 +22,26 @@ describe Webbynode::Commands::Delete do
     re.should_receive(:exec).with("delete_app myapp --force", true)
     cmd.should_receive(:ask).with("Do you really want to delete application myapp (y/n)? ").and_return("y") 
     cmd.run
+  end
+  
+  context "when pushand doesn't exist" do
+    it "should poop an easter egg" do
+      pushand.should_receive(:present?).and_return(false)
+      io.should_receive(:log).with("Ahn. Hello, McFly, anyone there?", true)
+      cmd.stub!(:ask).any_number_of_times
+      cmd.ask.stub!(:downcase)
+      cmd.execute
+    end
+  end
+  
+  context "when pushand exists" do
+    it "should not poop an easter egg" do
+      pushand.should_receive(:present?).and_return(true)
+      io.should_not_receive(:log).with("Ahn. Hello, McFly, anyone there?", true)
+      cmd.stub!(:ask).any_number_of_times
+      cmd.ask.stub!(:downcase)
+      cmd.execute
+    end
   end
   
   it "should delete if user responds Y" do

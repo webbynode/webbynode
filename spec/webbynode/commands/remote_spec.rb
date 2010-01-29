@@ -22,6 +22,11 @@ describe Webbynode::Commands::Remote do
   before do
     load_all_mocks
   end
+  
+  it "should notify the user" do
+    io.should_receive(:log).with("Performing the requested remote command..", true)
+    remote.run
+  end
  
   context "when successful" do    
     it "should receive at least one option when passing in the remote command" do

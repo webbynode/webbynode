@@ -14,6 +14,9 @@ module Webbynode::Commands
       # Parses Pushand File and returns remote application name
       remote_app_name = pushand.parse_remote_app_name
       
+      # Notify the user
+      io.log("Performing the requested remote command..", true)
+      
       # Executes the command on the remote server inside the application root folder
       remote_executor.exec("cd #{remote_app_name}; #{param_values.join(" ")}", true)
     end

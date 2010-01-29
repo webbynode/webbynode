@@ -22,6 +22,7 @@ module Webbynode::Commands
       
       # Logs a initialization message to the user
       # Pushes the application to Webbynode
+      notify("Pushing your application to Webbynode!")
       io.log("Pushing your application to Webbynode!")
       io.exec("git push webbynode master", false)
       
@@ -29,6 +30,8 @@ module Webbynode::Commands
       # It will perform the "after push" tasks if there are any available
       after_tasks.read_tasks(Webbynode::Commands::Tasks::AfterPushTasksFile)
       perform_after_tasks if after_tasks.has_tasks?
+      
+      notify("Application has been deployed!")
     end
     
     

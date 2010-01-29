@@ -11,7 +11,7 @@ describe Webbynode::Commands::Version do
   end
   
   it "should return the version of the gem" do
-    io.should_receive(:log).with("Webbynode Rapid Deployment Gem v#{Webbynode::VERSION}")
+    io.should_receive(:log).with("Rapid Deployment Gem v#{Webbynode::VERSION}", true)
     version.execute
   end
   

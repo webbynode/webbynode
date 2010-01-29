@@ -121,6 +121,12 @@ describe Webbynode::Commands::Init do
       
       @command.run
     end
+    
+    it "should log a message to the user when it's finished" do
+      io_handler.should_receive(:log).with("Webbynode has been initialized for this application!", true)
+      
+      @command.run
+    end
   end
 
   context "when git repo is initialized" do
@@ -142,7 +148,7 @@ describe Webbynode::Commands::Init do
       git_handler.should_receive(:present?).and_return(true)
       git_handler.should_receive(:add_remote).and_raise(Webbynode::GitRemoteAlreadyExistsError)
       
-      @command.should_receive(:puts).with("Webbynode already initialized for this application.")
+      io_handler.should_receive(:log).with("Webbynode already initialized for this application.", true)
       @command.run
     end
   end

@@ -35,8 +35,10 @@ module Webbynode::Commands
       end
       
       git.add_remote "webbynode", webby_ip, app_name
+      
+      io.log "Webbynode has been initialized for this application!", true
     rescue Webbynode::GitRemoteAlreadyExistsError
-      puts "Webbynode already initialized for this application."
+      io.log "Webbynode already initialized for this application.", true
     end
   end
 end

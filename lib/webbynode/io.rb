@@ -30,12 +30,13 @@ module Webbynode
       File.open(f, a, &blk)
     end
     
-    def log(text)
+    def log(text, notify=false)
       puts "[Webbynode] #{text}"
+      Webbynode::Notify.message(text) if notify
     end
 
-    def log_and_exit(text)
-      log(text)
+    def log_and_exit(text, notify=false)
+      log(text, notify)
       exit
     end
     

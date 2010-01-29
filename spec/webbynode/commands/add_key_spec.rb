@@ -32,13 +32,18 @@ describe Webbynode::Commands::AddKey do
   end
 
   context "when unsuccessful" do
-    let(:cmd)    { Webbynode::Commands::AddKey.new }
+    let(:cmd) { Webbynode::Commands::AddKey.new }
+    let(:io)  { double("Io").as_null_object }  
+    
+    before(:each) do
+      cmd.should_receive(:io).any_number_of_times.and_return(io)
+    end
     
     it "should report an error if the ssh key could not be added due to invalid authentication" do
       server.should_receive(:add_ssh_key).and_raise(Webbynode::InvalidAuthentication)
 
       cmd.should_receive(:server).any_number_of_times.and_return(server)
-      cmd.should_receive(:puts).with("Could not connect to server: invalid authentication.")
+      io.should_receive(:log).with("Could not connect to server: invalid authentication.", true)
       cmd.execute
     end
 
@@ -46,7 +51,7 @@ describe Webbynode::Commands::AddKey do
       server.should_receive(:add_ssh_key).and_raise(Webbynode::PermissionError)
 
       cmd.should_receive(:server).any_number_of_times.and_return(server)
-      cmd.should_receive(:puts).with("Could not create an SSH key: permission error.")
+      io.should_receive(:log).with("Could not create an SSH key: permission error.", true)
       cmd.execute
     end
   end

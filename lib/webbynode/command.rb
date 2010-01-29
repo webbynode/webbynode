@@ -199,6 +199,10 @@ module Webbynode
       @@api ||= Webbynode::ApiClient.new
     end
     
+    def notify(msg)
+      Webbynode::Notify.message(msg)
+    end
+    
     def validate_initialization
       raise Webbynode::GitNotRepoError,
         "Could not find a git repository." unless git.present?

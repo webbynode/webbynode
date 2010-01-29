@@ -4,6 +4,7 @@ Manifest.txt
 PostInstall.txt
 README.rdoc
 Rakefile
+assets/webbynode.png
 bin/webbynode
 bin/wn
 cucumber.yml
@@ -33,6 +34,7 @@ lib/webbynode/commands/version.rb
 lib/webbynode/git.rb
 lib/webbynode/helpers.rb
 lib/webbynode/io.rb
+lib/webbynode/notify.rb
 lib/webbynode/option.rb
 lib/webbynode/parameter.rb
 lib/webbynode/push_and.rb

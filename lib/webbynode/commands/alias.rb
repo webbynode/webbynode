@@ -114,10 +114,11 @@ module Webbynode::Commands
       # - There is already an alias that exists with the same name
       def append_alias
         if !command.blank? and !exists?(@alias)
+          notify("Alias added:\n[#{@alias}] #{command}")
           @session_aliases << "[#{@alias}] #{command}"
         else
-          io.log("You must provide a remote command for the alias.") if command.blank?
-          io.log("You already have an alias named [#{@alias}].") if exists?(@alias)
+          io.log("You must provide a remote command for the alias.", true) if command.blank?
+          io.log("You already have an alias named [#{@alias}].", true) if exists?(@alias)
         end
       end
       
@@ -128,6 +129,7 @@ module Webbynode::Commands
         tmp_aliases.each do |a|
           if a =~ /\[(.+)\] .+/
             @session_aliases << a unless $1.eql?(@alias)
+            notify("Alias removed: #{@alias}") if $1.eql?(@alias)
           end
         end
       end
@@ -140,7 +142,7 @@ module Webbynode::Commands
             io.log a
           end
         else
-          io.log "You have not yet set up any aliases."
+          io.log "You have not yet set up any aliases.", true
         end
       end
       

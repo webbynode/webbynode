@@ -107,7 +107,7 @@ describe Webbynode::Commands::Alias do
       it "should not add the alias to session_aliases if the command is blank" do
         a = Webbynode::Commands::Alias.new("add", "my_alias")
         a.should_receive(:io).any_number_of_times.and_return(io)
-        io.should_receive(:log).with("You must provide a remote command for the alias.")
+        io.should_receive(:log).with("You must provide a remote command for the alias.", true)
         a.execute
         a.session_aliases.size.should eql(0)
       end
@@ -119,7 +119,7 @@ describe Webbynode::Commands::Alias do
         a.stub!(:read_aliases_file)
         a.session_aliases << "[my_alias] foo"
         a.session_aliases << "[mah_alias] bar"
-        io.should_receive(:log).with("You already have an alias named [my_alias].")
+        io.should_receive(:log).with("You already have an alias named [my_alias].", true)
         a.execute
         a.should have(2).session_aliases
       end
@@ -204,7 +204,7 @@ describe Webbynode::Commands::Alias do
       it "it should not display any aliases since there are none. Will display a friendly message instead." do
         a.stub!(:read_aliases_file)
         a.session_aliases.should_receive(:any?).and_return(false)
-        io.should_receive(:log).with("You have not yet set up any aliases.")
+        io.should_receive(:log).with("You have not yet set up any aliases.", true)
         a.execute
       end
     end

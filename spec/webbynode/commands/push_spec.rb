@@ -28,6 +28,14 @@ describe Webbynode::Commands::Push do
       push.execute
     end
     
+    context "when succesful" do
+      it "should notify the user" do
+        push.should_receive(:notify).with("Pushing your application to Webbynode!")
+        push.should_receive(:notify).with("Application has been deployed!")
+        push.execute
+      end
+    end
+    
     describe "Tasks" do
       it "should have 2 before_tasks present" do
         push.execute

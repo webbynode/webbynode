@@ -33,3 +33,16 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'application')
 module Webbynode
   VERSION = '0.1.2'
 end
+
+class Array
+  def to_phrase(last_join="and")
+    return "" if empty?
+
+    array = self.clone
+    last = array.pop
+
+    return last if array.empty?
+
+    "#{array.join(", ")} #{last_join} #{last}"
+  end
+end

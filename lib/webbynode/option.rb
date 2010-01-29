@@ -1,15 +1,16 @@
 module Webbynode
   class Option
-    attr_reader :name, :kind, :desc, :options
+    attr_reader :name, :kind, :desc, :options, :errors
     attr_accessor :value
     
-    def Option.name(s)
+    def Option.name_for(s)
       return $1 if s =~ /^--(\w+)(=("[^"]+"|[\w]+))*/
     end
     
     def initialize(*args)
       raise "Cannot initialize Parameter without a name" unless args.first
       
+      @errors = []
       @value = nil
       @options = args.pop if args.last.is_a?(Hash)
       @options ||= {}
@@ -24,10 +25,30 @@ module Webbynode
       end
       
       @kind ||= String
-      
-      if @kind == Array
-        @value = []
+      @value = [] if @kind == Array
+    end
+    
+    def validate!
+      raise Webbynode::Command::InvalidCommand, errors.join("\n") unless valid?
+    end
+    
+    def valid?
+      @errors = []
+      if (validations = @options[:validate])
+        validations.each_pair do |key, value|
+          @errors << send("#{key}_error", value) unless send(key, value)
+        end
       end
+      @errors.empty?
+    end
+    
+    def in(allowed_values)
+      allowed_values.include?(self.value)
+    end
+    
+    def in_error(allowed_values)
+      opts = allowed_values.map { |v| "'#{v}'"}
+      "Invalid value '#{value}' for #{self.class.name.split("::").last.downcase} '#{self.name}'. It should be one of #{opts.to_phrase("or")}."
     end
     
     def parse(s)

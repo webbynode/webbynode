@@ -1,0 +1,20 @@
+HTTP/1.1 200 OK
+Server: nginx/0.6.35
+Date: Sat, 30 Jan 2010 21:08:17 GMT
+Content-Type: text/yaml; charset=utf-8
+Connection: keep-alive
+Set-Cookie: _webbymanager_session=BAh7BjoPc2Vzc2lvbl9pZCIlYWY1NmJlODIzMjVhMjQ3OThhMTJlODg2YWUzN2NlNDY%3D--68c4db1775911eaf87ad612ab27ef05ae5366943; path=/; HttpOnly
+Status: 200
+ETag: "7c4ab3a7f92166784ae648ae2df75520"
+X-Runtime: 78
+Cache-Control: private, max-age=0, must-revalidate
+Content-Length: 110
+
+--- 
+record: 
+  :ttl: 86400
+  :type: A
+  :aux: 0
+  :name: xyz
+  :data: 200.100.200.100
+  :id: 7360

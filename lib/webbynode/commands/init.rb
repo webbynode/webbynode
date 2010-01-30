@@ -3,7 +3,7 @@ module Webbynode::Commands
     description "Initializes the current folder as a deployable application"
     parameter :webby, String, "Name or IP of the Webby to deploy to"
     parameter :dns, String, "The DNS used for this application", :required => false
-    option :passphrase, String, "If present, passphrase will be used when creating a new SSH key", :take => :words
+    option :dns, "Creates the DNS entries for the domain"
     
     def execute
       unless params.any?
@@ -52,9 +52,23 @@ module Webbynode::Commands
       
       git.add_remote "webbynode", webby_ip, app_name
       
+      if option(:dns)
+        handle_dns
+      end
+      
       io.log "Webbynode has been initialized for this application!", true
     rescue Webbynode::GitRemoteAlreadyExistsError
       io.log "Webbynode already initialized for this application.", true
+    end
+  
+    def handle_dns
+      api.create_record param(:dns), git.parse_remote_ip
+    rescue Webbynode::ApiClient::ApiError
+      if $!.message =~ /Data has already been taken/
+        io.log "The DNS entry for '#{param(:dns)}' already existed, ignoring."
+      else
+        io.log "Couldn't create your DNS entry: #{$!.message}"
+      end
     end
   end
 end

@@ -6,10 +6,52 @@ module Webbynode
     base_uri "https://manager.webbynode.com/api/yaml"
 
     CREDENTIALS_FILE = "#{ENV['HOME']}/.webbynode"
+
     Unauthorized = Class.new(StandardError)
+    InactiveZone = Class.new(StandardError)
+    ApiError = Class.new(StandardError)
     
     def io
       @io ||= Io.new
+    end
+    
+    def zones
+      response = post("/dns")
+      if zones = response["zones"]
+        zones.inject({}) { |h, zone| h[zone[:domain]] = zone; h }
+      end
+    end
+    
+    def create_record(record, ip)
+      parts = record.split(".")
+      record = parts.shift
+      domain = "#{parts.join(".")}."
+      
+      zone = zones[domain]
+      if zone
+        raise InactiveZone, domain unless zone[:status] == 'Active'
+      else
+        zone = create_zone(domain)
+      end
+
+      create_a_record(zone[:id], record, ip)
+    end
+    
+    def create_zone(zone)
+      response = post("/dns/new", :query => {"zone[domain]" => zone, "zone[ttl]" => "86400"})
+      handle_error(response)
+      response
+    end
+    
+    def create_a_record(id, record, ip)
+      response = post("/dns/#{id}/records/new", :query => {"record[name]" => record, "record[type]" => "A", "record[data]" => ip})
+      handle_error(response)
+      response["record"]
+    end
+    
+    def handle_error(response)
+      raise ApiError, response["error"] if response["error"]
+      raise ApiError, "invalid response from the API (code #{response.code})" unless response.code == 200
     end
     
     def ip_for(hostname)
@@ -19,9 +61,6 @@ module Webbynode
     def webbies
       unless @webbies
         response = post("/webbies") || {}
-        if response.code == 401 or response.code == 411
-          raise Unauthorized, "You have provided the wrong credentials"
-        end
         
         @webbies = response
       end
@@ -49,7 +88,11 @@ module Webbynode
     end
     
     def post(uri, options={})
-      self.class.post(uri, { :body => credentials }.merge(options))
+      response = self.class.post(uri, { :body => credentials }.merge(options))
+      if response.code == 401 or response.code == 411
+        raise Unauthorized, "You have provided the wrong credentials"
+      end
+      response
     end
   end
 end

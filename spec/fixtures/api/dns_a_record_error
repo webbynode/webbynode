@@ -1,0 +1,13 @@
+HTTP/1.1 500 Internal Server Error
+Server: nginx/0.6.35
+Date: Sat, 30 Jan 2010 21:40:30 GMT
+Content-Type: text/yaml; charset=utf-8
+Connection: keep-alive
+Set-Cookie: _webbymanager_session=BAh7BjoPc2Vzc2lvbl9pZCIlZjA1ZDFkNTVjZDlkNjQ0OGQ3YzRmZTVjODYwZGQyZjc%3D--3f95ecf6d9eae211aee4f2340dce691424f27655; path=/; HttpOnly
+Status: 500
+X-Runtime: 5
+Cache-Control: no-cache
+Content-Length: 38
+
+--- 
+error: No DNS entry for id 99999

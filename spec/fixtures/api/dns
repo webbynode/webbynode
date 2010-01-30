@@ -1,0 +1,30 @@
+HTTP/1.1 200 OK
+Server: nginx/0.6.35
+Date: Sat, 30 Jan 2010 20:23:40 GMT
+Content-Type: text/yaml; charset=utf-8
+Connection: keep-alive
+Set-Cookie: _webbymanager_session=BAh7BjoPc2Vzc2lvbl9pZCIlODc4ZGUwY2I2YzI2N2E3NjJiMTU4MzUyODZhNjBmM2Q%3D--6fd4a124a19e997aec94772e04070acdde120887; path=/; HttpOnly
+Status: 200
+ETag: "ba0c974d33641165d7dcd0b6c0c0363e"
+X-Runtime: 97
+Cache-Control: private, max-age=0, must-revalidate
+Content-Length: 300
+
+--- 
+zones: 
+- :ttl: 86400
+  :domain: rubyista.info.
+  :status: Active
+  :id: 14
+- :ttl: 86400
+  :domain: controledefrota.com.
+  :status: Active
+  :id: 137
+- :ttl: 86400
+  :domain: androidreference.com.
+  :status: Active
+  :id: 307
+- :ttl: 86400
+  :domain: webbyapp.com.
+  :status: Active
+  :id: 979

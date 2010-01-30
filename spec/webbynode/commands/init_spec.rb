@@ -5,8 +5,8 @@ describe Webbynode::Commands::Init do
   let(:git_handler) { double("dummy_git_handler").as_null_object }
   let(:io_handler)  { double("dummy_io_handler").as_null_object }
   
-  def create_init(ip="4.3.2.1", host=nil)
-    @command = Webbynode::Commands::Init.new(ip, host)
+  def create_init(ip="4.3.2.1", host=nil, extra=[])
+    @command = Webbynode::Commands::Init.new(ip, host, *extra)
     @command.should_receive(:git).any_number_of_times.and_return(git_handler) 
     @command.should_receive(:io).any_number_of_times.and_return(io_handler)
   end
@@ -14,6 +14,50 @@ describe Webbynode::Commands::Init do
   before(:each) do
     FakeWeb.clean_registry
     create_init
+  end
+  
+  context "when creating a DNS entry with --dns option" do
+    def create_init(ip="4.3.2.1", host=nil, extra=[])
+      @command = Webbynode::Commands::Init.new(ip, host, *extra)
+      @command.should_receive(:git).any_number_of_times.and_return(git_handler) 
+    end
+
+    it "should setup DNS using Webbynode API" do
+      create_init("10.0.1.1", "new.rubyista.info", "--dns")
+
+      api = Webbynode::ApiClient.new
+      api.should_receive(:create_record).with("new.rubyista.info", "10.0.1.1")
+      git_handler.should_receive(:parse_remote_ip).and_return("10.0.1.1")
+
+      @command.should_receive(:api).any_number_of_times.and_return(api)
+      @command.run
+    end
+
+    it "should indicate the record already exists" do
+      create_init("10.0.1.1", "new.rubyista.info", "--dns")
+
+      api = Webbynode::ApiClient.new
+      api.should_receive(:create_record).with("new.rubyista.info", "10.0.1.1").and_raise(Webbynode::ApiClient::ApiError.new("Data has already been taken"))
+      git_handler.should_receive(:parse_remote_ip).and_return("10.0.1.1")
+
+      @command.should_receive(:api).any_number_of_times.and_return(api)
+      @command.run
+      
+      stdout.should =~ /The DNS entry for 'new.rubyista.info' already existed, ignoring./
+    end
+
+    it "should show an user friendly error" do
+      create_init("10.0.1.1", "new.rubyista.info", "--dns")
+
+      api = Webbynode::ApiClient.new
+      api.should_receive(:create_record).with("new.rubyista.info", "10.0.1.1").and_raise(Webbynode::ApiClient::ApiError.new("No DNS entry for id 99999"))
+      git_handler.should_receive(:parse_remote_ip).and_return("10.0.1.1")
+
+      @command.should_receive(:api).any_number_of_times.and_return(api)
+      @command.run
+      
+      stdout.should =~ /Couldn't create your DNS entry: No DNS entry for id 99999/
+    end
   end
   
   it "should ask for user's login email if no credentials" do

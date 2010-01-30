@@ -6,11 +6,15 @@ module Webbynode::Commands
     
     requires_initialization!
     requires_options!
-    requires_pushed_application!
-    
+  
     parameter :command, Array, "Commands to execute"
-    
+  
     def execute
+      unless server.application_pushed?
+        io.log "Before being able to run remote commands from your Webby, you must first push your application to it."
+        exit
+      end
+      
       # Parses Pushand File and returns remote application name
       remote_app_name = pushand.parse_remote_app_name
       

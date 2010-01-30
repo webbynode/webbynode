@@ -4,14 +4,28 @@ module Webbynode
       @remote_ip = remote_ip
     end
     
+    def io
+      @io ||= Webbynode::Io.new
+    end
+    
     def connect
       @conn = nil if @conn and @conn.closed?
       @conn ||= Net::SSH.start(@remote_ip, 'git')
     rescue Net::SSH::AuthenticationFailed
       HighLine.track_eof = false
-
-      @password ||= ask("Enter your password: ") { |q| q.echo = '' }
-      @conn     ||= Net::SSH.start(@remote_ip, 'git', :password => @password)
+      
+      begin
+        @password ||= ask("Enter your password: ") { |q| q.echo = '' }
+        @conn     ||= Net::SSH.start(@remote_ip, 'git', :password => @password)  
+      rescue Net::SSH::AuthenticationFailed
+        io.log "Could not connect to server: invalid authentication.", true
+        exit
+      end
+      
+    rescue Net::SSH::Disconnect
+      io.log "Could not connect to the server: Wrong IP or Server Offline.", true
+      exit
+    
     end
     
     def execute(script, echo=false)

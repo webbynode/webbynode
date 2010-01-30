@@ -219,11 +219,6 @@ module Webbynode
         "No remote options were provided." if params.empty?
     end
     
-    def validate_remote_application_availability
-      raise Webbynode::ApplicationNotDeployed,
-        "Before being able to run remote commands from your Webby, you must first push your application to it." unless server.application_pushed?
-    end
-    
     def settings
       Settings[self.class] || {}
     end
@@ -237,7 +232,6 @@ module Webbynode
       
       validate_initialization                   if settings[:requires_initialization!]
       validate_options                          if settings[:requires_options!]
-      validate_remote_application_availability  if settings[:requires_pushed_application!]
       execute
     end
     

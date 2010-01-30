@@ -3,7 +3,7 @@ module Webbynode::Commands
     
     requires_initialization!
     
-    attr_accessor :before_tasks, :after_tasks
+    attr_accessor :app_name, :before_tasks, :after_tasks
     
     def initialize(*args)
       super
@@ -12,6 +12,8 @@ module Webbynode::Commands
     end
     
     def execute
+      @app_name = pushand.parse_remote_app_name
+      
       # Ensures there are Task Files to read from
       before_tasks.ensure_tasks_folder
       
@@ -22,8 +24,7 @@ module Webbynode::Commands
       
       # Logs a initialization message to the user
       # Pushes the application to Webbynode
-      notify("Pushing your application to Webbynode!")
-      io.log("Pushing your application to Webbynode!")
+      io.log("Pushing [#{app_name}] to Webbynode!", true)
       io.exec("git push webbynode master", false)
       
       # Reads out the "after push" tasks file to see if there are any tasks that must be performed
@@ -31,7 +32,7 @@ module Webbynode::Commands
       after_tasks.read_tasks(Webbynode::Commands::Tasks::AfterPushTasksFile)
       perform_after_tasks if after_tasks.has_tasks?
       
-      notify("Application has been deployed!")
+      io.log("[#{app_name}] has been deployed!", true)
     end
     
     

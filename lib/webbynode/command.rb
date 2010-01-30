@@ -7,6 +7,7 @@ module Webbynode
     
     InvalidOption = Class.new(StandardError)
     InvalidCommand = Class.new(StandardError)
+    CommandError = Class.new(StandardError)
     
     def Command.inherited(child)
       Settings[child] ||= { 
@@ -232,7 +233,12 @@ module Webbynode
       
       validate_initialization                   if settings[:requires_initialization!]
       validate_options                          if settings[:requires_options!]
-      execute
+      begin
+        execute
+      rescue CommandError
+        # io.log $!
+        puts $!
+      end
     end
     
     private

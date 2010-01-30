@@ -16,8 +16,8 @@ module Webbynode
     end
     
     def webbies
-      webbies = post("/webbies") || {}
-      webbies['webbies'].inject({}) { |h, webby| h[webby[:name]] = webby; h }
+      @webbies ||= post("/webbies") || {}
+      @webbies['webbies'].inject({}) { |h, webby| h[webby[:name]] = webby; h }
     end
     
     def credentials

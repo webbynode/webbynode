@@ -18,6 +18,14 @@ module Webbynode::Commands
         webby_ip = webby
       else
         webby_ip = api.ip_for(webby)
+        unless webby_ip
+          if (webbies = api.webbies.keys) and webbies.any?
+            raise CommandError, 
+              "Couldn't find Webby '#{webby}' on your account. Your Webbies are: #{webbies.map { |w| "'#{w}'"}.to_phrase}."
+          else
+            raise CommandError, "You don't have any active Webbies on your account."
+          end
+        end
       end
       
       unless io.file_exists?(".gitignore")

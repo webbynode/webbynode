@@ -22,6 +22,40 @@ describe Webbynode::Commands::Init do
     stdout.should =~ /Usage: webbynode init webby \[dns\]/
   end
   
+  it "should report Webby doesn't exist" do
+    api = double("ApiClient")
+    api.should_receive(:ip_for).with("my_webby_name").and_return(nil)
+    api.should_receive(:webbies).and_return({
+      "one_webby"=>{:name => 'one_webby', :other => 'other'}, 
+      "another_webby"=>{:name => 'another_webby', :other => 'other'}
+    })
+    
+    io_handler.should_receive(:app_name).any_number_of_times.and_return("my_app")
+
+    create_init("my_webby_name")
+    @command.should_receive(:api).any_number_of_times.and_return(api)
+    @command.run
+    
+    stdout.should =~ /Couldn't find Webby 'my_webby_name' on your account. Your Webbies are/
+    stdout.should =~ /'one_webby'/
+    stdout.should =~ /' and '/
+    stdout.should =~ /'another_webby'/
+  end
+  
+  it "should report user doesn't have Webbies" do
+    api = double("ApiClient")
+    api.should_receive(:ip_for).with("my_webby_name").and_return(nil)
+    api.should_receive(:webbies).and_return({})
+    
+    io_handler.should_receive(:app_name).any_number_of_times.and_return("my_app")
+
+    create_init("my_webby_name")
+    @command.should_receive(:api).any_number_of_times.and_return(api)
+    @command.run
+    
+    stdout.should =~ /You don't have any active Webbies on your account./
+  end
+  
   it "should try to get Webby's IP if no IP given" do
     api = double("ApiClient")
     api.should_receive(:ip_for).with("my_webby_name").and_return("1.2.3.4")

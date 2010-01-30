@@ -17,14 +17,18 @@ module Webbynode::Commands
       if webby =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/
         webby_ip = webby
       else
-        webby_ip = api.ip_for(webby)
-        unless webby_ip
-          if (webbies = api.webbies.keys) and webbies.any?
-            raise CommandError, 
-              "Couldn't find Webby '#{webby}' on your account. Your Webbies are: #{webbies.map { |w| "'#{w}'"}.to_phrase}."
-          else
-            raise CommandError, "You don't have any active Webbies on your account."
+        begin
+          webby_ip = api.ip_for(webby)
+          unless webby_ip
+            if (webbies = api.webbies.keys) and webbies.any?
+              raise CommandError, 
+                "Couldn't find Webby '#{webby}' on your account. Your Webbies are: #{webbies.map { |w| "'#{w}'"}.to_phrase}."
+            else
+              raise CommandError, "You don't have any active Webbies on your account."
+            end
           end
+        rescue Webbynode::ApiClient::Unauthorized
+          raise CommandError, "Your credentials didn't match any Webbynode account."
         end
       end
       

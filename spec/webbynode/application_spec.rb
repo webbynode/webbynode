@@ -5,13 +5,6 @@ describe Webbynode::Application do
   class TestCommand < Webbynode::Command
   end
   
-  it "should pass no params if line empty" do
-    pending
-    app = Webbynode::Application.new("")
-    app.params.should == []
-    app.should_receive(:a)
-  end
-  
   describe "running commands" do
     it "should instantiate the class" do
       cmd = mock("Init")

@@ -12,14 +12,43 @@ describe Webbynode::Commands::Init do
   end
   
   before(:each) do
+    FakeWeb.clean_registry
     create_init
   end
   
-  it "should output usage if no params given" do
-    pending "improve handling of missing commands"
-    command = Webbynode::Commands::Init.new
-    command.run
-    stdout.should =~ /Usage: webbynode init webby \[dns\]/
+  it "should ask for user's login email if no credentials" do
+    FakeWeb.register_uri(:post, "#{Webbynode::ApiClient.base_uri}/webbies", 
+      :email => "fcoury@me.com", :response => read_fixture("api/webbies"))
+
+    io_handler.should_receive(:file_exists?).with(Webbynode::ApiClient::CREDENTIALS_FILE).and_return(false)
+    io_handler.should_receive(:app_name).any_number_of_times.and_return("my_app")
+    io_handler.should_receive(:create_file).with(Webbynode::ApiClient::CREDENTIALS_FILE, "email = abc123\ntoken = 234def\n")
+
+    create_init("my_webby_name")
+    @command.api.should_receive(:io).any_number_of_times.and_return(io_handler)
+    @command.api.should_receive(:ask).with("API token:   ").and_return("234def")
+    @command.api.should_receive(:ask).with("Login email: ").and_return("abc123")
+    @command.run
+    
+    stdout.should =~ /Couldn't find Webby 'my_webby_name' on your account. Your Webbies are/
+    stdout.should =~ /'webby3067'/
+    stdout.should =~ /' and '/
+    stdout.should =~ /'sandbox'/
+  end
+  
+  it "should report the error if user provides wrong credentials" do
+    FakeWeb.register_uri(:post, "#{Webbynode::ApiClient.base_uri}/webbies", 
+      :email => "fcoury@me.com", :response => read_fixture("api/webbies_unauthorized"))
+
+    io_handler.should_receive(:app_name).any_number_of_times.and_return("my_app")
+    io_handler.should_receive(:create_file).never
+
+    create_init("my_webby_name")
+
+    @command.api.should_receive(:ip_for).and_raise(Webbynode::ApiClient::Unauthorized)
+    @command.run
+
+    stdout.should =~ /Your credentials didn't match any Webbynode account./
   end
   
   it "should report Webby doesn't exist" do

@@ -4,6 +4,10 @@ require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 describe Webbynode::ApiClient do
   let(:base_uri) { Webbynode::ApiClient.base_uri }
   let(:api)      { Webbynode::ApiClient.new }
+  
+  before(:each) do
+    FakeWeb.clean_registry
+  end
 
   describe "#ip_for" do
     describe "when file ~/.webbynode is absent" do
@@ -26,7 +30,6 @@ describe Webbynode::ApiClient do
 
     describe "when file ~/.webbynode is present" do
       before do
-        FakeWeb.clean_registry
         FakeWeb.register_uri(:post, "#{base_uri}/webbies", 
           :email => "fcoury@me.com", :response => read_fixture("api/webbies"))
       end
@@ -40,6 +43,17 @@ describe Webbynode::ApiClient do
         api.should_receive(:credentials).and_return({:email => "fcoury@me.com", :token => "apitoken"})
         api.ip_for("this_doesnt_exist").nil?.should == true
       end
+    end
+  end
+
+  describe "when unauthorized" do
+    it "should raise an error" do
+      FakeWeb.register_uri(:post, "#{base_uri}/webbies", 
+        :email => "fcoury@me.com", :response => read_fixture("api/webbies_unauthorized"))
+
+      api = Webbynode::ApiClient.new
+      api.should_receive(:credentials).and_return({:email => "fcoury@me.com"})
+      lambda { api.ip_for("sandbox") }.should raise_error(Webbynode::ApiClient::Unauthorized, "You have provided the wrong credentials")
     end
   end
   
@@ -63,6 +77,9 @@ describe Webbynode::ApiClient do
 
     context "when credentials doesn't exist" do
       it "should input the credentials" do
+        FakeWeb.register_uri(:post, "#{base_uri}/webbies", 
+          :email => "fcoury@me.com", :response => read_fixture("api/webbies"))
+
         io.should_receive(:file_exists?).with("#{ENV['HOME']}/.webbynode").and_return(false)
         io.should_receive(:create_file).with("#{ENV['HOME']}/.webbynode", "email = login@email.com\ntoken = apitoken\n")
         
@@ -70,6 +87,19 @@ describe Webbynode::ApiClient do
         api.should_receive(:ask).with("API token:   ").once.ordered.and_return("apitoken")
         
         api.init_credentials
+      end
+
+      it "should not write the file if credentials are wrong" do
+        FakeWeb.register_uri(:post, "#{base_uri}/webbies", 
+          :email => "fcoury@me.com", :response => read_fixture("api/webbies_unauthorized"))
+
+        io.should_receive(:file_exists?).with("#{ENV['HOME']}/.webbynode").and_return(false)
+        io.should_receive(:create_file).never
+        
+        api.should_receive(:ask).with("Login email: ").once.ordered.and_return("login@email.com")
+        api.should_receive(:ask).with("API token:   ").once.ordered.and_return("apitoken")
+        
+        lambda { api.init_credentials }.should raise_error(Webbynode::ApiClient::Unauthorized, "You have provided the wrong credentials")
       end
     end
   end

@@ -129,7 +129,7 @@ module Webbynode::Commands
         tmp_aliases.each do |a|
           if a =~ /\[(.+)\] .+/
             @session_aliases << a unless $1.eql?(@alias)
-            notify("Alias removed: #{@alias}") if $1.eql?(@alias)
+            notify("Alias removed: [#{@alias}]") if $1.eql?(@alias)
           end
         end
       end

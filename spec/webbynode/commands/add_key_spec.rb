@@ -43,7 +43,7 @@ describe Webbynode::Commands::AddKey do
       server.should_receive(:add_ssh_key).and_raise(Webbynode::InvalidAuthentication)
 
       cmd.should_receive(:server).any_number_of_times.and_return(server)
-      io.should_receive(:log).with("Could not connect to server: invalid authentication.", true)
+      io.should_receive(:log).with("Could not connect to webby: invalid authentication.", true)
       cmd.execute
     end
 

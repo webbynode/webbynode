@@ -11,8 +11,8 @@ module Webbynode::Commands
         return
       end
       
-      webby = param(:webby)
-      app_name = param(:dns) || io.app_name
+      webby     = param(:webby)
+      app_name  = param(:dns) || io.app_name
       
       if webby =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/
         webby_ip = webby
@@ -20,9 +20,13 @@ module Webbynode::Commands
         webby_ip = api.ip_for(webby)
       end
       
-      git.add_git_ignore unless io.file_exists?(".gitignore")
+      unless io.file_exists?(".gitignore")
+        git.add_git_ignore
+      end
       
-      io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name}\n") unless io.file_exists?(".pushand")
+      unless io.file_exists?(".pushand")
+        io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name}\n")
+      end
       
       unless git.present?
         git.init 

@@ -10,9 +10,9 @@ module Webbynode::Commands
       
       app_name = pushand.parse_remote_app_name
       if option(:force) or ask("Do you really want to delete application #{app_name} (y/n)? ").downcase == "y"
-        notify("Removing [#{app_name}] from your Webby...")
+        notify("Removing [#{app_name}] from your webby...")
         remote_executor.exec "delete_app #{app_name} --force", true
-        notify("The application [#{app_name}] has been removed from your Webby.\n\nThe webserver is restarting.")
+        notify("The application [#{app_name}] has been removed from your webby.\n\nThe webserver is restarting.")
       else
         puts "Aborted."
       end

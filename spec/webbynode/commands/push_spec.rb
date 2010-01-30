@@ -19,7 +19,7 @@ describe Webbynode::Commands::Push do
   context "when the user runs the command" do
     it "should display a message that the application is being pushed to the webby" do
       pushand.should_receive(:parse_remote_app_name).and_return("test.webbynode.com")
-      io.should_receive(:log).with("Pushing [test.webbynode.com] to Webbynode!", true)
+      io.should_receive(:log).with("Pushing [test.webbynode.com] to your webby!", true)
       push.stub!(:exec)
       push.execute
     end

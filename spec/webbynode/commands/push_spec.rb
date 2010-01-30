@@ -18,7 +18,8 @@ describe Webbynode::Commands::Push do
   
   context "when the user runs the command" do
     it "should display a message that the application is being pushed to the webby" do
-      io.should_receive(:log).with("Pushing your application to Webbynode!")
+      pushand.should_receive(:parse_remote_app_name).and_return("test.webbynode.com")
+      io.should_receive(:log).with("Pushing [test.webbynode.com] to Webbynode!", true)
       push.stub!(:exec)
       push.execute
     end
@@ -30,8 +31,8 @@ describe Webbynode::Commands::Push do
     
     context "when succesful" do
       it "should notify the user" do
-        push.should_receive(:notify).with("Pushing your application to Webbynode!")
-        push.should_receive(:notify).with("Application has been deployed!")
+        pushand.should_receive(:parse_remote_app_name).and_return("test.webbynode.com")
+        io.should_receive(:log).with("[test.webbynode.com] has been deployed!", true)
         push.execute
       end
     end
@@ -141,7 +142,7 @@ describe Webbynode::Commands::Push do
         3.times { |n| push.after_tasks.session_tasks << "Task #{n}" }
         3.times { |n| re.should_receive(:exec).exactly(:once).with("cd test.webbynode.com; Task #{n}", true) }
         3.times { |n| io.should_receive(:log).exactly(:once).with("Performing Task: Task #{n}")}
-        pushand.should_receive(:parse_remote_app_name).exactly(3).times.and_return("test.webbynode.com")
+        pushand.should_receive(:parse_remote_app_name).exactly(4).times.and_return("test.webbynode.com")
         push.execute
       end
     end

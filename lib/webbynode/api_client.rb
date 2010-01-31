@@ -78,7 +78,7 @@ module Webbynode
       else
         email = ask("Login email: ")
         token = ask("API token:   ")
-        response = self.class.post("/webbies", { :email => email, :token => token })
+        response = self.class.post("/webbies", :body => { :email => email, :token => token })
         if response.code == 401 or response.code == 411
           raise Unauthorized, "You have provided the wrong credentials"
         end

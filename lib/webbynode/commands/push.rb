@@ -5,6 +5,8 @@ module Webbynode::Commands
     
     attr_accessor :app_name, :before_tasks, :after_tasks
     
+    add_alias "deploy"
+    
     def initialize(*args)
       super
       @before_tasks = Webbynode::Commands::Tasks.new

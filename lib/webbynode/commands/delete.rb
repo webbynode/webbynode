@@ -3,6 +3,9 @@ module Webbynode::Commands
     summary "Deletes current application on your Webby where it's deployed"
     option :force, "Skips confirmation and forces the deletion of the app"
     
+    add_alias "rm"
+    add_alias "remove"
+    
     def execute
       unless pushand.present?
         io.log("Ahn. Hello, McFly, anyone there?", true)

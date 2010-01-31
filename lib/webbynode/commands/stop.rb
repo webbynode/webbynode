@@ -6,6 +6,8 @@ module Webbynode::Commands
     requires_initialization!
         
     def execute
+      exit if no?("Are you sure you wish to shutdown your webby? (y/n)")
+      
       api.webbies.each do |webby|    
         if webby[1][:ip].eql?(git.parse_remote_ip)
           unless webby[1][:status].eql?("off")

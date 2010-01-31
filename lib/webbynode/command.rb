@@ -203,6 +203,20 @@ module Webbynode
     def notify(msg)
       Webbynode::Notify.message(msg)
     end
+
+    def yes?(question)
+      answer = ask(question)
+      return true   if answer == "y" or answer == "yes"
+      return false  if answer == "n" or answer == "no" 
+      exit
+    end
+    
+    def no?(question)
+      answer = ask(question)
+      return true   if answer == "n" or answer == "no"
+      return false  if answer == "y" or answer == "yes"
+      exit
+    end
     
     def validate_initialization
       raise Webbynode::GitNotRepoError,

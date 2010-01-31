@@ -1,6 +1,6 @@
 module Webbynode::Commands
   class Init < Webbynode::Command
-    description "Initializes the current folder as a deployable application"
+    summary "Initializes the current folder as a deployable application"
     parameter :webby, String, "Name or IP of the Webby to deploy to"
     parameter :dns, String, "The DNS used for this application", :required => false
     option :dns, "Creates the DNS entries for the domain"

@@ -3,7 +3,8 @@ module Webbynode::Commands
     requires_initialization!
     
     attr_accessor :action, :type, :command, :session_file, :session_tasks
-    
+
+    summary "Manages tasks to be executed before or after you push your changes"
     parameter :action,  String, "add, remove or show.",       :required => true, :validate => { :in => ["add", "remove", "show"] }
     parameter :type,    String, "before_push or after_push.", :required => true, :validate => { :in => ["before_push", "after_push"]}
     parameter :command, Array, "Task to perform.",            :required => false

@@ -1,6 +1,6 @@
 module Webbynode::Commands
   class Start < Webbynode::Command
-    
+    summary "Starts your Webby, when it's off"
     add_alias "boot"
     
     requires_initialization!

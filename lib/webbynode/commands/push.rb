@@ -7,6 +7,8 @@ module Webbynode::Commands
     
     add_alias "deploy"
     
+    summary "Pushes all changes to your Webby"
+    
     def initialize(*args)
       super
       @before_tasks = Webbynode::Commands::Tasks.new

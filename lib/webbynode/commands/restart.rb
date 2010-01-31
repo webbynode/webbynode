@@ -1,6 +1,6 @@
 module Webbynode::Commands
   class Restart < Webbynode::Command
-    
+    summary "Reboots your Webby"
     add_alias "reboot"
     
     requires_initialization!

@@ -42,6 +42,10 @@ module Webbynode
         Settings[self][:summary] = s
       end
       
+      def setting(s)
+        Settings[self][s]
+      end
+      
       def parameter(*args)
         param = Parameter.new(*args)
         Settings[self][:parameters] << param
@@ -54,9 +58,13 @@ module Webbynode
         Settings[self][:options_hash][option.name] = option
       end
       
+      def class_for(command)
+        Webbynode::Commands.const_get command_class_name(command)
+      end
+      
       def for(command)
         begin
-          Webbynode::Commands.const_get command_class_name(command)
+          class_for(command)
         rescue NameError
           
           # Assumes Command Not Found

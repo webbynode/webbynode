@@ -1,6 +1,6 @@
 module Webbynode::Commands
   class Stop < Webbynode::Command
-    
+    summary "Shuts down your Webby"
     add_alias "shutdown"
     
     requires_initialization!

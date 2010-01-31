@@ -219,13 +219,13 @@ module Webbynode
     end
     
     def validate_initialization
-      raise Webbynode::GitNotRepoError,
+      raise CommandError,
         "Could not find a git repository." unless git.present?
-      raise Webbynode::GitRemoteDoesNotExistError,
+      raise CommandError,
         "Webbynode has not been initialized for this git repository." unless git.remote_webbynode?
-      raise Webbynode::DirectoryNotFound,
+      raise CommandError,
         "Could not find .webbynode folder, has Webbynode been initialized for this repository?" unless io.directory?('.webbynode')
-      raise Webbynode::PushAndFileNotFound,
+      raise CommandError,
         "Could not find .pushand file, has Webbynode been initialized for this repository?" unless pushand.present?
     end
     

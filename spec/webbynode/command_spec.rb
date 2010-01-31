@@ -218,13 +218,13 @@ describe Webbynode::Command do
     
     it "should not have a git repository" do
       git.should_receive(:present?).and_return(false)
-      lambda { command.run }.should raise_error(Webbynode::GitNotRepoError,
+      lambda { command.run }.should raise_error(Webbynode::Command::CommandError,
         "Could not find a git repository.")
     end
     
     it "should not have webbynode git remote" do
       git.should_receive(:remote_webbynode?).and_return(false)
-      lambda { command.run }.should raise_error(Webbynode::GitRemoteDoesNotExistError,
+      lambda { command.run }.should raise_error(Webbynode::Command::CommandError,
         "Webbynode has not been initialized for this git repository.")
     end
     
@@ -232,7 +232,7 @@ describe Webbynode::Command do
       git.should_receive(:present?).and_return(true)
       io.should_receive(:directory?).with(".webbynode").and_return(true)
       pushand.should_receive(:present?).and_return(false)
-      lambda { command.run }.should raise_error(Webbynode::PushAndFileNotFound,
+      lambda { command.run }.should raise_error(Webbynode::Command::CommandError,
         "Could not find .pushand file, has Webbynode been initialized for this repository?")
     end
   end

@@ -21,14 +21,14 @@ describe Webbynode::ApiClient do
     it "should create the domain, when inexistent" do
       api.should_receive(:zones).and_return({})
       api.should_receive(:create_zone).with("newdomain.com.").and_return({:id => 20, :status => 'Active'})
-      api.should_receive(:create_a_record).with(20, "new", "212.10.20.10")
+      api.should_receive(:create_a_record).with(20, "new", "212.10.20.10", "new.newdomain.com")
       
       api.create_record("new.newdomain.com", "212.10.20.10")
     end
 
     it "should retrieve the domains, when inexistent" do
       api.should_receive(:zones).and_return({"mydomain.com.br." => {:id => 21, :status => 'Active'}})
-      api.should_receive(:create_a_record).with(21, "new", "212.10.20.10")
+      api.should_receive(:create_a_record).with(21, "new", "212.10.20.10", "new.mydomain.com.br")
       
       api.create_record("new.mydomain.com.br", "212.10.20.10")
     end
@@ -69,7 +69,7 @@ describe Webbynode::ApiClient do
         :email => "fcoury@me.com", :response => read_fixture("api/dns_a_record"))
      
       api.should_receive(:init_credentials).and_return({:email => "fcoury@me.com", :token => "apitoken"})
-      api.create_a_record(14, "xyz", "200.100.200.100")[:id].should == 7360
+      api.create_a_record(14, "xyz", "200.100.200.100", "xyz.rubyista.info")[:id].should == 7360
     end
 
     it "raise an exception upon errors" do
@@ -81,7 +81,7 @@ describe Webbynode::ApiClient do
      
       api.should_receive(:init_credentials).and_return({:email => "fcoury@me.com", :token => "apitoken"})
       lambda { 
-        api.create_a_record(14, "xyz", "200.100.200.100") 
+        api.create_a_record(14, "xyz", "200.100.200.100", "xyz.rubyista.info") 
       }.should raise_error(Webbynode::ApiClient::ApiError, "No DNS entry for id 99999")
     end
   end

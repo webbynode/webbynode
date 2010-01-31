@@ -155,6 +155,21 @@ describe Webbynode::Command do
       wn.param_values.should == ["param1", "param2"]
     end
   end
+  
+  describe "handling Unauthorized API errors" do
+    class UnauthorizedCommand < Webbynode::Command
+      def execute
+        raise Webbynode::ApiClient::Unauthorized
+      end
+    end
+    
+    it "should output a friendly message" do
+      cmd = UnauthorizedCommand.new
+      cmd.run
+      
+      stdout.should =~ /Your credentials didn't match any Webbynode account./
+    end
+  end
     
   describe "parsing array parameters" do
     class ArrayCmd < Webbynode::Command

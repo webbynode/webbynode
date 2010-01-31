@@ -249,6 +249,8 @@ module Webbynode
       validate_options                          if settings[:requires_options!]
       begin
         execute
+      rescue Webbynode::ApiClient::Unauthorized
+        puts "Your credentials didn't match any Webbynode account."
       rescue CommandError
         # io.log $!
         puts $!

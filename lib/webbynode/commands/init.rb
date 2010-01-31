@@ -28,8 +28,6 @@ module Webbynode::Commands
               raise CommandError, "You don't have any active Webbies on your account."
             end
           end
-        rescue Webbynode::ApiClient::Unauthorized
-          raise CommandError, "Your credentials didn't match any Webbynode account."
         end
       end
       

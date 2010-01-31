@@ -16,6 +16,17 @@ describe Webbynode::Commands::Init do
     create_init
   end
   
+  context "selecting an engine" do
+    it "should create the .webbynode/engine file" do
+      command = Webbynode::Commands::Init.new("10.0.1.1", "--engine=php")
+      command.option(:engine).should == 'php'
+      command.should_receive(:io).any_number_of_times.and_return(io_handler)
+
+      io_handler.should_receive(:create_file).with(".webbynode/engine", "php")
+      command.run
+    end
+  end
+  
   context "when creating a DNS entry with --dns option" do
     def create_init(ip="4.3.2.1", host=nil, extra=[])
       @command = Webbynode::Commands::Init.new(ip, host, *extra)

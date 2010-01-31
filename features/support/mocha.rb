@@ -1,6 +1,6 @@
 require "mocha"
 
-World(Mocha::Standalone)
+World(Mocha::API)
  
 Before do
   mocha_setup

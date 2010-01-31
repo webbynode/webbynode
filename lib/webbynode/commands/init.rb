@@ -4,6 +4,7 @@ module Webbynode::Commands
     parameter :webby, String, "Name or IP of the Webby to deploy to"
     parameter :dns, String, "The DNS used for this application", :required => false
     option :dns, "Creates the DNS entries for the domain"
+    option :engine, "Sets the application engine for the app", :validate => { :in => ['php', 'rack', 'rails'] }
     
     def execute
       unless params.any?
@@ -39,6 +40,8 @@ module Webbynode::Commands
       unless io.file_exists?(".pushand")
         io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name}\n")
       end
+      
+      io.create_file(".webbynode/engine", option(:engine)) if option(:engine)
       
       unless git.present?
         git.init 

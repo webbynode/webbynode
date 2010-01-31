@@ -5,6 +5,8 @@ module Webbynode
     attr_reader :command, :params, :aliases
     
     def initialize(*args)
+      args = ["help", "commands"] unless args.any?
+      
       @command = args.shift
       @params = args
     end

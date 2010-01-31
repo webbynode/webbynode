@@ -57,10 +57,7 @@ module Webbynode
     
     def handle_error(response)
       raise ApiError, response["error"] if response["error"]
-      unless response.code == 200
-        puts "#{response.inspect}"
-        raise ApiError, "invalid response from the API (code #{response.code})"
-      end
+      raise ApiError, "invalid response from the API (code #{response.code})" unless response.code == 200
     end
     
     def ip_for(hostname)

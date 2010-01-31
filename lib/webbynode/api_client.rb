@@ -23,6 +23,7 @@ module Webbynode
     end
     
     def create_record(record, ip)
+      original_record = record
       parts = record.split(".")
       record = parts.shift
       domain = "#{parts.join(".")}."
@@ -34,7 +35,7 @@ module Webbynode
         zone = create_zone(domain)
       end
 
-      create_a_record(zone[:id], record, ip)
+      create_a_record(zone[:id], record, ip, original_record)
     end
     
     def create_zone(zone)
@@ -43,15 +44,23 @@ module Webbynode
       response
     end
     
-    def create_a_record(id, record, ip)
+    def create_a_record(id, record, ip, original_record)
       response = post("/dns/#{id}/records/new", :query => {"record[name]" => record, "record[type]" => "A", "record[data]" => ip})
+      if response["errors"] and response["errors"] =~ /Data has already been taken/
+        io.log "WARNING: '#{original_record}' is already setup on Webbynode DNS, make sure it's pointing to #{ip}" 
+        return
+      end
+      
       handle_error(response)
       response["record"]
     end
     
     def handle_error(response)
       raise ApiError, response["error"] if response["error"]
-      raise ApiError, "invalid response from the API (code #{response.code})" unless response.code == 200
+      unless response.code == 200
+        puts "#{response.inspect}"
+        raise ApiError, "invalid response from the API (code #{response.code})"
+      end
     end
     
     def ip_for(hostname)

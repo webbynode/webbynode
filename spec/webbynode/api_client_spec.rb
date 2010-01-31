@@ -150,6 +150,35 @@ describe Webbynode::ApiClient do
         creds[:email].should == "fcoury@me.com"
         creds[:token].should == "apitoken"
       end
+
+      it "should write the credentials if force is true" do
+        FakeWeb.register_uri(:post, "#{base_uri}/webbies", 
+          :email => "fcoury@me.com", :response => read_fixture("api/webbies"))
+
+        io.should_receive(:file_exists?).with("#{ENV['HOME']}/.webbynode").and_return(true)
+        io.should_receive(:create_file).with("#{ENV['HOME']}/.webbynode", "email = login@email.com\ntoken = apitoken\n")
+        
+        api.should_receive(:ask).with("Login email: ").once.ordered.and_return("login@email.com")
+        api.should_receive(:ask).with("API token:   ").once.ordered.and_return("apitoken")
+        
+        creds = api.init_credentials(true)
+        creds[:email].should == "login@email.com"
+        creds[:token].should == "apitoken"
+      end
+      
+      it "should not prompt and write the credentials if force is a Hash" do
+        FakeWeb.register_uri(:post, "#{base_uri}/webbies", 
+          :email => "fcoury@me.com", :response => read_fixture("api/webbies"))
+
+        io.should_receive(:file_exists?).with("#{ENV['HOME']}/.webbynode").and_return(true)
+        io.should_receive(:create_file).with("#{ENV['HOME']}/.webbynode", "email = login@email.com\ntoken = apitoken\n")
+        
+        api.should_receive(:ask).never
+        
+        creds = api.init_credentials({ :email => 'login@email.com', :token => 'apitoken' })
+        creds[:email].should == "login@email.com"
+        creds[:token].should == "apitoken"
+      end
     end
 
     context "when credentials doesn't exist" do

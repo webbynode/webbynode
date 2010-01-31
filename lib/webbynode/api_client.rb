@@ -78,12 +78,16 @@ module Webbynode
       @credentials ||= init_credentials
     end
     
-    def init_credentials
-      creds = if io.file_exists?(CREDENTIALS_FILE)
+    def init_credentials(overwrite=false)
+      creds = if io.file_exists?(CREDENTIALS_FILE) and !overwrite
         io.read_config(CREDENTIALS_FILE)
       else
-        email = ask("Login email: ")
-        token = ask("API token:   ")
+        email = overwrite[:email] if overwrite.is_a?(Hash) and overwrite[:email]
+        token = overwrite[:token] if overwrite.is_a?(Hash) and overwrite[:token]
+
+        email ||= ask("Login email: ")
+        token ||= ask("API token:   ")
+        
         response = self.class.post("/webbies", :body => { :email => email, :token => token })
         if response.code == 401 or response.code == 411
           raise Unauthorized, "You have provided the wrong credentials"

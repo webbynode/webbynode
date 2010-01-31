@@ -29,6 +29,9 @@ lib/webbynode/commands/help.rb
 lib/webbynode/commands/init.rb
 lib/webbynode/commands/push.rb
 lib/webbynode/commands/remote.rb
+lib/webbynode/commands/restart.rb
+lib/webbynode/commands/start.rb
+lib/webbynode/commands/stop.rb
 lib/webbynode/commands/tasks.rb
 lib/webbynode/commands/version.rb
 lib/webbynode/git.rb
@@ -44,7 +47,14 @@ lib/webbynode/ssh.rb
 lib/webbynode/ssh_keys.rb
 spec/fixtures/aliases
 spec/fixtures/api/credentials
+spec/fixtures/api/dns
+spec/fixtures/api/dns_a_record
+spec/fixtures/api/dns_a_record_already_exists
+spec/fixtures/api/dns_a_record_error
+spec/fixtures/api/dns_new_zone
 spec/fixtures/api/webbies
+spec/fixtures/api/webbies_unauthorized
+spec/fixtures/api/webby
 spec/fixtures/commands/tasks/after_push
 spec/fixtures/fixture_helpers
 spec/fixtures/git/config/210.11.13.12

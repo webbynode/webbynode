@@ -8,7 +8,7 @@ module Webbynode::Commands
     def execute
       api.webbies.each do |webby|    
         if webby[1][:ip].eql?(git.parse_remote_ip)
-          unless webby[1][:status].eql?("Off")
+          unless webby[1][:status].eql?("off")
             puts "#{webby[0]} will now shutdown!"
             api.post("/webby/#{webby[1][:name]}/shutdown")
           else

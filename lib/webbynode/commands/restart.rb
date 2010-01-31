@@ -8,7 +8,7 @@ module Webbynode::Commands
     def execute
       api.webbies.each do |webby|    
         if webby[1][:ip].eql?(git.parse_remote_ip)
-          if webby[1][:status].eql?("Active")
+          if webby[1][:status].eql?("on")
             puts "#{webby[0]} will now be rebooted!"
             api.post("/webby/#{webby[1][:name]}/reboot")
           else

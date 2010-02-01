@@ -23,6 +23,7 @@ lib/webbynode/application.rb
 lib/webbynode/command.rb
 lib/webbynode/commands/add_key.rb
 lib/webbynode/commands/alias.rb
+lib/webbynode/commands/change_dns.rb
 lib/webbynode/commands/config.rb
 lib/webbynode/commands/delete.rb
 lib/webbynode/commands/help.rb
@@ -67,6 +68,7 @@ spec/webbynode/application_spec.rb
 spec/webbynode/command_spec.rb
 spec/webbynode/commands/add_key_spec.rb
 spec/webbynode/commands/alias_spec.rb
+spec/webbynode/commands/change_dns_spec.rb
 spec/webbynode/commands/config_spec.rb
 spec/webbynode/commands/delete_spec.rb
 spec/webbynode/commands/help_spec.rb
@@ -75,6 +77,7 @@ spec/webbynode/commands/push_spec.rb
 spec/webbynode/commands/remote_spec.rb
 spec/webbynode/commands/tasks_spec.rb
 spec/webbynode/commands/version_spec.rb
+spec/webbynode/commands/webbies_spec.rb
 spec/webbynode/git_spec.rb
 spec/webbynode/io_spec.rb
 spec/webbynode/option_spec.rb

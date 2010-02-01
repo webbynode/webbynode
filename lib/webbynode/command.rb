@@ -215,15 +215,15 @@ module Webbynode
 
     def yes?(question)
       answer = ask(question).downcase
-      return true   if answer == "y" or answer == "yes"
-      return false  if answer == "n" or answer == "no" 
+      return true   if %w[y yes].include?(answer)
+      return false  if %w[n no].include?(answer)
       exit
     end
     
     def no?(question)
       answer = ask(question).downcase
-      return true   if answer == "n" or answer == "no"
-      return false  if answer == "y" or answer == "yes"
+      return true   if %w[n no].include?(answer)
+      return false  if %w[y yes].include?(answer)
       exit
     end
     

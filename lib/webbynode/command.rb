@@ -83,6 +83,7 @@ module Webbynode
           
           # If no aliases:
           puts "Command \"#{command}\" doesn't exist"
+          exit
         end
       end
       

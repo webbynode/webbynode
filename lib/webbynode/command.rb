@@ -214,14 +214,14 @@ module Webbynode
     end
 
     def yes?(question)
-      answer = ask(question)
+      answer = ask(question).downcase
       return true   if answer == "y" or answer == "yes"
       return false  if answer == "n" or answer == "no" 
       exit
     end
     
     def no?(question)
-      answer = ask(question)
+      answer = ask(question).downcase
       return true   if answer == "n" or answer == "no"
       return false  if answer == "y" or answer == "yes"
       exit

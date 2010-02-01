@@ -2,6 +2,13 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 
 describe Webbynode::Command do
+  let(:re)      { double("RemoteExecutor").as_null_object }
+  let(:git)     { double("Git").as_null_object }
+  let(:pushand) { double("Pushand").as_null_object }
+  let(:server)  { double("Server").as_null_object }
+  let(:ssh)     { double("SSh").as_null_object }
+  let(:io)      { double("Io").as_null_object }
+  
   describe "resolving commands" do
     it "should allow adding aliases to child classes" do
       class Zap < Webbynode::Command
@@ -33,6 +40,33 @@ describe Webbynode::Command do
       Amazing.command.should == "amazing"
       SomeStrangeStuff = Class.new(Webbynode::Command)
       SomeStrangeStuff.command.should == "some_strange_stuff"
+    end
+  end
+  
+  describe "#run" do
+    class RequireInitialize < Webbynode::Command
+      requires_initialization!
+      
+      def execute
+        puts "command was executed"
+      end
+    end
+    
+    context "when git is missing" do
+      it "should provide a friendly error" do
+        git.should_receive(:present?).and_return(false)
+        
+        command = RequireInitialize.new
+        command.should_receive(:remote_executor).any_number_of_times.and_return(re)
+        command.should_receive(:git).any_number_of_times.and_return(git)
+        command.should_receive(:io).any_number_of_times.and_return(io)
+        command.should_receive(:pushand).any_number_of_times.and_return(pushand)
+        command.should_receive(:server).any_number_of_times.and_return(server)
+        command.run
+        
+        stdout.should =~ /Could not find a git repository/
+        stdout.should_not =~ /command was executed/
+      end
     end
   end
   
@@ -209,22 +243,16 @@ describe Webbynode::Command do
     end
     
     let(:command) { NewCommand.new("some") }
-    let(:re)      { double("RemoteExecutor").as_null_object }
-    let(:git)     { double("Git").as_null_object }
-    let(:pushand) { double("Pushand").as_null_object }
-    let(:server)  { double("Server").as_null_object }
-    let(:ssh)     { double("SSh").as_null_object }
-    let(:io)      { double("Io").as_null_object }
     
     it "should not have a git repository" do
       git.should_receive(:present?).and_return(false)
-      lambda { command.run }.should raise_error(Webbynode::Command::CommandError,
+      lambda { command.validate_initialization }.should raise_error(Webbynode::Command::CommandError,
         "Could not find a git repository.")
     end
     
     it "should not have webbynode git remote" do
       git.should_receive(:remote_webbynode?).and_return(false)
-      lambda { command.run }.should raise_error(Webbynode::Command::CommandError,
+      lambda { command.validate_initialization }.should raise_error(Webbynode::Command::CommandError,
         "Webbynode has not been initialized for this git repository.")
     end
     
@@ -232,7 +260,7 @@ describe Webbynode::Command do
       git.should_receive(:present?).and_return(true)
       io.should_receive(:directory?).with(".webbynode").and_return(true)
       pushand.should_receive(:present?).and_return(false)
-      lambda { command.run }.should raise_error(Webbynode::Command::CommandError,
+      lambda { command.validate_initialization }.should raise_error(Webbynode::Command::CommandError,
         "Could not find .pushand file, has Webbynode been initialized for this repository?")
     end
   end

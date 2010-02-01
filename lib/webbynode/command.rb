@@ -253,9 +253,9 @@ module Webbynode
         return
       end
       
-      validate_initialization                   if settings[:requires_initialization!]
-      validate_options                          if settings[:requires_options!]
       begin
+        validate_initialization                   if settings[:requires_initialization!]
+        validate_options                          if settings[:requires_options!]
         execute
       rescue Webbynode::ApiClient::Unauthorized
         puts "Your credentials didn't match any Webbynode account."

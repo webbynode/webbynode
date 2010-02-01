@@ -28,7 +28,7 @@ module Webbynode::Commands
       
       # Logs a initialization message to the user
       # Pushes the application to Webbynode
-      io.log("Pushing [#{app_name}] to your webby!", true)
+      io.log "Pushing #{app_name}", :start
       io.exec("git push webbynode master", false)
       
       # Reads out the "after push" tasks file to see if there are any tasks that must be performed
@@ -36,7 +36,7 @@ module Webbynode::Commands
       after_tasks.read_tasks(Webbynode::Commands::Tasks::AfterPushTasksFile)
       perform_after_tasks if after_tasks.has_tasks?
       
-      io.log("[#{app_name}] has been deployed!", true)
+      io.log "Finished pushing #{app_name}", :finish
     end
     
     

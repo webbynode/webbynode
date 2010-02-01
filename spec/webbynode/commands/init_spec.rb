@@ -61,8 +61,8 @@ describe Webbynode::Commands::Init do
       create_init("10.0.1.1", "new.rubyista.info", "--adddns")
 
       api = Webbynode::ApiClient.new
-      api.should_receive(:create_record).with("new.rubyista.info", "10.0.1.1").and_raise(Webbynode::ApiClient::ApiError.new("No DNS entry for id 99999"))
       git_handler.should_receive(:parse_remote_ip).and_return("10.0.1.1")
+      api.should_receive(:create_record).with("new.rubyista.info", "10.0.1.1").and_raise(Webbynode::ApiClient::ApiError.new("No DNS entry for id 99999"))
 
       @command.should_receive(:api).any_number_of_times.and_return(api)
       @command.run
@@ -157,7 +157,7 @@ describe Webbynode::Commands::Init do
     it "should assume host is app's name when not given" do
       io_handler.should_receive(:file_exists?).with(".pushand").and_return(false)
       io_handler.should_receive(:app_name).any_number_of_times.and_return("application_name")
-      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 application_name\n")
+      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 application_name\n", true)
     
       @command.run
     end
@@ -167,7 +167,7 @@ describe Webbynode::Commands::Init do
       
       io_handler.should_receive(:file_exists?).with(".pushand").and_return(false)
       io_handler.should_receive(:app_name).any_number_of_times.and_return("application_name")
-      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 my.com.br\n")
+      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 application_name my.com.br\n", true)
     
       @command.run
     end
@@ -192,10 +192,10 @@ describe Webbynode::Commands::Init do
   end
   
   context "when .pushand is not present" do
-    it "should be created" do
+    it "should be created and made an executable" do
       io_handler.should_receive(:file_exists?).with(".pushand").and_return(false)
       io_handler.should_receive(:app_name).any_number_of_times.and_return("mah_app")
-      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 mah_app\n")
+      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 mah_app\n", true)
       
       @command.run
     end
@@ -241,7 +241,8 @@ describe Webbynode::Commands::Init do
     end
     
     it "should log a message to the user when it's finished" do
-      io_handler.should_receive(:log).with("Webbynode has been initialized for this application!", true)
+      io_handler.should_receive(:app_name).any_number_of_times.and_return("my_app")
+      io_handler.should_receive(:log).with("Application my_app ready for Rapid Deployment", :finish)
       
       @command.run
     end
@@ -266,7 +267,7 @@ describe Webbynode::Commands::Init do
       git_handler.should_receive(:present?).and_return(true)
       git_handler.should_receive(:add_remote).and_raise(Webbynode::GitRemoteAlreadyExistsError)
       
-      io_handler.should_receive(:log).with("Webbynode already initialized for this application.", true)
+      io_handler.should_receive(:log).with("Application already initialized.", true)
       @command.run
     end
   end

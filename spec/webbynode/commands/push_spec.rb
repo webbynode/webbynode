@@ -19,7 +19,7 @@ describe Webbynode::Commands::Push do
   context "when the user runs the command" do
     it "should display a message that the application is being pushed to the webby" do
       pushand.should_receive(:parse_remote_app_name).and_return("test.webbynode.com")
-      io.should_receive(:log).with("Pushing [test.webbynode.com] to your webby!", true)
+      io.should_receive(:log).with("Pushing test.webbynode.com", :start)
       push.stub!(:exec)
       push.execute
     end
@@ -32,7 +32,7 @@ describe Webbynode::Commands::Push do
     context "when succesful" do
       it "should notify the user" do
         pushand.should_receive(:parse_remote_app_name).and_return("test.webbynode.com")
-        io.should_receive(:log).with("[test.webbynode.com] has been deployed!", true)
+        io.should_receive(:log).with("Finished pushing test.webbynode.com", :finish)
         push.execute
       end
     end

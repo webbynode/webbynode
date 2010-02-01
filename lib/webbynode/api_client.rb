@@ -47,7 +47,7 @@ module Webbynode
     def create_a_record(id, record, ip, original_record)
       response = post("/dns/#{id}/records/new", :query => {"record[name]" => record, "record[type]" => "A", "record[data]" => ip})
       if response["errors"] and response["errors"] =~ /Data has already been taken/
-        io.log "WARNING: '#{original_record}' is already setup on Webbynode DNS, make sure it's pointing to #{ip}" 
+        io.log "'#{original_record}' is already setup on Webbynode DNS, make sure it's pointing to #{ip}", :warning
         return
       end
       

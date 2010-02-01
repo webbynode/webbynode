@@ -31,7 +31,41 @@ module Webbynode
     end
     
     def log(text, notify=false)
-      puts "[Webbynode] #{text}"
+      notify = :action unless notify
+
+      case notify
+      when :start
+        notify = true
+        puts "[Webbynode] #{text}" 
+      
+      when :action
+        notify = false
+        puts "            #{text}"
+      
+      when :warning
+        notify = false
+        puts "            WARNING: #{text}"
+      
+      when :action
+        notify = false
+        puts "            #{text}"
+      
+      when :finish
+        notify = true
+        puts
+        puts "[Webbynode] #{text}"
+        
+      when :error
+        notify = true
+        puts
+        puts "[Webbynode] ERROR: #{text}"
+        
+      else
+        notify = false
+        puts "            #{text}"
+        
+      end
+          
       Webbynode::Notify.message(text) if notify
     end
 

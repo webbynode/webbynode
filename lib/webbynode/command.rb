@@ -77,13 +77,12 @@ module Webbynode
               remote_command = a.extract_command(command)
               r = Webbynode::Commands::Remote.new(remote_command)
               r.execute
-              exit
+              return
             end
           end  
           
           # If no aliases:
           puts "Command \"#{command}\" doesn't exist"
-          exit
         end
       end
       

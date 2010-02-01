@@ -13,12 +13,16 @@ module Webbynode::Commands
       end
       
       webby     = param(:webby)
-      app_name  = param(:dns) || io.app_name
+      app_name  = io.app_name
+      dns_entry = " #{param(:dns)}" if param(:dns)
+      
+      io.log "Initializing application #{app_name} #{dns_entry ? "with dns#{dns_entry}" : ""}", :start
       
       if webby =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/
         webby_ip = webby
       else
         begin
+          io.log "Retrieving IP for Webby #{webby}...", :action
           webby_ip = api.ip_for(webby)
           unless webby_ip
             if (webbies = api.webbies.keys) and webbies.any?
@@ -31,44 +35,42 @@ module Webbynode::Commands
         end
       end
       
-      unless io.file_exists?(".gitignore")
-        git.add_git_ignore
-      end
-      
+      io.log "Initializing directory structure...", :action
+      git.add_git_ignore unless io.file_exists?(".gitignore")
+
       unless io.file_exists?(".pushand")
-        io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name}\n")
+        io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name}#{dns_entry}\n", true)
       end
       
+      io.exec("mkdir .webbynode") unless io.directory?(".webbynode")
       io.create_file(".webbynode/engine", option(:engine)) if option(:engine)
       
       unless git.present?
+        io.log "Initializing git and applying initial commit...", :action
         git.init 
         git.add "." 
         git.commit "Initial commit"
       end
       
-      unless io.directory?(".webbynode")
-        io.exec("mkdir .webbynode")
-      end
-      
+      io.log "Adding webbynode as git remote...", :action
       git.add_remote "webbynode", webby_ip, app_name
       
-      if option(:adddns)
-        handle_dns
-      end
+      handle_dns if option(:adddns)
       
-      io.log "Webbynode has been initialized for this application!", true
+      io.log "Application #{app_name} ready for Rapid Deployment", :finish
     rescue Webbynode::GitRemoteAlreadyExistsError
-      io.log "Webbynode already initialized for this application.", true
+      io.log "Application already initialized.", true
     end
   
     def handle_dns
-      api.create_record param(:dns), git.parse_remote_ip
+      ip = git.parse_remote_ip
+      io.log "Creating DNS entry for #{param(:dns)}...", :action
+      api.create_record param(:dns), ip
     rescue Webbynode::ApiClient::ApiError
       if $!.message =~ /Data has already been taken/
-        io.log "The DNS entry for '#{param(:dns)}' already existed, ignoring."
+        io.log "The DNS entry for '#{param(:dns)}' already existed, ignoring.", :error
       else
-        io.log "Couldn't create your DNS entry: #{$!.message}"
+        io.log "Couldn't create your DNS entry: #{$!.message}", :error
       end
     end
   end

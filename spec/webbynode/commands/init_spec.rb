@@ -183,9 +183,12 @@ describe Webbynode::Commands::Init do
   end
   
   context "when .webbynode is not present" do
-    it "should create the .webbynode system folder" do
+    it "should create the .webbynode system folder and stub files" do
       io_handler.should_receive(:directory?).with(".webbynode").and_return(false)
       io_handler.should_receive(:exec).with("mkdir .webbynode")
+      io_handler.should_receive(:create_file).with(".webbynode/tasks/after_push", "")
+      io_handler.should_receive(:create_file).with(".webbynode/tasks/before_push", "")
+      io_handler.should_receive(:create_file).with(".webbynode/aliases", "")
       
       @command.run
     end

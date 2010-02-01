@@ -42,7 +42,13 @@ module Webbynode::Commands
         io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name}#{dns_entry}\n", true)
       end
       
-      io.exec("mkdir .webbynode") unless io.directory?(".webbynode")
+      unless io.directory?(".webbynode")
+        io.exec("mkdir .webbynode") 
+        io.create_file(".webbynode/tasks/after_push", "")
+        io.create_file(".webbynode/tasks/before_push", "")
+        io.create_file(".webbynode/aliases", "")
+      end
+
       io.create_file(".webbynode/engine", option(:engine)) if option(:engine)
       
       unless git.present?

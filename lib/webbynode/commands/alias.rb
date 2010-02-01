@@ -7,10 +7,12 @@ module Webbynode::Commands
     
     requires_initialization!
 
-    summary "Creates an alias for a complicated command, so it's easy to execute it when needed "
-    parameter :action,  String, "add, remove or show.", :required => true
-    parameter :alias,   String, "The custom alias.",    :required => false # true if action == add or remove
-    parameter :command, Array,  "Task to perform.",     :required => false # true if action == add
+    summary "Manages a list of alias for your common used remote commands"
+    parameter :action,  String, "add, remove or show",    
+      :required => true,
+      :validate => { :in => ['add', 'remove', 'show' ]}
+    parameter :alias,   String, "name of the alias",      :required => false
+    parameter :command, Array,  "command to be executed", :required => false
     
     FilePath = ".webbynode/aliases"
     

@@ -13,5 +13,5 @@ Feature: Bootstrap an app for deployment
     When I run "wn help init"
     Then I should see "Usage: webbynode init webby \[dns\]"
      And I should see "Parameters:"
-     And I should see "    webby                       Name or IP of the Webby to deploy to"
-     And I should see "    dns                         The DNS used for this application, optional"
+     And I should see "    webby               Name or IP of the Webby to deploy to"
+     And I should see "    dns                 The DNS used for this application, optional"

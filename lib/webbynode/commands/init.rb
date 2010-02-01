@@ -1,9 +1,9 @@
 module Webbynode::Commands
   class Init < Webbynode::Command
-    summary "Initializes the current folder as a deployable application"
+    summary "Prepares the application on current folder for deployment"
     parameter :webby, String, "Name or IP of the Webby to deploy to"
     parameter :dns, String, "The DNS used for this application", :required => false
-    option :dns, "Creates the DNS entries for the domain"
+    option :adddns, "Creates the DNS entries for the domain"
     option :engine, "Sets the application engine for the app", :validate => { :in => ['php', 'rack', 'rails'] }
     
     def execute
@@ -53,7 +53,7 @@ module Webbynode::Commands
       
       git.add_remote "webbynode", webby_ip, app_name
       
-      if option(:dns)
+      if option(:adddns)
         handle_dns
       end
       

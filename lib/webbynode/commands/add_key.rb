@@ -2,7 +2,7 @@ module Webbynode::Commands
   class AddKey < Webbynode::Command
     requires_initialization!
 
-    summary "Adds your SSH public key to your Webby, so you can deploy without typing a password every time"
+    summary "Adds your ssh public key to your Webby, making deployments easy"
     option :passphrase, "If present, passphrase will be used when creating a new SSH key", :take => :words
 
     LocalSshKey = "#{ENV['HOME']}/.ssh/id_rsa.pub"

@@ -77,10 +77,10 @@ describe Webbynode::Command do
     it "should provide help for parameters" do
       NewCommand.help.should =~ /Usage: webbynode new_command webby \[dns\] \[options\]/
       NewCommand.help.should =~ /Parameters:/
-      NewCommand.help.should =~ /    webby                       Name or IP of the Webby to deploy to/
-      NewCommand.help.should =~ /    dns                         The DNS used for this application, optional/
+      NewCommand.help.should =~ /    webby               Name or IP of the Webby to deploy to/
+      NewCommand.help.should =~ /    dns                 The DNS used for this application, optional/
       NewCommand.help.should =~ /Options:/
-      NewCommand.help.should =~ /    --passphrase=words          If present, passphrase will be used when creating a new SSH key/
+      NewCommand.help.should =~ /    --passphrase=words  If present, passphrase will be used when creating a new SSH key/
     end
   end
   

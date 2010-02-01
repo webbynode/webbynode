@@ -157,7 +157,7 @@ module Webbynode
       if (params = Settings[self][:parameters])
         help << "Parameters:"
         params.each do |p|
-          help << "    #{p.name.to_s.ljust(25)}   #{p.desc}#{p.required? ? "" : ", optional"}"
+          help << "    #{p.name.to_s.ljust(20)}#{p.desc}#{p.required? ? "" : ", optional"}"
         end
       end
       help.join("\n")
@@ -168,7 +168,7 @@ module Webbynode
       if (options = Settings[self][:options] || []).any?
         help << "Options:"
         options.each do |p|
-          help << "    #{p.to_s.ljust(25)}   #{p.desc}#{p.required? ? "" : ", optional"}"
+          help << "    #{p.to_s.ljust(20)}#{p.desc}#{p.required? ? "" : ", optional"}"
         end
       end
       help.join("\n")

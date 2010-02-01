@@ -7,7 +7,7 @@ module Webbynode::Commands
     
     add_alias "deploy"
     
-    summary "Pushes all changes to your Webby"
+    summary "Sends all pending changes on the current application to your Webby"
     
     def initialize(*args)
       super

@@ -6,7 +6,6 @@ require 'net/ssh'
 require 'highline/import'
 require 'pp'
 
-require File.join(File.dirname(__FILE__), 'webbynode', 'helpers')
 require File.join(File.dirname(__FILE__), 'webbynode', 'io')
 require File.join(File.dirname(__FILE__), 'webbynode', 'git')
 require File.join(File.dirname(__FILE__), 'webbynode', 'ssh')

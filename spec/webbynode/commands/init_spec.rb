@@ -27,14 +27,14 @@ describe Webbynode::Commands::Init do
     end
   end
   
-  context "when creating a DNS entry with --dns option" do
+  context "when creating a DNS entry with --adddns option" do
     def create_init(ip="4.3.2.1", host=nil, extra=[])
       @command = Webbynode::Commands::Init.new(ip, host, *extra)
       @command.should_receive(:git).any_number_of_times.and_return(git_handler) 
     end
 
     it "should setup DNS using Webbynode API" do
-      create_init("10.0.1.1", "new.rubyista.info", "--dns")
+      create_init("10.0.1.1", "new.rubyista.info", "--adddns")
 
       api = Webbynode::ApiClient.new
       api.should_receive(:create_record).with("new.rubyista.info", "10.0.1.1")
@@ -45,7 +45,7 @@ describe Webbynode::Commands::Init do
     end
 
     it "should indicate the record already exists" do
-      create_init("10.0.1.1", "new.rubyista.info", "--dns")
+      create_init("10.0.1.1", "new.rubyista.info", "--adddns")
 
       api = Webbynode::ApiClient.new
       api.should_receive(:create_record).with("new.rubyista.info", "10.0.1.1").and_raise(Webbynode::ApiClient::ApiError.new("Data has already been taken"))
@@ -58,7 +58,7 @@ describe Webbynode::Commands::Init do
     end
 
     it "should show an user friendly error" do
-      create_init("10.0.1.1", "new.rubyista.info", "--dns")
+      create_init("10.0.1.1", "new.rubyista.info", "--adddns")
 
       api = Webbynode::ApiClient.new
       api.should_receive(:create_record).with("new.rubyista.info", "10.0.1.1").and_raise(Webbynode::ApiClient::ApiError.new("No DNS entry for id 99999"))

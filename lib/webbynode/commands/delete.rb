@@ -1,6 +1,6 @@
 module Webbynode::Commands
   class Delete < Webbynode::Command
-    summary "Deletes current application on your Webby where it's deployed"
+    summary "Removes the current application from your Webby"
     option :force, "Skips confirmation and forces the deletion of the app"
     
     add_alias "rm"

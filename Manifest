@@ -21,7 +21,6 @@ lib/webbynode.rb
 lib/webbynode/api_client.rb
 lib/webbynode/application.rb
 lib/webbynode/command.rb
-lib/webbynode/commands.rb
 lib/webbynode/commands/add_key.rb
 lib/webbynode/commands/alias.rb
 lib/webbynode/commands/config.rb
@@ -36,7 +35,6 @@ lib/webbynode/commands/stop.rb
 lib/webbynode/commands/tasks.rb
 lib/webbynode/commands/version.rb
 lib/webbynode/git.rb
-lib/webbynode/helpers.rb
 lib/webbynode/io.rb
 lib/webbynode/notify.rb
 lib/webbynode/option.rb

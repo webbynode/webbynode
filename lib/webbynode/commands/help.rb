@@ -17,7 +17,6 @@ module Webbynode::Commands
         end
         puts 
         puts "Try 'webbynode help COMMAND' for more information."
-        
       else
         puts Help.for(param(:command)).help
       end

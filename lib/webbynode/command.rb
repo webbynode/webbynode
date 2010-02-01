@@ -289,6 +289,12 @@ module Webbynode
         end
       end
       
+      # If help is invoked without any arguments, the first argument will
+      # be set to "commands" so it will always display a list of available commands.
+      if self.class.command.eql?("help") and param(:command).blank?
+        settings[:parameters][0].value = "commands"
+      end
+
       settings[:parameters].each { |p| p.validate! }
     end
   end

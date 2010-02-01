@@ -19,64 +19,19 @@ Echoe.new('webbynode', '0.2.0') do |p|
   #   ['httparty', '>=0.4.5']
   # ]
   p.install_message = <<EOS
-  
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      Webbynode Rapid Deployment Gem
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  -=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-
-        Webbynode Rapid Deployment Gem
-  -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-
+This deployment engine is highly experimental and
+should be considered beta code for now.
 
-    This deployment engine is highly experimental and
-    should be considered beta code for now.
+For a quickstart:
+http://guides.webbynode.com/articles/readystacks/rapid-apps.html
 
-
-    Initial Setup
-  -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-
-
-    Setup an initial Webbynode repository with:
-
-      webbynode init [webby_name OR webby_ip] [example.com]
-      This will:
-        * generate the .webbynode folder
-        * generate the .pushand file
-        * generate the .gitignore file
-        * initialize git
-        * add and commit what you currently have
-        * add Webbynode to "git remote"
-
-    Now, deploy your application with:
-
-      webbynode push
-
-    Then, for each update, follow the familiar git workflow:
-
-      git add .
-      git commit -m "My Updates"
-
-    And finally, to release the updated version of your application, again, execute:
-
-      webbynode push
-
-
-    Webbynode Commands
-  -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-
-
-    For a list of available commands, run:
-    
-      webbynode help
-    
-    To get help on a specific command, run:
-    
-      webbynode help [command]
-      
+ 
 EOS
 end
-# 
-# Rake::TestTask.new(:test_new) do |test|
-#   test.libs << 'test'
-#   test.ruby_opts << '-rubygems'
-#   test.pattern = 'test/**/test_*.rb'
-#   test.verbose = true
-# end
 
 require 'rcov/rcovtask'
 desc 'Measures test coverage using rcov'

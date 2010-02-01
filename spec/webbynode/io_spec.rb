@@ -99,6 +99,17 @@ describe Webbynode::Io do
       io = Webbynode::Io.new
       io.create_file("file_to_write", "file_contents")
     end
+    
+    it "should accept an optional executable parameter" do
+      file = double("File")
+      File.should_receive(:open).with("file_to_write", "w").and_yield(file)
+      file.should_receive(:write).with("file_contents")
+      
+      FileUtils.should_receive(:chmod).with(0755, "file_to_write")
+
+      io = Webbynode::Io.new
+      io.create_file("file_to_write", "file_contents", true)
+    end
   end
   
   describe "#exec" do

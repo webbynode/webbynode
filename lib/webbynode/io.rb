@@ -46,10 +46,11 @@ module Webbynode
       end
     end
     
-    def create_file(file, contents)
-      File.open(file, "w") do |file|
+    def create_file(file_name, contents, executable=nil)
+      File.open(file_name, "w") do |file|
         file.write(contents)
       end
+      FileUtils.chmod 0755, file_name if executable
     end
     
     def templates_path

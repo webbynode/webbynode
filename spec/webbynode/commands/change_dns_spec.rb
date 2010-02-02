@@ -5,9 +5,15 @@ describe Webbynode::Commands::ChangeDns do
   let(:git) { double("git").as_null_object }
   let(:io)  { double("io").as_null_object }
   let(:api) { double("api").as_null_object }
+  let(:cmd) { Webbynode::Commands::ChangeDns.new("the.newdns.com") }
+  
 
   before(:each) do
     FakeWeb.clean_registry
+    cmd.should_receive(:io).any_number_of_times.and_return(io)
+    cmd.should_receive(:git).any_number_of_times.and_return(git)
+    cmd.should_receive(:api).any_number_of_times.and_return(api)
+    
   end
 
   it "should change pushand" do
@@ -16,11 +22,30 @@ describe Webbynode::Commands::ChangeDns do
     git.should_receive(:parse_remote_ip).and_return("1.2.3.4")
     api.should_receive(:create_record).with("the.newdns.com", "1.2.3.4")
     
-    cmd = Webbynode::Commands::ChangeDns.new("the.newdns.com")
-    cmd.should_receive(:io).any_number_of_times.and_return(io)
-    cmd.should_receive(:git).any_number_of_times.and_return(git)
-    cmd.should_receive(:api).any_number_of_times.and_return(api)
+    cmd.run
+  end
+  
+  it "should give an error message if there are git changes pending" do
+    git.should_receive(:clean?).and_return(false)
     
     cmd.run
+    stdout.should =~ /Cannot change DNS because you have pending changes. Do a git commit or add changes to .gitignore./
+  end
+
+  context "when committing the DNS change" do
+    it "should perform a commit of .pushand" do
+      io.should_receive(:file_exists?).with(".webbynode/config").and_return(false)
+      git.should_receive(:add).with(".pushand")
+      git.should_receive(:commit).with("Changed DNS to \"the.newdns.com\"")
+      cmd.run
+    end
+
+    it "should perform a commit of .pushand and .webbynode/config if the later exists" do
+      io.should_receive(:file_exists?).with(".webbynode/config").and_return(true)
+      git.should_receive(:add).with(".pushand")
+      git.should_receive(:add).with(".webbynode/config")
+      git.should_receive(:commit).with("Changed DNS to \"the.newdns.com\"")
+      cmd.run
+    end
   end
 end

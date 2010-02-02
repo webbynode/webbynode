@@ -8,11 +8,19 @@ module Webbynode::Commands
     add_alias "dns"
     
     def execute
+      raise CommandError, 
+        "Cannot change DNS because you have pending changes. Do a git commit or add changes to .gitignore." unless git.clean?
+      
       git.delete_file ".webbynode/config"
       handle_dns param(:dns_entry)
       
       app_name = io.app_name
       io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name} #{param(:dns_entry)}\n", true)
+
+      git.add ".pushand"
+      git.add ".webbynode/config" if io.file_exists?(".webbynode/config")
+      git.commit "Changed DNS to \"#{param(:dns_entry)}\""
+
       io.log "Your application will start responding to #{param(:dns_entry)} after next deployment."
     end
   end

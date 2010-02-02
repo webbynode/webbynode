@@ -3,15 +3,17 @@ require File.join(File.expand_path(File.dirname(__FILE__)), '../..', 'spec_helpe
 
 describe Webbynode::Commands::Push do
 
-  let(:push) { Webbynode::Commands::Push.new }
-  let(:io) { double('Io').as_null_object }
-  let(:re) { double('RemoteExecutor').as_null_object }
+  let(:push)    { Webbynode::Commands::Push.new }
+  let(:io)      { double('Io').as_null_object }
+  let(:re)      { double('RemoteExecutor').as_null_object }
   let(:pushand) { double('PushAnd').as_null_object }
+  let(:git)     { double('Git').as_null_object }
 
   before(:each) do
     push.should_receive(:io).any_number_of_times.and_return(io)
     push.should_receive(:remote_executor).any_number_of_times.and_return(re)
     push.should_receive(:pushand).any_number_of_times.and_return(pushand)
+    push.should_receive(:git).any_number_of_times.and_return(git)
     push.before_tasks.stub!(:read_tasks)
     push.after_tasks.stub!(:read_tasks)
   end
@@ -27,6 +29,28 @@ describe Webbynode::Commands::Push do
     it "should push the application to the webby" do
       io.should_receive(:exec).with("git push webbynode master", false)
       push.execute
+    end
+    
+    it "should not push and warn the user if git status is not clean" do
+      git.should_receive(:clean?).and_return(false)
+      lambda { push.execute }.should raise_error(Webbynode::Command::CommandError,
+        "Cannot push because you have pending changes. Do a git commit or add changes to .gitignore.")
+    end
+    
+    it "should not push and warn the user if git status is not clean and the user uses --dirty" do
+      pushcmd = Webbynode::Commands::Push.new("--dirty")
+      pushcmd.should_receive(:io).any_number_of_times.and_return(io)
+      pushcmd.should_receive(:remote_executor).any_number_of_times.and_return(re)
+      pushcmd.should_receive(:pushand).any_number_of_times.and_return(pushand)
+      pushcmd.should_receive(:git).any_number_of_times.and_return(git)
+      pushcmd.before_tasks.stub!(:read_tasks)
+      pushcmd.after_tasks.stub!(:read_tasks)
+
+      pushand.should_receive(:parse_remote_app_name).and_return("app")
+      io.should_receive(:log).with("Finished pushing app", :finish)
+      git.should_receive(:clean?).never
+
+      pushcmd.execute
     end
     
     context "when succesful" do

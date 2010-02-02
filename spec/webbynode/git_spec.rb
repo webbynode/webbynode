@@ -50,6 +50,30 @@ describe Webbynode::Git do
     end
   end
   
+  describe "#clean?" do
+    context "when git repo is clean" do
+      it "should return true" do
+        io_handler = mock("io")
+        io_handler.should_receive(:exec).with("git status").and_return(read_fixture('git/status/clean'))
+
+        git = Webbynode::Git.new
+        git.should_receive(:io).and_return(io_handler)
+        git.should be_clean
+      end
+    end
+
+    context "when git repo is dirty" do
+      it "should return false" do
+        io_handler = mock("io")
+        io_handler.should_receive(:exec).with("git status").and_return(read_fixture('git/status/dirty'))
+
+        git = Webbynode::Git.new
+        git.should_receive(:io).and_return(io_handler)
+        git.should_not be_clean
+      end
+    end
+  end
+  
   describe "#add_git_init" do
     context "when sucessful" do
       it "should create .gitignore from the template" do

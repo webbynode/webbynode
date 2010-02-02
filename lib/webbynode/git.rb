@@ -22,6 +22,10 @@ module Webbynode
       end
     end
     
+    def clean?
+      io.exec("git status") =~ /working directory clean/
+    end
+    
     def delete_file(file)
       return unless io.file_exists?(file)
       io.delete_file(file)

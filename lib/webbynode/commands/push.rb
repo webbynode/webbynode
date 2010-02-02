@@ -8,6 +8,7 @@ module Webbynode::Commands
     add_alias "deploy"
     
     summary "Sends all pending changes on the current application to your Webby"
+    option :dirty, "Allows pushing even if the current application has git changes pending"
     
     def initialize(*args)
       super
@@ -16,6 +17,11 @@ module Webbynode::Commands
     end
     
     def execute
+      unless option(:dirty)
+        raise CommandError, 
+          "Cannot push because you have pending changes. Do a git commit or add changes to .gitignore." unless git.clean?
+      end
+      
       @app_name = pushand.parse_remote_app_name
       
       # Ensures there are Task Files to read from

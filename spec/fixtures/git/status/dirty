@@ -1,0 +1,9 @@
+# On branch master
+# Changed but not updated:
+#   (use "git add <file>..." to update what will be committed)
+#   (use "git checkout -- <file>..." to discard changes in working directory)
+#
+#       modified:   lib/webbynode/git.rb
+#       modified:   spec/webbynode/git_spec.rb
+#
+no changes added to commit (use "git add" and/or "git commit -a")

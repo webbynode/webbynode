@@ -44,6 +44,34 @@ describe Webbynode::Commands::Init do
       @command.run
     end
 
+    it "should setup empty and www records for a tld" do
+      create_init("10.0.1.1", "rubyista.info", "--adddns")
+
+      io = double("Io").as_null_object
+      io.should_receive(:create_file).with(".webbynode/config", "DNS_ALIAS='www.rubyista.info'")
+
+      api = Webbynode::ApiClient.new
+      api.should_receive(:create_record).with("rubyista.info", "10.0.1.1")
+      api.should_receive(:create_record).with("www.rubyista.info", "10.0.1.1")
+      git_handler.should_receive(:parse_remote_ip).any_number_of_times.and_return("10.0.1.1")
+
+      @command.should_receive(:api).any_number_of_times.and_return(api)
+      @command.should_receive(:io).any_number_of_times.and_return(io)
+      @command.run
+    end
+
+    it "should setup empty and www records for a non-.com tld" do
+      create_init("10.0.1.1", "rubyista.com.br", "--adddns")
+
+      api = Webbynode::ApiClient.new
+      api.should_receive(:create_record).with("rubyista.com.br", "10.0.1.1")
+      api.should_receive(:create_record).with("www.rubyista.com.br", "10.0.1.1")
+      git_handler.should_receive(:parse_remote_ip).any_number_of_times.and_return("10.0.1.1")
+
+      @command.should_receive(:api).any_number_of_times.and_return(api)
+      @command.run
+    end
+
     it "should indicate the record already exists" do
       create_init("10.0.1.1", "new.rubyista.info", "--adddns")
 
@@ -185,7 +213,7 @@ describe Webbynode::Commands::Init do
   context "when .webbynode is not present" do
     it "should create the .webbynode system folder and stub files" do
       io_handler.should_receive(:directory?).with(".webbynode").and_return(false)
-      io_handler.should_receive(:exec).with("mkdir .webbynode")
+      io_handler.should_receive(:exec).with("mkdir -p .webbynode/tasks")
       io_handler.should_receive(:create_file).with(".webbynode/tasks/after_push", "")
       io_handler.should_receive(:create_file).with(".webbynode/tasks/before_push", "")
       io_handler.should_receive(:create_file).with(".webbynode/aliases", "")

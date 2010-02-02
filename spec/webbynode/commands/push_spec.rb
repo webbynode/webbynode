@@ -115,14 +115,14 @@ describe Webbynode::Commands::Push do
       end
       
       it "should provide feedback to the user that it's going to perform the tasks" do
-        io.should_receive(:log).with("Performing Before Push Tasks..")
+        io.should_receive(:log).with("Performing Before Push Tasks...", :action)
         push.execute
       end
       
       it "should loop through each of the tasks, perform them and provide feedback" do
         3.times { |n| push.before_tasks.session_tasks << "Task #{n}" }
         3.times { |n| io.should_receive(:exec).exactly(:once).with("Task #{n}") }
-        3.times { |n| io.should_receive(:log).exactly(:once).with("Performing Task: Task #{n}")}
+        3.times { |n| io.should_receive(:log).exactly(:once).with("  Performing Task: Task #{n}", :action)}
         push.execute
       end
     end
@@ -134,14 +134,14 @@ describe Webbynode::Commands::Push do
       end
       
       it "should provide feedback to the user that it's going to perform the tasks" do
-        io.should_receive(:log).with("Performing After Push Tasks..")
+        io.should_receive(:log).with("Performing After Push Tasks...", :action)
         push.execute
       end
       
       it "should loop through each of the tasks, perform them and provide feedback" do
         3.times { |n| push.after_tasks.session_tasks << "Task #{n}" }
         3.times { |n| re.should_receive(:exec).exactly(:once).with("cd test.webbynode.com; Task #{n}", true) }
-        3.times { |n| io.should_receive(:log).exactly(:once).with("Performing Task: Task #{n}")}
+        3.times { |n| io.should_receive(:log).exactly(:once).with("  Performing Task: Task #{n}", :action) }
         pushand.should_receive(:parse_remote_app_name).exactly(4).times.and_return("test.webbynode.com")
         push.execute
       end

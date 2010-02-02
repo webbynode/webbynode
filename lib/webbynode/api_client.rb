@@ -24,9 +24,10 @@ module Webbynode
     
     def create_record(record, ip)
       original_record = record
-      parts = record.split(".")
-      record = parts.shift
-      domain = "#{parts.join(".")}."
+
+      url = Domainatrix.parse("http://#{record}")
+      record = url.subdomain
+      domain = "#{url.domain}.#{url.public_suffix}."
       
       zone = zones[domain]
       if zone

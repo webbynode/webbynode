@@ -1,3 +1,5 @@
+require 'yaml'
+
 module Webbynode
   class DirectoryNotFound < StandardError; end
   
@@ -98,6 +100,21 @@ module Webbynode
     def create_from_template(file, template)
       contents = read_from_template(template)
       create_file(file, contents)
+    end
+    
+    def config_multi_add(key, new_value)
+      raise "Missing Webbynode config file" unless file_exists?(".webbynode/config")
+      config = read_yaml(".webbynode/config")
+      (config[key] ||= []) << new_value
+      write_yaml(config)
+    end
+    
+    def read_yaml(file)
+      YAML.load_file(file)
+    end
+    
+    def write_yaml(obj)
+      create_file(file, obj.to_yaml)
     end
     
     def read_config(config_file)

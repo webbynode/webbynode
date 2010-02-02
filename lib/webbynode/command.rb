@@ -297,5 +297,26 @@ module Webbynode
 
       settings[:parameters].each { |p| p.validate! }
     end
+    
+    def handle_dns(dns)
+      url = Domainatrix.parse("http://#{dns}")
+      
+      if url.subdomain.empty?
+        dns = "#{url.domain}.#{url.public_suffix}"
+        io.log "Creating DNS entries for www.#{dns} and #{dns}..."
+        api.create_record "#{dns}", git.parse_remote_ip
+        api.create_record "www.#{dns}", git.parse_remote_ip
+        io.create_file ".webbynode/config", "DNS_ALIAS='www.#{dns}'"
+      else
+        io.log "Creating DNS entry for #{dns}..."
+        api.create_record dns, git.parse_remote_ip
+      end
+    rescue Webbynode::ApiClient::ApiError
+      if $!.message =~ /Data has already been taken/
+        io.log "The DNS entry for '#{dns}' already existed, ignoring."
+      else
+        io.log "Couldn't create your DNS entry: #{$!.message}"
+      end
+    end
   end
 end

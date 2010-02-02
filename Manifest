@@ -35,6 +35,7 @@ lib/webbynode/commands/start.rb
 lib/webbynode/commands/stop.rb
 lib/webbynode/commands/tasks.rb
 lib/webbynode/commands/version.rb
+lib/webbynode/commands/webbies.rb
 lib/webbynode/git.rb
 lib/webbynode/io.rb
 lib/webbynode/notify.rb

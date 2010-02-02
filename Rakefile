@@ -10,7 +10,10 @@ Echoe.new('webbynode', '0.2.0') do |p|
   p.author          = "Felipe Coury"
   p.email           = "felipe@webbynode.com"  
   p.ignore_pattern  = ["tmp/*", "script/*"]  
-  p.dependencies = [ ['httparty', '>=0.4.5'] ]
+  p.dependencies = [ 
+    ['httparty', '>=0.4.5'],
+    ['domainatrix','>=0.0.7']
+  ]
   # p.dependencies = [
   #   ['activeresource','>= 2.3.4'],
   #   ['activesupport','>= 2.3.4'],

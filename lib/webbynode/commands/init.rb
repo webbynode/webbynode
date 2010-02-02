@@ -43,10 +43,11 @@ module Webbynode::Commands
       end
       
       unless io.directory?(".webbynode")
-        io.exec("mkdir .webbynode") 
+        io.exec("mkdir -p .webbynode/tasks") 
         io.create_file(".webbynode/tasks/after_push", "")
         io.create_file(".webbynode/tasks/before_push", "")
         io.create_file(".webbynode/aliases", "")
+        io.create_file(".webbynode/config", "")
       end
 
       io.create_file(".webbynode/engine", option(:engine)) if option(:engine)
@@ -61,23 +62,11 @@ module Webbynode::Commands
       io.log "Adding webbynode as git remote...", :action
       git.add_remote "webbynode", webby_ip, app_name
       
-      handle_dns if option(:adddns)
+      handle_dns param(:dns) if option(:adddns)
       
       io.log "Application #{app_name} ready for Rapid Deployment", :finish
     rescue Webbynode::GitRemoteAlreadyExistsError
       io.log "Application already initialized.", true
-    end
-  
-    def handle_dns
-      ip = git.parse_remote_ip
-      io.log "Creating DNS entry for #{param(:dns)}...", :action
-      api.create_record param(:dns), ip
-    rescue Webbynode::ApiClient::ApiError
-      if $!.message =~ /Data has already been taken/
-        io.log "The DNS entry for '#{param(:dns)}' already existed, ignoring.", :error
-      else
-        io.log "Couldn't create your DNS entry: #{$!.message}", :error
-      end
     end
   end
 end

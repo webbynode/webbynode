@@ -21,7 +21,7 @@ describe Webbynode::PushAnd do
   
   describe "parse_remote_app_name" do
     it "should parse the .pushand file for the app name" do
-      @io.should_receive(:read_file).with(".pushand").and_return("phd $0 app_name")
+      @io.should_receive(:read_file).with(".pushand").and_return("phd $0 app_name dnsentry")
       @pushand.parse_remote_app_name.should == "app_name"
     end
   end

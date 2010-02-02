@@ -44,18 +44,18 @@ module Webbynode::Commands
       
       # Performs the before push tasks locally
       def perform_before_tasks
-        io.log("Performing Before Push Tasks..")
+        io.log "Performing Before Push Tasks...", :action
         before_tasks.session_tasks.each do |task|
-          io.log("Performing Task: #{task}")
+          io.log "  Performing Task: #{task}", :action
           io.exec(task)
         end
       end
       
       # Performs the after push tasks remotely from the application root
       def perform_after_tasks
-        io.log("Performing After Push Tasks..")
+        io.log "Performing After Push Tasks...", :action
         after_tasks.session_tasks.each do |task|
-          io.log("Performing Task: #{task}")
+          io.log "  Performing Task: #{task}", :action
           remote_executor.exec("cd #{pushand.parse_remote_app_name}; #{task}", true)
         end
       end

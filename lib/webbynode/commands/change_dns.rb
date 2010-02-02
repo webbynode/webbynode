@@ -8,6 +8,7 @@ module Webbynode::Commands
     add_alias "dns"
     
     def execute
+      io.delete_file ".webbynode/config"
       handle_dns param(:dns_entry)
       
       app_name = io.app_name

@@ -89,6 +89,10 @@ module Webbynode
       FileUtils.chmod 0755, file_name if executable
     end
     
+    def delete_file(file_name)
+      File.delete(file_name)
+    end
+    
     def templates_path
       TemplatesPath
     end

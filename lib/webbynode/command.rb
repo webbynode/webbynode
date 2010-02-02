@@ -98,7 +98,7 @@ module Webbynode
 
     def initialize(*args)
       parse_args(args)
-    rescue InvalidCommand
+    rescue InvalidCommand, CommandError
       @parse_error = $!.message
     end
 
@@ -116,7 +116,7 @@ module Webbynode
     end
     
     def option(p)
-      raise InvalidOption, "Unknown option: #{p}" unless options[p]
+      raise CommandError, "Unknown option: #{p}." unless options[p]
       options[p].value if options[p]
     end
     
@@ -253,6 +253,11 @@ module Webbynode
         return
       end
       
+      if @help
+        puts self.class.help
+        return
+      end
+      
       begin
         validate_initialization                   if settings[:requires_initialization!]
         validate_options                          if settings[:requires_options!]
@@ -273,9 +278,12 @@ module Webbynode
 
       i = 0
       while (opt = args.shift)
-        if (name = Option.name_for(opt))
+        if opt == "--help"
+          @help = true
+          return
+        elsif (name = Option.name_for(opt))
           option = settings[:options_hash][name.to_sym]
-          raise Webbynode::Command::InvalidOption, "Unknown option: #{name.to_sym}" unless option
+          raise Webbynode::Command::CommandError, "Unknown option: #{name.to_sym}." unless option
           option.parse(opt)
         else
           raise InvalidCommand, "command '#{self.class.command}' takes no parameters" if settings[:parameters].empty?

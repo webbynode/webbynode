@@ -116,6 +116,17 @@ describe Webbynode::Command do
       NewCommand.help.should =~ /Options:/
       NewCommand.help.should =~ /    --passphrase=words  If present, passphrase will be used when creating a new SSH key/
     end
+    
+    it "should show the help if --help option is passed" do
+      cmd = NewCommand.new("--help")
+      cmd.run
+      stdout.should =~ /Usage: webbynode new_command webby \[dns\] \[options\]/
+      stdout.should =~ /Parameters:/
+      stdout.should =~ /    webby               Name or IP of the Webby to deploy to/
+      stdout.should =~ /    dns                 The DNS used for this application, optional/
+      stdout.should =~ /Options:/
+      stdout.should =~ /    --passphrase=words  If present, passphrase will be used when creating a new SSH key/
+    end
   end
   
   describe "parsing options" do
@@ -128,6 +139,13 @@ describe Webbynode::Command do
       
       stdout.should =~ /Missing 'param1' parameter. Use "webbynode help sample" for more information./
       stdout.should =~ /Usage: webbynode sample param1/
+    end
+    
+    it "should report an unknown option" do
+      Sample99 = Class.new(Webbynode::Command)
+      cmd = Sample99.new("--unknown")
+      lambda { cmd.run }.should_not raise_error
+      stdout.should =~ /Unknown option: unknown/
     end
     
     it "should parse arguments as params" do
@@ -185,7 +203,7 @@ describe Webbynode::Command do
       wn = Cmd.new("--provided=auto", "param1", "--force", "param2")
       wn.option(:provided) == "auto"
       wn.option(:force).should be_true
-      lambda { wn.option(:another) }.should raise_error(Webbynode::Command::InvalidOption)
+      lambda { wn.option(:another) }.should raise_error(Webbynode::Command::CommandError)
       wn.param_values.should == ["param1", "param2"]
     end
   end

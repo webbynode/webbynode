@@ -62,6 +62,8 @@ spec/fixtures/git/config/210.11.13.12
 spec/fixtures/git/config/67.23.79.31
 spec/fixtures/git/config/67.23.79.32
 spec/fixtures/git/config/config
+spec/fixtures/git/status/clean
+spec/fixtures/git/status/dirty
 spec/fixtures/pushand
 spec/spec_helper.rb
 spec/webbynode/api_client_spec.rb

@@ -22,6 +22,11 @@ module Webbynode
       end
     end
     
+    def delete_file(file)
+      io.delete_file(file)
+      exec "git rm #{file} > /dev/null 2>&1"
+    end
+    
     def add_git_ignore
       io.create_from_template(".gitignore", "gitignore")
     end

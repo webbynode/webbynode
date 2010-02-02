@@ -23,6 +23,7 @@ module Webbynode
     end
     
     def delete_file(file)
+      return unless file_exists?(file)
       io.delete_file(file)
       exec "git rm #{file} > /dev/null 2>&1"
     end

@@ -15,12 +15,14 @@ features/support/env.rb
 features/support/hooks.rb
 features/support/io_features.rb
 features/support/mocha.rb
+lib/templates/backup
 lib/templates/gitignore
 lib/templates/help
 lib/webbynode.rb
 lib/webbynode/api_client.rb
 lib/webbynode/application.rb
 lib/webbynode/command.rb
+lib/webbynode/commands/add_backup.rb
 lib/webbynode/commands/add_key.rb
 lib/webbynode/commands/alias.rb
 lib/webbynode/commands/change_dns.rb
@@ -70,6 +72,7 @@ spec/spec_helper.rb
 spec/webbynode/api_client_spec.rb
 spec/webbynode/application_spec.rb
 spec/webbynode/command_spec.rb
+spec/webbynode/commands/add_backup_spec.rb
 spec/webbynode/commands/add_key_spec.rb
 spec/webbynode/commands/alias_spec.rb
 spec/webbynode/commands/change_dns_spec.rb

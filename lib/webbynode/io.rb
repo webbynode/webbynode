@@ -110,10 +110,27 @@ module Webbynode
       (@properties||={})[s] = Properties.new(s)
     end
     
-    def with_setting(&blk)
-      settings = properties(".webbynode/settings")
+    def general_settings
+      @general_settings ||= properties("#{ENV['HOME']}/.webbynode")
+    end
+    
+    def with_settings_for(file, &blk)
+      settings = properties(file)
       yield settings
       settings.save
+    end
+    
+    def with_general_settings(&blk)
+      yield general_settings
+      general_settings.save
+    end
+    
+    def with_setting(&blk)
+      with_settings_for ".webbynode/settings", &blk
+    end
+    
+    def add_general_setting(key, value)
+      with_general_settings { |s| s[key] = value }
     end
     
     def remove_setting(key)

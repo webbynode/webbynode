@@ -1,0 +1,15 @@
+Webbynode Rapid App Backup
+
+This service will backup a dump of your application Database and the contents
+of your application folder to a bucket on Amazon S3. If you don't have an 
+Amazon S3 account or if you don't know how to create one, please check our 
+guide on http://guides.webbynode.com/rapid.
+
+DISCLAIMER: Backing up to S3 will incur on a charge by Amazon according to the
+terms of the services contract you accepted when signing up to their services.
+We do not guarantee the minimum or maximum size of the backup, depending 
+completely on how large is the data your application produces. By entering your
+credentials below, you are acknowledging and accepting this terms.
+
+Enter your Amazon S3 credentials or leave the field empty to abort:
+

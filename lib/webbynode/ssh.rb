@@ -9,13 +9,14 @@ module Webbynode
     end
     
     def connect
+      raise "No IP given" unless @remote_ip
       @conn = nil if @conn and @conn.closed?
-      @conn ||= Net::SSH.start(@remote_ip, 'git')
+      @conn ||= Net::SSH.start(@remote_ip, 'git', :auth_methods => %w(publickey hostbased))
     rescue Net::SSH::AuthenticationFailed
       HighLine.track_eof = false
       
       begin
-        @password ||= ask("Enter your password: ") { |q| q.echo = '' }
+        @password ||= ask("Enter your deployment password for #{@remote_ip}: ") { |q| q.echo = '' }
         @conn     ||= Net::SSH.start(@remote_ip, 'git', :password => @password)  
       rescue Net::SSH::AuthenticationFailed
         io.log "Could not connect to server: invalid authentication.", true

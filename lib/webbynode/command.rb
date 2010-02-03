@@ -308,16 +308,18 @@ module Webbynode
     
     def handle_dns(dns)
       url = Domainatrix.parse("http://#{dns}")
+      ip = git.parse_remote_ip
       
       if url.subdomain.empty?
         dns = "#{url.domain}.#{url.public_suffix}"
         io.log "Creating DNS entries for www.#{dns} and #{dns}..."
-        api.create_record "#{dns}", git.parse_remote_ip
-        api.create_record "www.#{dns}", git.parse_remote_ip
-        io.create_file ".webbynode/config", "DNS_ALIAS='www.#{dns}'"
+        io.add_setting "dns_alias", "'www.#{dns}'"
+        api.create_record "#{dns}", ip
+        api.create_record "www.#{dns}", ip
       else
         io.log "Creating DNS entry for #{dns}..."
-        api.create_record dns, git.parse_remote_ip
+        io.remove_setting "dns_alias"
+        api.create_record dns, ip
       end
     rescue Webbynode::ApiClient::ApiError
       if $!.message =~ /Data has already been taken/

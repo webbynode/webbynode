@@ -41,6 +41,7 @@ lib/webbynode/io.rb
 lib/webbynode/notify.rb
 lib/webbynode/option.rb
 lib/webbynode/parameter.rb
+lib/webbynode/properties.rb
 lib/webbynode/push_and.rb
 lib/webbynode/remote_executor.rb
 lib/webbynode/server.rb

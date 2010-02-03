@@ -34,16 +34,16 @@ describe Webbynode::Commands::ChangeDns do
 
   context "when committing the DNS change" do
     it "should perform a commit of .pushand" do
-      io.should_receive(:file_exists?).with(".webbynode/config").and_return(false)
+      io.should_receive(:file_exists?).with(".webbynode/settings").and_return(false)
       git.should_receive(:add).with(".pushand")
       git.should_receive(:commit).with("Changed DNS to \"the.newdns.com\"")
       cmd.run
     end
 
-    it "should perform a commit of .pushand and .webbynode/config if the later exists" do
-      io.should_receive(:file_exists?).with(".webbynode/config").and_return(true)
+    it "should perform a commit of .pushand and .webbynode/settings if the later exists" do
+      io.should_receive(:file_exists?).with(".webbynode/settings").and_return(true)
       git.should_receive(:add).with(".pushand")
-      git.should_receive(:add).with(".webbynode/config")
+      git.should_receive(:add).with(".webbynode/settings")
       git.should_receive(:commit).with("Changed DNS to \"the.newdns.com\"")
       cmd.run
     end

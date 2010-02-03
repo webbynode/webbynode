@@ -106,6 +106,24 @@ module Webbynode
       create_file(file, contents)
     end
     
+    def properties(s)
+      (@properties||={})[s] = Properties.new(s)
+    end
+    
+    def with_setting(&blk)
+      settings = properties(".webbynode/settings")
+      yield settings
+      settings.save
+    end
+    
+    def remove_setting(key)
+      with_setting { |s| s.remove key }
+    end
+    
+    def add_setting(key, value)
+      with_setting { |s| s[key] = value }
+    end
+    
     def config_multi_add(key, new_value)
       raise "Missing Webbynode config file" unless file_exists?(".webbynode/config")
       config = read_yaml(".webbynode/config")

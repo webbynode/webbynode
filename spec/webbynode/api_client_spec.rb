@@ -144,7 +144,7 @@ describe Webbynode::ApiClient do
     context "when credentials file exists" do
       it "should read the credentials" do
         io.should_receive(:file_exists?).with("#{ENV['HOME']}/.webbynode").and_return(true)
-        io.should_receive(:read_config).with("#{ENV['HOME']}/.webbynode").and_return({:email => "fcoury@me.com", :token => "apitoken"})
+        api.should_receive(:properties).and_return({:email => "fcoury@me.com", :token => "apitoken"})
 
         creds = api.init_credentials
         creds[:email].should == "fcoury@me.com"
@@ -155,8 +155,11 @@ describe Webbynode::ApiClient do
         FakeWeb.register_uri(:post, "#{base_uri}/webbies", 
           :email => "fcoury@me.com", :response => read_fixture("api/webbies"))
 
+        properties = {}
+        properties.should_receive(:save)
+
         io.should_receive(:file_exists?).with("#{ENV['HOME']}/.webbynode").and_return(true)
-        io.should_receive(:create_file).with("#{ENV['HOME']}/.webbynode", "email = login@email.com\ntoken = apitoken\n")
+        api.should_receive(:properties).any_number_of_times.and_return(properties)
         
         api.should_receive(:ask).with("Login email: ").once.ordered.and_return("login@email.com")
         api.should_receive(:ask).with("API token:   ").once.ordered.and_return("apitoken")
@@ -169,10 +172,13 @@ describe Webbynode::ApiClient do
       it "should not prompt and write the credentials if force is a Hash" do
         FakeWeb.register_uri(:post, "#{base_uri}/webbies", 
           :email => "fcoury@me.com", :response => read_fixture("api/webbies"))
+          
+        properties = {}
+        properties.should_receive(:save)
 
         io.should_receive(:file_exists?).with("#{ENV['HOME']}/.webbynode").and_return(true)
-        io.should_receive(:create_file).with("#{ENV['HOME']}/.webbynode", "email = login@email.com\ntoken = apitoken\n")
-        
+        api.should_receive(:properties).any_number_of_times.and_return(properties)
+          
         api.should_receive(:ask).never
         
         creds = api.init_credentials({ :email => 'login@email.com', :token => 'apitoken' })
@@ -186,8 +192,11 @@ describe Webbynode::ApiClient do
         FakeWeb.register_uri(:post, "#{base_uri}/webbies", 
           :email => "fcoury@me.com", :response => read_fixture("api/webbies"))
 
+        properties = {}
+        properties.should_receive(:save)
+
         io.should_receive(:file_exists?).with("#{ENV['HOME']}/.webbynode").and_return(false)
-        io.should_receive(:create_file).with("#{ENV['HOME']}/.webbynode", "email = login@email.com\ntoken = apitoken\n")
+        api.should_receive(:properties).any_number_of_times.and_return(properties)
         
         api.should_receive(:ask).with("Login email: ").once.ordered.and_return("login@email.com")
         api.should_receive(:ask).with("API token:   ").once.ordered.and_return("apitoken")
@@ -199,8 +208,11 @@ describe Webbynode::ApiClient do
         FakeWeb.register_uri(:post, "#{base_uri}/webbies", 
           :email => "fcoury@me.com", :response => read_fixture("api/webbies_unauthorized"))
 
+        properties = {}
+        properties.should_receive(:save).never
+
         io.should_receive(:file_exists?).with("#{ENV['HOME']}/.webbynode").and_return(false)
-        io.should_receive(:create_file).never
+        api.should_receive(:properties).any_number_of_times.and_return(properties)
         
         api.should_receive(:ask).with("Login email: ").once.ordered.and_return("login@email.com")
         api.should_receive(:ask).with("API token:   ").once.ordered.and_return("apitoken")

@@ -22,12 +22,14 @@ describe Webbynode::Commands::Init do
       command.option(:engine).should == 'php'
       command.should_receive(:io).any_number_of_times.and_return(io_handler)
 
-      io_handler.should_receive(:create_file).with(".webbynode/engine", "php")
+      io_handler.should_receive(:add_setting).with("engine", "php")
       command.run
     end
   end
   
   context "when creating a DNS entry with --adddns option" do
+    let(:io) { io = double("Io").as_null_object }
+
     def create_init(ip="4.3.2.1", host=nil, extra=[])
       @command = Webbynode::Commands::Init.new(ip, host, *extra)
       @command.should_receive(:git).any_number_of_times.and_return(git_handler) 
@@ -36,19 +38,21 @@ describe Webbynode::Commands::Init do
     it "should setup DNS using Webbynode API" do
       create_init("10.0.1.1", "new.rubyista.info", "--adddns")
 
+      io.should_receive(:remove_setting).with("dns_alias")
+
       api = Webbynode::ApiClient.new
       api.should_receive(:create_record).with("new.rubyista.info", "10.0.1.1")
       git_handler.should_receive(:parse_remote_ip).and_return("10.0.1.1")
 
       @command.should_receive(:api).any_number_of_times.and_return(api)
+      @command.should_receive(:io).any_number_of_times.and_return(io)
       @command.run
     end
 
     it "should setup empty and www records for a tld" do
       create_init("10.0.1.1", "rubyista.info", "--adddns")
 
-      io = double("Io").as_null_object
-      io.should_receive(:create_file).with(".webbynode/config", "DNS_ALIAS='www.rubyista.info'")
+      io.should_receive(:add_setting).with("dns_alias", "'www.rubyista.info'")
 
       api = Webbynode::ApiClient.new
       api.should_receive(:create_record).with("rubyista.info", "10.0.1.1")
@@ -63,11 +67,15 @@ describe Webbynode::Commands::Init do
     it "should setup empty and www records for a non-.com tld" do
       create_init("10.0.1.1", "rubyista.com.br", "--adddns")
 
+      # io = double("Io")
+      # io.should_receive(:properties).with(".webbynode/settings").and_return(stub("Properties"))
+
       api = Webbynode::ApiClient.new
       api.should_receive(:create_record).with("rubyista.com.br", "10.0.1.1")
       api.should_receive(:create_record).with("www.rubyista.com.br", "10.0.1.1")
       git_handler.should_receive(:parse_remote_ip).any_number_of_times.and_return("10.0.1.1")
 
+      @command.should_receive(:io).any_number_of_times.and_return(io)
       @command.should_receive(:api).any_number_of_times.and_return(api)
       @command.run
     end
@@ -79,7 +87,12 @@ describe Webbynode::Commands::Init do
       api.should_receive(:create_record).with("new.rubyista.info", "10.0.1.1").and_raise(Webbynode::ApiClient::ApiError.new("Data has already been taken"))
       git_handler.should_receive(:parse_remote_ip).and_return("10.0.1.1")
 
+      # the DNS setting should remove any dns_aliases on .webbynode/settings
+      io = Webbynode::Io.new
+      io.should_receive(:remove_setting).with("dns_alias")
+
       @command.should_receive(:api).any_number_of_times.and_return(api)
+      @command.should_receive(:io).any_number_of_times.and_return(io)
       @command.run
       
       stdout.should =~ /The DNS entry for 'new.rubyista.info' already existed, ignoring./
@@ -92,7 +105,12 @@ describe Webbynode::Commands::Init do
       git_handler.should_receive(:parse_remote_ip).and_return("10.0.1.1")
       api.should_receive(:create_record).with("new.rubyista.info", "10.0.1.1").and_raise(Webbynode::ApiClient::ApiError.new("No DNS entry for id 99999"))
 
+      # the DNS setting should remove any dns_aliases on .webbynode/settings
+      io = Webbynode::Io.new
+      io.should_receive(:remove_setting).with("dns_alias")
+
       @command.should_receive(:api).any_number_of_times.and_return(api)
+      @command.should_receive(:io).any_number_of_times.and_return(io)
       @command.run
       
       stdout.should =~ /Couldn't create your DNS entry: No DNS entry for id 99999/
@@ -105,12 +123,15 @@ describe Webbynode::Commands::Init do
 
     io_handler.should_receive(:file_exists?).with(Webbynode::ApiClient::CREDENTIALS_FILE).and_return(false)
     io_handler.should_receive(:app_name).any_number_of_times.and_return("my_app")
-    io_handler.should_receive(:create_file).with(Webbynode::ApiClient::CREDENTIALS_FILE, "email = abc123\ntoken = 234def\n")
+
+    props = {}
+    props.stub(:save)
 
     create_init("my_webby_name")
     @command.api.should_receive(:io).any_number_of_times.and_return(io_handler)
     @command.api.should_receive(:ask).with("API token:   ").and_return("234def")
     @command.api.should_receive(:ask).with("Login email: ").and_return("abc123")
+    @command.api.should_receive(:properties).any_number_of_times.and_return(props)
     @command.run
     
     stdout.should =~ /Couldn't find Webby 'my_webby_name' on your account. Your Webbies are/

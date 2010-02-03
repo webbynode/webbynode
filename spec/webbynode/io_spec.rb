@@ -16,6 +16,32 @@ describe Webbynode::Io do
     end
   end
   
+  describe '#add_setting' do
+    let(:io) { Webbynode::Io.new }
+
+    it "should add a key to the property file .webbynode/settings" do
+      props = mock("Hash")
+      props.should_receive(:[]=).with("engine", "php")
+      props.should_receive(:save)
+      
+      io.should_receive(:properties).with(".webbynode/settings").and_return(props)
+      io.add_setting("engine", "php")
+    end
+  end
+  
+  describe '#remove_setting' do
+    let(:io) { Webbynode::Io.new }
+
+    it "should add a key to the property file .webbynode/settings" do
+      props = mock("Hash")
+      props.should_receive(:remove).with("engine")
+      props.should_receive(:save)
+      
+      io.should_receive(:properties).with(".webbynode/settings").and_return(props)
+      io.remove_setting("engine")
+    end
+  end
+  
   describe '#create_local_key' do
     describe "when key file missing" do
       before(:each) do

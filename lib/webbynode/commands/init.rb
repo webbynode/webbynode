@@ -50,7 +50,7 @@ module Webbynode::Commands
         io.create_file(".webbynode/config", "")
       end
 
-      io.create_file(".webbynode/engine", option(:engine)) if option(:engine)
+      io.add_setting("engine", option(:engine)) if option(:engine)
       
       unless git.present?
         io.log "Initializing git and applying initial commit...", :action

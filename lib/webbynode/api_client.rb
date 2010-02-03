@@ -81,7 +81,7 @@ module Webbynode
     
     def init_credentials(overwrite=false)
       creds = if io.file_exists?(CREDENTIALS_FILE) and !overwrite
-        io.read_config(CREDENTIALS_FILE)
+        properties
       else
         email = overwrite[:email] if overwrite.is_a?(Hash) and overwrite[:email]
         token = overwrite[:token] if overwrite.is_a?(Hash) and overwrite[:token]
@@ -93,9 +93,17 @@ module Webbynode
         if response.code == 401 or response.code == 411
           raise Unauthorized, "You have provided the wrong credentials"
         end
-        io.create_file(CREDENTIALS_FILE, "email = #{email}\ntoken = #{token}\n")
+
+        properties['email'] = email
+        properties['token'] = token
+        properties.save
+
         { :email => email, :token => token }
       end
+    end
+    
+    def properties
+      @properties ||= Webbynode::Properties.new(CREDENTIALS_FILE)
     end
     
     def post(uri, options={})

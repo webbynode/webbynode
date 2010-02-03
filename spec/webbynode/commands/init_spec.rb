@@ -206,7 +206,7 @@ describe Webbynode::Commands::Init do
     it "should assume host is app's name when not given" do
       io_handler.should_receive(:file_exists?).with(".pushand").and_return(false)
       io_handler.should_receive(:app_name).any_number_of_times.and_return("application_name")
-      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 application_name\n", true)
+      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 application_name application_name\n", true)
     
       @command.run
     end
@@ -247,7 +247,7 @@ describe Webbynode::Commands::Init do
     it "should be created and made an executable" do
       io_handler.should_receive(:file_exists?).with(".pushand").and_return(false)
       io_handler.should_receive(:app_name).any_number_of_times.and_return("mah_app")
-      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 mah_app\n", true)
+      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 mah_app mah_app\n", true)
       
       @command.run
     end

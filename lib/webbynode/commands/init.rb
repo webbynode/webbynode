@@ -14,9 +14,14 @@ module Webbynode::Commands
       
       webby     = param(:webby)
       app_name  = io.app_name
-      dns_entry = " #{param(:dns)}" if param(:dns)
       
-      io.log "Initializing application #{app_name} #{dns_entry ? "with dns#{dns_entry}" : ""}", :start
+      if param(:dns)
+        dns_entry = "#{param(:dns)}" 
+      else
+        dns_entry = app_name
+      end
+      
+      io.log "Initializing application #{app_name} #{dns_entry ? "with dns #{dns_entry}" : ""}", :start
       
       if webby =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/
         webby_ip = webby
@@ -39,7 +44,7 @@ module Webbynode::Commands
       git.add_git_ignore unless io.file_exists?(".gitignore")
 
       unless io.file_exists?(".pushand")
-        io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name}#{dns_entry}\n", true)
+        io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name} #{dns_entry}\n", true)
       end
       
       unless io.directory?(".webbynode")

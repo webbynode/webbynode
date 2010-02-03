@@ -7,7 +7,7 @@ module Webbynode::Commands
     
     add_alias "deploy"
     
-    summary "Sends all pending changes on the current application to your Webby"
+    summary "Sends pending changes on the current application to your Webby"
     option :dirty, "Allows pushing even if the current application has git changes pending"
     
     def initialize(*args)

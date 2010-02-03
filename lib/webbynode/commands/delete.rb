@@ -8,7 +8,8 @@ module Webbynode::Commands
     
     def execute
       unless pushand.present?
-        io.log("Ahn. Hello, McFly, anyone there?", true)
+        io.log("Ahn!? Hello, McFly, anybody home?", true)
+        return
       end
       
       app_name = pushand.parse_remote_app_name

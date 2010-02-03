@@ -27,7 +27,7 @@ describe Webbynode::Commands::Delete do
   context "when pushand doesn't exist" do
     it "should poop an easter egg" do
       pushand.should_receive(:present?).and_return(false)
-      io.should_receive(:log).with("Ahn. Hello, McFly, anyone there?", true)
+      io.should_receive(:log).with("Ahn!? Hello, McFly, anybody home?", true)
       cmd.stub!(:ask).any_number_of_times
       cmd.ask.stub!(:downcase)
       cmd.execute
@@ -37,7 +37,7 @@ describe Webbynode::Commands::Delete do
   context "when pushand exists" do
     it "should not poop an easter egg" do
       pushand.should_receive(:present?).and_return(true)
-      io.should_not_receive(:log).with("Ahn. Hello, McFly, anyone there?", true)
+      io.should_not_receive(:log).with("Ahn!? Hello, McFly, anybody home?", true)
       cmd.stub!(:ask).any_number_of_times
       cmd.ask.stub!(:downcase)
       cmd.execute

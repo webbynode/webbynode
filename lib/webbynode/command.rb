@@ -228,7 +228,7 @@ module Webbynode
     
     def validate_initialization
       raise CommandError,
-        "Could not find a git repository." unless git.present?
+        "Ahn!? Hello, McFly, anybody home?" unless git.present?
       raise CommandError,
         "Webbynode has not been initialized for this git repository." unless git.remote_webbynode?
       raise CommandError,

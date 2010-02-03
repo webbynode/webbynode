@@ -64,7 +64,7 @@ describe Webbynode::Command do
         command.should_receive(:server).any_number_of_times.and_return(server)
         command.run
         
-        stdout.should =~ /Could not find a git repository/
+        stdout.should =~ /Hello, McFly, anybody home?/
         stdout.should_not =~ /command was executed/
       end
     end
@@ -265,7 +265,7 @@ describe Webbynode::Command do
     it "should not have a git repository" do
       git.should_receive(:present?).and_return(false)
       lambda { command.validate_initialization }.should raise_error(Webbynode::Command::CommandError,
-        "Could not find a git repository.")
+        "Ahn!? Hello, McFly, anybody home?")
     end
     
     it "should not have webbynode git remote" do

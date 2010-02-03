@@ -1,5 +1,6 @@
 module Webbynode::Commands
   class AddBackup < Webbynode::Command
+    summary "Configures automatic nightly backups for the current application"
     option :retain, "Number of backups to retain on S3 (one backup per day), default is 30", :take => :days
     
     def execute

@@ -36,6 +36,10 @@ module Webbynode
       notify = :action unless notify
 
       case notify
+      when :notify
+        notify = true
+        puts "#{text}" 
+      
       when :start
         notify = true
         puts "[Webbynode] #{text}" 

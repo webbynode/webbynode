@@ -11,7 +11,7 @@ module Webbynode::Commands
     
     def execute
       server.add_ssh_key LocalSshKey, options[:passphrase].value
-      notify("Your local SSH Key has been added to your webby!")
+      io.log "Your local SSH Key has been added to your webby!", :notify
 
     rescue Webbynode::InvalidAuthentication
       io.log "Could not connect to webby: invalid authentication.", true

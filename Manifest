@@ -15,6 +15,7 @@ features/support/env.rb
 features/support/hooks.rb
 features/support/io_features.rb
 features/support/mocha.rb
+lib/templates/api_token
 lib/templates/backup
 lib/templates/gitignore
 lib/templates/help

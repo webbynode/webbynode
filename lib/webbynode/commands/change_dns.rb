@@ -11,6 +11,8 @@ module Webbynode::Commands
       raise CommandError, 
         "Cannot change DNS because you have pending changes. Do a git commit or add changes to .gitignore." unless git.clean?
       
+      io.log "Changing DNS to #{param(:dns_entry)}...", :quiet_start
+      
       git.delete_file ".webbynode/config"
       handle_dns param(:dns_entry)
       

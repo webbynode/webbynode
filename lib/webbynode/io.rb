@@ -44,6 +44,10 @@ module Webbynode
         notify = true
         puts "[Webbynode] #{text}" 
       
+      when :quiet_start
+        notify = false
+        puts "[Webbynode] #{text}" 
+      
       when :action
         notify = false
         puts "            #{text}"

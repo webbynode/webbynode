@@ -4,7 +4,7 @@ module Webbynode::Commands
     parameter :webby, String, "Name or IP of the Webby to deploy to"
     parameter :dns, String, "The DNS used for this application", :required => false
     option :adddns, "Creates the DNS entries for the domain"
-    option :engine, "Sets the application engine for the app", :validate => { :in => ['php', 'rack', 'rails'] }
+    option :engine, "Sets the application engine for the app", :validate => { :in => ['php', 'rack', 'rails', 'rails3'] }
     
     def execute
       unless params.any?

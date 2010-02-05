@@ -53,7 +53,7 @@ module Webbynode
     def commit(comments)
       comments.gsub! /"/, '\"'
       exec("git commit -m \"#{comments}\"") do |output|
-        output =~ /#{comments}/
+        output =~ /#{comments}/ or output =~ /nothing to commit/
       end
     end
 

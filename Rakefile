@@ -21,7 +21,7 @@ Echoe.new('webbynode', '0.2.0') do |p|
   #   ['highline', '>=1.5.1'],
   #   ['httparty', '>=0.4.5']
   # ]
-  p.install_message = <<EOS
+  p.install_message = "
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       Webbynode Rapid Deployment Gem
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -30,10 +30,9 @@ This deployment engine is highly experimental and
 should be considered beta code for now.
 
 For a quickstart:
-http://guides.webbynode.com/articles/readystacks/rapid-apps.html
+http://guides.webbynode.com/articles/rapidapps
 
- 
-EOS
+"
 end
 
 require 'rcov/rcovtask'

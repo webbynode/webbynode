@@ -159,6 +159,7 @@ describe Webbynode::ApiClient do
         properties.should_receive(:save)
 
         io.should_receive(:file_exists?).with("#{ENV['HOME']}/.webbynode").and_return(true)
+        io.should_receive(:read_from_template)
         api.should_receive(:properties).any_number_of_times.and_return(properties)
         
         api.should_receive(:ask).with("Login email: ").once.ordered.and_return("login@email.com")
@@ -196,8 +197,9 @@ describe Webbynode::ApiClient do
         properties.should_receive(:save)
 
         io.should_receive(:file_exists?).with("#{ENV['HOME']}/.webbynode").and_return(false)
+        io.should_receive(:read_from_template)
         api.should_receive(:properties).any_number_of_times.and_return(properties)
-        
+
         api.should_receive(:ask).with("Login email: ").once.ordered.and_return("login@email.com")
         api.should_receive(:ask).with("API token:   ").once.ordered.and_return("apitoken")
         
@@ -212,6 +214,7 @@ describe Webbynode::ApiClient do
         properties.should_receive(:save).never
 
         io.should_receive(:file_exists?).with("#{ENV['HOME']}/.webbynode").and_return(false)
+        io.should_receive(:read_from_template)
         api.should_receive(:properties).any_number_of_times.and_return(properties)
         
         api.should_receive(:ask).with("Login email: ").once.ordered.and_return("login@email.com")

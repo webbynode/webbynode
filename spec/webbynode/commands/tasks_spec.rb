@@ -149,6 +149,25 @@ describe Webbynode::Commands::Tasks do
     end
   end
   
+  describe "feedback" do
+    def selectable_helper(type)
+      @task = Webbynode::Commands::Tasks.new("add", type, "sample")
+      @task.stub!(:validate_parameters)
+      @task.should_receive(:io).any_number_of_times.and_return(io)
+      @task.execute
+    end
+
+    it "should provide feedback that a before_push task as added" do
+      io.should_receive(:log).with("Before push task added.", :simple)
+      selectable_helper('before_push')
+    end
+
+    it "should provide feedback that an after_push task as added" do
+      io.should_receive(:log).with("After push task added.", :simple)
+      selectable_helper('after_push')
+    end
+  end
+  
   context "should initialize the [add] or [remove] action, depending on user input" do
     it "should have a [add] and [remove] method availble" do
       task.private_methods.should include('add')
@@ -161,8 +180,14 @@ describe Webbynode::Commands::Tasks do
     end
     
     it "should initialize the [remove] method" do
+      io = double("Io").as_null_object
+      io.should_receive(:log).with("After push task removed.", :simple)
+      io.should_receive(:directory?).and_return(true)
+      io.should_receive(:file_exists?).any_number_of_times.and_return(true)
+
       task = Webbynode::Commands::Tasks.new('remove', 'after_push', 'rake', 'db:migrate', 'RAILS_ENV=production')
-      task.should_receive(:send).with('remove')
+      task.should_receive(:io).any_number_of_times.and_return(io)
+      task.stub!(:delete_task)
       task.stub!(:read_tasks)
       task.execute
     end
@@ -186,28 +211,26 @@ describe Webbynode::Commands::Tasks do
     end
     
     it "should display no tasks, since there are none initially" do
-      io.should_receive(:log).with("These are the current tasks for \"After push\":")
-      io.should_not_receive(:log)
+      io.should_receive(:log).with("You haven't set up any tasks for \"After push\".")
       stask.execute
       stask.should have(0).session_tasks
     end
     
     it "should display 3 tasks: task0 task1 task2" do
       3.times {|num| stask.session_tasks << "task#{num}"}
-      io.should_receive(:log).with("These are the current tasks for \"After push\":")
+      io.should_receive(:log).with("Current tasks for \"After push\":", :simple)
       stask.stub!(:read_tasks)
       io.should_not_receive(:log_and_exit)
-      io.should_receive(:log).with("[0] task0")
-      io.should_receive(:log).with("[1] task1")
-      io.should_receive(:log).with("[2] task2")
+      io.should_receive(:log).with("1. task0")
+      io.should_receive(:log).with("2. task1")
+      io.should_receive(:log).with("3. task2")
       stask.execute
       stask.should have(3).session_tasks
     end
     
     it "should tell the user that there are no tasks if there aren't any" do
       stask.stub!(:read_tasks)
-      io.should_receive(:log_and_exit).with("You haven't set up any tasks for \"After push\".")
-      io.should_not_receive(:log).with("These are the current tasks for \"After push\".")
+      io.should_receive(:log).with("You haven't set up any tasks for \"After push\".")
       stask.execute
     end
   end
@@ -241,15 +264,15 @@ describe Webbynode::Commands::Tasks do
       end
       
       it "should display the updated list of tasks" do
-        io.should_receive(:log).with("These are the current tasks for \"After push\":")
-        io.should_receive(:log).with("[0] rake db:migrate RAILS_ENV=production")
+        io.should_receive(:log).with("Current tasks for \"After push\":", :simple)
+        io.should_receive(:log).with("1. rake db:migrate RAILS_ENV=production")
         task.execute
       end
     end
   end
   
   describe "removing tasks from a file" do
-    let(:rtask) { Webbynode::Commands::Tasks.new('remove', 'after_push', 1) }
+    let(:rtask) { Webbynode::Commands::Tasks.new('remove', 'after_push', 2) }
     
     before(:each) do
       rtask.should_receive(:io).any_number_of_times.and_return(io)
@@ -274,10 +297,10 @@ describe Webbynode::Commands::Tasks do
       it "should display the updated list of tasks" do
         3.times {|num| rtask.session_tasks << "task#{num}" }
         rtask.stub(:read_tasks)
-        io.should_receive(:log).with("These are the current tasks for \"After push\":")
-        io.should_receive(:log).with("[0] task0")
-        io.should_not_receive(:log).with("[1] task1")
-        io.should_receive(:log).with("[1] task2")
+        io.should_receive(:log).with("Current tasks for \"After push\":", :simple)
+        io.should_receive(:log).with("1. task0")
+        io.should_not_receive(:log).with("2. task1")
+        io.should_receive(:log).with("2. task2")
         rtask.execute
         rtask.session_tasks.should include("task0")
         rtask.session_tasks.should_not include("task1")

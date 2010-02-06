@@ -33,9 +33,13 @@ module Webbynode
     end
     
     def log(text, notify=false)
-      notify = :action unless notify
+      notify = :simple unless notify
 
       case notify
+      when :simple
+        notify = false
+        puts "#{text}"
+        
       when :notify
         notify = true
         puts "#{text}" 

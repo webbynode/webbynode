@@ -5,9 +5,9 @@ module Webbynode::Commands
     attr_accessor :action, :type, :command, :session_file, :session_tasks
 
     summary "Manages tasks executed before or after you push your changes"
-    parameter :action,  String, "add, remove or show.",       :required => true, :validate => { :in => ["add", "remove", "show"] }
-    parameter :type,    String, "before_push or after_push.", :required => true, :validate => { :in => ["before_push", "after_push"]}
-    parameter :command, Array, "Task to perform.",            :required => false
+    parameter :action,  String, "add, remove or show",       :required => true, :validate => { :in => ["add", "remove", "show"] }
+    parameter :type,    String, "before_push or after_push", :required => true, :validate => { :in => ["before_push", "after_push"]}
+    parameter :command, Array, "task to perform",            :required => false
     
     # Constants
     # Paths to the webbynode task files
@@ -66,16 +66,22 @@ module Webbynode::Commands
     
     private
       
+      Labels = { 'before_push' => 'Before push', 'after_push' => 'After push' }
+
       # Gets invoked if the user specified [add] for @action
       def add
         append_task(command)
+        io.log "#{Labels[param(:type)]} task added.", :simple
+        io.log ""
         write_tasks
         show_tasks
       end
 
       # Gets invoked if the user specified [remove] for @action    
       def remove
-        delete_task(command.to_i)
+        delete_task(command.to_i-1)
+        io.log "#{Labels[param(:type)]} task removed.", :simple
+        io.log ""
         write_tasks
         show_tasks
       end
@@ -117,11 +123,12 @@ module Webbynode::Commands
       def show_tasks(from_file = false)
         read_tasks(session_file, true) if from_file
         if session_tasks.empty?
-          io.log_and_exit "You haven't set up any tasks for \"#{type.gsub('_',' ').capitalize}\"."
+          io.log "You haven't set up any tasks for \"#{type.gsub('_',' ').capitalize}\"."
+          return
         end
-        io.log "These are the current tasks for \"#{type.gsub('_',' ').capitalize}\":"
+        io.log "Current tasks for \"#{type.gsub('_',' ').capitalize}\":", :simple
         session_tasks.each_with_index do |task, index|
-          io.log "[#{index}] #{task}"
+          io.log "#{index+1}. #{task}"
         end
       end
       

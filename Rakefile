@@ -11,10 +11,10 @@ Echoe.new('webbynode', '0.2.0') do |p|
   p.email           = "felipe@webbynode.com"  
   p.ignore_pattern  = ["tmp/*", "script/*"]  
   p.dependencies = [ 
+    ['net-ssh', '>=2.0.20'],
+    ['highline', '>=1.5.2'],
     ['httparty', '>=0.4.5'],
     ['domainatrix','>=0.0.7'],
-    ['net-ssh', '>=2.0.20'],
-    ['highline', '>=1.5.2']
   ]
   # p.dependencies = [
   #   ['activeresource','>= 2.3.4'],

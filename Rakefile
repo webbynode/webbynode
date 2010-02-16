@@ -12,7 +12,9 @@ Echoe.new('webbynode', '0.2.0') do |p|
   p.ignore_pattern  = ["tmp/*", "script/*"]  
   p.dependencies = [ 
     ['httparty', '>=0.4.5'],
-    ['domainatrix','>=0.0.7']
+    ['domainatrix','>=0.0.7'],
+    ['net-ssh', '>=2.0.20'],
+    ['highline', '>=1.5.2']
   ]
   # p.dependencies = [
   #   ['activeresource','>= 2.3.4'],

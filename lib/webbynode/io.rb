@@ -1,4 +1,5 @@
 require 'yaml'
+require 'fileutils'
 
 module Webbynode
   class DirectoryNotFound < StandardError; end
@@ -94,7 +95,7 @@ module Webbynode
       File.open(file_name, "w") do |file|
         file.write(contents)
       end
-      FileUtils.chmod 0755, file_name if executable
+      ::FileUtils.chmod 0755, file_name if executable
     end
     
     def delete_file(file_name)

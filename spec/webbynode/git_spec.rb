@@ -262,6 +262,17 @@ describe Webbynode::Git do
         git.should_receive(:io).any_number_of_times.and_return(io_handler)
         5.times {git.parse_config}
       end
+      
+      it "should handle .git/config" do
+        io_handler = mock("io")
+        io_handler.as_null_object
+        
+        File.should_receive(:open).exactly(:once).with(".git/config").and_return(read_fixture('git/config/config_5'))
+        git = Webbynode::Git.new
+        git.stub!(:remote_webbynode?).and_return(true)
+        git.should_receive(:io).any_number_of_times.and_return(io_handler)
+        git.parse_config
+      end
     end
     
     context "when unsuccessful" do

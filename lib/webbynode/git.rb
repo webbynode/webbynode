@@ -67,7 +67,7 @@ module Webbynode
           when /^\[(\w+)(?: "(.+)")*\]/
             key, subkey = $1, $2
             current = (config[key] ||= {})
-            current = (current[subkey] ||= {}) if subkey
+            current = (current[subkey] = {}) if subkey
           else
             key, value = line.strip.split(' = ')
             current[key] = value

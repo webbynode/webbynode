@@ -14,12 +14,40 @@ describe Webbynode::Commands::Init do
   before(:each) do
     FakeWeb.clean_registry
     create_init
+    git_handler.stub!(:remote_exists?).and_return(false)
+  end
+  
+  context "when already initialized" do
+    it "keep the same remotes when answer is no to overwriting" do
+      command = Webbynode::Commands::Init.new("10.0.1.1")
+      command.should_receive(:git).any_number_of_times.and_return(git_handler) 
+      command.should_receive(:ask).with("Webbynode already initialized. Do you want to overwrite the current settings (y/n)?").once.ordered.and_return("n")
+
+      git_handler.should_receive(:present?).and_return(true)
+      git_handler.should_receive(:remote_exists?).with("webbynode").and_return(true)
+      git_handler.should_receive(:delete_remote).with("webbynode").never
+      
+      command.run
+    end
+
+    it "delete webbynode remote when answer is yes to overwriting" do
+      command = Webbynode::Commands::Init.new("10.0.1.1")
+      command.should_receive(:git).any_number_of_times.and_return(git_handler) 
+      command.should_receive(:ask).with("Webbynode already initialized. Do you want to overwrite the current settings (y/n)?").once.ordered.and_return("y")
+
+      git_handler.should_receive(:present?).and_return(true)
+      git_handler.should_receive(:remote_exists?).with("webbynode").and_return(true)
+      git_handler.should_receive(:delete_remote).with("webbynode")
+      
+      command.run
+    end
   end
   
   context "selecting an engine" do
     it "should create the .webbynode/engine file" do
       command = Webbynode::Commands::Init.new("10.0.1.1", "--engine=php")
       command.option(:engine).should == 'php'
+      command.should_receive(:git).any_number_of_times.and_return(git_handler) 
       command.should_receive(:io).any_number_of_times.and_return(io_handler)
 
       io_handler.should_receive(:add_setting).with("engine", "php")

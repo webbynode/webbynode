@@ -30,6 +30,42 @@ describe Webbynode::Git do
     Webbynode::Git.new.io.class.should == Webbynode::Io
   end
   
+  describe "#delete_remote" do
+    it "executes remote rm command for the specificed remote" do
+      git = Webbynode::Git.new
+      git.should_receive(:exec).with("git remote rm webbynode")
+      git.delete_remote("webbynode")
+    end
+    
+    it "should raise an error if the specified remote doesn't exist'" do
+      git = Webbynode::Git.new
+      git.should_receive(:exec).with("git remote rm webbynode").and_yield("error: Could not remove config section 'remote.other'")
+      lambda { git.delete_remote("webbynode") }.should raise_error(Webbynode::GitRemoteCouldNotRemoveError, "error: Could not remove config section 'remote.other'")
+    end
+  end
+  
+  describe "#remote_exists?" do
+    it "returns false when git is not present" do
+      git = Webbynode::Git.new
+      git.should_receive(:present?).any_number_of_times.and_return(false)
+      git.remote_exists?("anything").should be_false
+    end
+    
+    it "returns false if no matching remote found" do
+      git = Webbynode::Git.new
+      git.should_receive(:present?).any_number_of_times.and_return(true)
+      git.should_receive(:parse_config).and_return({'remote'=>{"webbynode"=>"something"}})
+      git.remote_exists?("anything").should be_false
+    end
+    
+    it "returns true if a matching remote found" do
+      git = Webbynode::Git.new
+      git.should_receive(:present?).any_number_of_times.and_return(true)
+      git.should_receive(:parse_config).and_return({'remote'=>{"webbynode"=>"something"}})
+      git.remote_exists?("webbynode").should be_true
+    end
+  end
+  
   describe "#present?" do
     it "should be true if folder .git exists" do
       io_handler = mock("io")

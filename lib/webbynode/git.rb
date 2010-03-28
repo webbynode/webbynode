@@ -3,6 +3,7 @@ module Webbynode
   class GitNotRepoError < StandardError; end
   class GitRemoteDoesNotExistError < StandardError; end
   class GitRemoteAlreadyExistsError < StandardError; end
+  class GitRemoteCouldNotRemoveError < StandardError; end
 
   class Git
     attr_accessor :config, :remote_ip
@@ -50,6 +51,16 @@ module Webbynode
       end
     end
     
+    def delete_remote(name)
+      exec("git remote rm #{name}") do |output|
+        # raise an exception if cannot remove
+        raise GitRemoteCouldNotRemoveError, output if output =~ /Could not remove config section/
+        
+        # success if output is empty
+        output.nil? or output.empty?
+      end
+    end
+    
     def commit(comments)
       comments.gsub! /"/, '\"'
       exec("git commit -m \"#{comments}\"") do |output|
@@ -83,6 +94,15 @@ module Webbynode
     def parse_remote_ip
       @config     ||= parse_config
       @remote_ip  ||= ($2 if @config["remote"]["webbynode"]["url"] =~ /^(\w+)@(.+):(.+)$/) if @config
+    end
+    
+    def remote_exists?(remote)
+      config = parse_config
+      config['remote'].key?(remote)
+    rescue Webbynode::GitNotRepoError
+      return false
+    rescue Webbynode::GitRemoteDoesNotExistError
+      return false
     end
     
     def remote_webbynode?

@@ -12,9 +12,9 @@ module Webbynode
     def Command.inherited(child)
       Settings[child] ||= { 
         :parameters_hash => {}, 
-        :options_hash => {}, 
-        :parameters => [], 
-        :options => [] 
+        :options_hash    => {}, 
+        :parameters      => [], 
+        :options         => [] 
       }
     end
     
@@ -259,8 +259,8 @@ module Webbynode
       end
       
       begin
-        validate_initialization                   if settings[:requires_initialization!]
-        validate_options                          if settings[:requires_options!]
+        validate_initialization if settings[:requires_initialization!]
+        validate_options        if settings[:requires_options!]
         execute
       rescue Webbynode::ApiClient::Unauthorized
         puts "Your credentials didn't match any Webbynode account."

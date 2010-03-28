@@ -64,6 +64,12 @@ module Webbynode::Commands
         git.commit "Initial commit"
       end
       
+      if git.remote_exists?('webbynode')
+        if ask('Webbynode already initialized. Do you want to overwrite the current settings (y/n)?').downcase == 'y'
+          git.delete_remote('webbynode')
+        end
+      end
+      
       io.log "Adding webbynode as git remote...", :action
       git.add_remote "webbynode", webby_ip, app_name
       

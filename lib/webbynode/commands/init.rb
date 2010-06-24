@@ -41,7 +41,11 @@ module Webbynode::Commands
       end
       
       io.log "Initializing directory structure...", :action
-      git.add_git_ignore unless io.file_exists?(".gitignore")
+      if io.file_exists?(".gitignore")
+        git.add_to_git_ignore("config/database.yml", "db/schema.rb")
+      else
+        git.add_git_ignore 
+      end
 
       unless io.file_exists?(".pushand")
         io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name} #{dns_entry}\n", true)

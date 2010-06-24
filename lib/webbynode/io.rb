@@ -115,6 +115,11 @@ module Webbynode
       create_file(file, contents)
     end
     
+    def add_line(file, line)
+      return if File.read(file) =~ /^#{line}$/
+      File.open(file, 'a') { |f| f.puts line }
+    end
+    
     def properties(s)
       (@properties||={})[s] = Properties.new(s)
     end

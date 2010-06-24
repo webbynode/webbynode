@@ -37,6 +37,10 @@ module Webbynode
       io.create_from_template(".gitignore", "gitignore")
     end
     
+    def add_to_git_ignore(*entries)
+      entries.each { |e| io.add_line ".gitignore", e }
+    end
+    
     def add(what)
       exec "git add #{what}"
     end

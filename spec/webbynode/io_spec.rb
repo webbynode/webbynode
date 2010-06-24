@@ -116,6 +116,32 @@ describe Webbynode::Io do
     end
   end
   
+  describe '#add_line' do
+    context "when line doesn't exist yet" do
+      it "adds one line to a file" do
+        file = stub('file')
+        
+        File.should_receive(:read).with('.gitignore').and_return('')
+        
+        File.should_receive(:open).with('.gitignore', 'a').and_yield(file)
+        file.should_receive(:puts).with('new_line')
+        
+        io = Webbynode::Io.new
+        io.add_line '.gitignore', 'new_line'
+      end
+    end
+    
+    context 'when line exists' do
+      it "doesn't add the line again" do
+        File.should_receive(:read).with('.gitignore').and_return('new_line')
+        File.should_receive(:open).with('.gitignore', 'a').never
+        
+        io = Webbynode::Io.new
+        io.add_line '.gitignore', 'new_line'
+      end
+    end
+  end
+  
   describe '#create_file' do
     it "should create a file with specified contents" do
       file = double("File")

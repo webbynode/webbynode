@@ -259,6 +259,15 @@ describe Webbynode::Commands::Init do
     end
   end
   
+  context "when .gitignore is present" do
+    it "adds config/database.yml to .gitconfig" do
+      io_handler.should_receive(:file_exists?).with(".gitignore").and_return(true)
+      git_handler.should_receive(:add_to_git_ignore).with("config/database.yml", "db/schema.rb")
+      
+      @command.run
+    end
+  end
+  
   context "when .webbynode is not present" do
     it "should create the .webbynode system folder and stub files" do
       io_handler.should_receive(:directory?).with(".webbynode").and_return(false)

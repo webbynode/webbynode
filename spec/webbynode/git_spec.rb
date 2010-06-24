@@ -123,6 +123,20 @@ describe Webbynode::Git do
     end
   end
   
+  describe '#check_git_ignore' do
+    context "when config/database.yml is absent" do
+      it "adds the line to .gitignore" do
+        io = double("io")
+        io.should_receive(:add_line).with(".gitignore", "config/database.yml")
+        io.should_receive(:add_line).with(".gitignore", "db/schema.rb")
+        
+        git = Webbynode::Git.new
+        git.stub(:io).and_return(io)
+        git.add_to_git_ignore("config/database.yml", "db/schema.rb")
+      end
+    end
+  end
+  
   describe "#init" do
     context "when successful" do
       it "should return true" do

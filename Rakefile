@@ -4,7 +4,7 @@ require 'rake/testtask'
 
 require 'echoe'  
   
-Echoe.new('webbynode', '0.2.3') do |p|  
+Echoe.new('webbynode', '0.2.4') do |p|  
   p.description     = "Webbynode Deployment Gem"  
   p.url             = "http://webbynode.com"  
   p.author          = "Felipe Coury"

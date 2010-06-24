@@ -184,6 +184,10 @@ module Webbynode
       help.join("\n")
     end
     
+    def gemfile
+      @@gemfile ||= Webbynode::Gemfile.new
+    end
+    
     def io
       @@io ||= Webbynode::Io.new
     end

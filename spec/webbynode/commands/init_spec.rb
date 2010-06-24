@@ -2,11 +2,13 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), '../..', 'spec_helper')
 
 describe Webbynode::Commands::Init do
-  let(:git_handler) { double("dummy_git_handler").as_null_object }
-  let(:io_handler)  { double("dummy_io_handler").as_null_object }
+  let(:git_handler) { double("git").as_null_object }
+  let(:io_handler)  { double("io").as_null_object }
+  let(:gemfile)     { double("gemfile").as_null_object.tap { |g| g.stub!(:present?).and_return(false) } }
   
   def create_init(ip="4.3.2.1", host=nil, extra=[])
     @command = Webbynode::Commands::Init.new(ip, host, *extra)
+    @command.stub!(:gemfile).and_return(gemfile)
     @command.should_receive(:git).any_number_of_times.and_return(git_handler) 
     @command.should_receive(:io).any_number_of_times.and_return(io_handler)
   end
@@ -17,9 +19,22 @@ describe Webbynode::Commands::Init do
     git_handler.stub!(:remote_exists?).and_return(false)
   end
   
+  context "Gemfile checking" do
+    context "when present" do
+      it "complains if there is a sqlite3-ruby dependency outside of development and test groups" do
+        gemfile.should_receive(:present?).and_return(true)
+        gemfile.should_receive(:dependencies).and_return(['sqlite3-ruby', 'mysql'])
+        
+        lambda { @command.execute }.should raise_error(Webbynode::Command::CommandError)
+    
+      end
+    end
+  end
+  
   context "when already initialized" do
     it "keep the same remotes when answer is no to overwriting" do
       command = Webbynode::Commands::Init.new("10.0.1.1")
+      command.stub!(:gemfile).and_return(gemfile)
       command.should_receive(:git).any_number_of_times.and_return(git_handler) 
       command.should_receive(:ask).with("Webbynode already initialized. Do you want to overwrite the current settings (y/n)?").once.ordered.and_return("n")
 
@@ -32,6 +47,7 @@ describe Webbynode::Commands::Init do
 
     it "delete webbynode remote when answer is yes to overwriting" do
       command = Webbynode::Commands::Init.new("10.0.1.1")
+      command.stub!(:gemfile).and_return(gemfile)
       command.should_receive(:git).any_number_of_times.and_return(git_handler) 
       command.should_receive(:ask).with("Webbynode already initialized. Do you want to overwrite the current settings (y/n)?").once.ordered.and_return("y")
 
@@ -47,6 +63,7 @@ describe Webbynode::Commands::Init do
     it "should create the .webbynode/engine file" do
       command = Webbynode::Commands::Init.new("10.0.1.1", "--engine=php")
       command.option(:engine).should == 'php'
+      command.stub!(:gemfile).and_return(gemfile)
       command.should_receive(:git).any_number_of_times.and_return(git_handler) 
       command.should_receive(:io).any_number_of_times.and_return(io_handler)
 
@@ -60,6 +77,7 @@ describe Webbynode::Commands::Init do
 
     def create_init(ip="4.3.2.1", host=nil, extra=[])
       @command = Webbynode::Commands::Init.new(ip, host, *extra)
+      @command.stub!(:gemfile).and_return(gemfile)
       @command.should_receive(:git).any_number_of_times.and_return(git_handler) 
     end
 

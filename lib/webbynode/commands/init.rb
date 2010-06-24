@@ -12,6 +12,8 @@ module Webbynode::Commands
         return
       end
       
+      check_gemfile
+      
       webby       = param(:webby)
       app_name    = io.app_name
       git_present = git.present?
@@ -97,6 +99,48 @@ module Webbynode::Commands
       io.log "Application #{app_name} ready for Rapid Deployment", :finish
     rescue Webbynode::GitRemoteAlreadyExistsError
       io.log "Application already initialized.", true
+    end
+    
+    private
+    
+    def check_gemfile
+      return unless gemfile.present?
+      
+      dependencies = gemfile.dependencies(:without => [:development, :test])
+      if dependencies.include? 'sqlite3-ruby'
+        raise CommandError, <<-EOS
+Gemfile dependency problem.
+
+It seems you have a gem dependency on your Gemfile:
+
+  gem 'sqlite3-ruby', :require => 'sqlite3'
+  
+Which causes an error when used with Passenger gem. It's advisable that you replace it with the gems mysql or pg:
+
+  gem 'mysql'
+  
+  -or-
+  
+  gem 'pq'
+  
+If you still want to keep this gem for your development and/or test environments, it's advisable that you wraps it on development and test groups:
+
+  group :test do
+    gem 'sqlite3-ruby', :require => 'sqlite3'
+  end
+  
+  -or-
+  
+  group :development do
+    gem 'sqlite3-ruby', :require => 'sqlite3'
+  end
+  
+To know more about this issue, visit:
+
+  http://guides.webbynode.com/articles/rapidapps/rails3warning.html
+  
+EOS
+      end
     end
   end
 end

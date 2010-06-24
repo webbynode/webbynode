@@ -124,21 +124,24 @@ module Webbynode::Commands
       dependencies = gemfile.dependencies(:without => [:development, :test])
       if dependencies.include? 'sqlite3-ruby'
         raise CommandError, <<-EOS
+
 Gemfile dependency problem.
 
-It seems you have a gem dependency on your Gemfile:
+The following gem dependency was found in your Gemfile:
 
   gem 'sqlite3-ruby', :require => 'sqlite3'
   
-Which causes an error when used with Passenger gem. It's advisable that you replace it with the gems mysql or pg:
+This dependency will cause an error in production when using Passenger. We recommend you remove it.
+Also, be sure to define the database driver gem for the database type you are using in production (either the mysql or the pg gem).
 
   gem 'mysql'
   
   -or-
   
-  gem 'pq'
+  gem 'pg'
   
-If you still want to keep this gem for your development and/or test environments, it's advisable that you wrap it on development and test groups:
+If you would like to use SQLite3 in your development and test environments,
+you may do so by wrapping the gem definition inside the :test and :development groups.
 
   group :test do
     gem 'sqlite3-ruby', :require => 'sqlite3'
@@ -150,7 +153,7 @@ If you still want to keep this gem for your development and/or test environments
     gem 'sqlite3-ruby', :require => 'sqlite3'
   end
   
-To know more about this issue, visit:
+To learn more about this issue, visit:
 
   http://guides.webbynode.com/articles/rapidapps/rails3warning.html
   

@@ -70,7 +70,7 @@ module Webbynode::Commands
         io.create_file(".webbynode/config", "")
       end
 
-      io.add_setting("engine", option(:engine)) if option(:engine)
+      detect_engine
       
       unless git_present
         io.log "Initializing git and applying initial commit...", :action
@@ -102,6 +102,21 @@ module Webbynode::Commands
     end
     
     private
+    
+    def detect_engine
+      unless engine = option(:engine)
+        if rails3?
+          io.log "Detected Rails 3 application...", :action
+          engine = "rails3" 
+        end
+      end
+      
+      io.add_setting "engine", engine if engine
+    end
+    
+    def rails3?
+      io.file_exists?("script/rails")
+    end
     
     def check_gemfile
       return unless gemfile.present?

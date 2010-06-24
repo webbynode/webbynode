@@ -26,7 +26,17 @@ describe Webbynode::Commands::Init do
         gemfile.should_receive(:dependencies).and_return(['sqlite3-ruby', 'mysql'])
         
         lambda { @command.execute }.should raise_error(Webbynode::Command::CommandError)
-    
+      end
+    end
+  end
+  
+  context "Rails3 auto detection" do
+    context "when script/rails is present" do
+      it "makes engine=rails3 implicitly" do
+        io_handler.stub!(:file_exists?).with("script/rails").and_return(true)
+        io_handler.should_receive(:add_setting).with("engine", "rails3")
+        
+        @command.run
       end
     end
   end

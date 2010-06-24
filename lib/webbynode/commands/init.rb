@@ -123,7 +123,7 @@ Which causes an error when used with Passenger gem. It's advisable that you repl
   
   gem 'pq'
   
-If you still want to keep this gem for your development and/or test environments, it's advisable that you wraps it on development and test groups:
+If you still want to keep this gem for your development and/or test environments, it's advisable that you wrap it on development and test groups:
 
   group :test do
     gem 'sqlite3-ruby', :require => 'sqlite3'

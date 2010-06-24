@@ -65,6 +65,19 @@ module Webbynode
       end
     end
     
+    def tracks?(file)
+      io.exec2("git ls-files #{file} --error-unmatch") != 1
+    end
+    
+    def remove(file)
+      io.exec2("git rm --cached #{file}") == 0
+    end
+    
+    def commit2(comments)
+      comments.gsub! /"/, '\"'
+      io.exec2("git commit -m \"#{comments}\"") == 0
+    end
+    
     def commit(comments)
       comments.gsub! /"/, '\"'
       exec("git commit -m \"#{comments}\"") do |output|
@@ -119,7 +132,7 @@ module Webbynode
       def exec(cmd, &blk)
         handle_output io.exec(cmd), &blk
       end
-    
+      
       def handle_output(output, &blk)
         raise GitNotRepoError, output if output =~ /Not a git repository/
 

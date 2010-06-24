@@ -260,6 +260,42 @@ describe Webbynode::Commands::Init do
   end
   
   context "when .gitignore is present" do
+    context "when config/database.yml is already tracked by git" do
+      it "stops tracking config/database.yml" do
+        git_handler.should_receive(:tracks?).with("config/database.yml").and_return(true)
+        git_handler.should_receive(:remove).with("config/database.yml")
+      
+        @command.run
+      end
+    end
+    
+    context "when config/database.yml is not tracked by git" do
+      it "doesn't stop tracking config/database.yml" do
+        git_handler.should_receive(:tracks?).with("config/database.yml").and_return(false)
+        git_handler.should_receive(:remove).with("config/database.yml").never
+      
+        @command.run
+      end
+    end
+    
+    context "when db/schema.rb is already tracked by git" do
+      it "stops tracking db/schema.rb" do
+        git_handler.should_receive(:tracks?).with("db/schema.rb").and_return(true)
+        git_handler.should_receive(:remove).with("db/schema.rb")
+      
+        @command.run
+      end
+    end
+    
+    context "when db/schema.rb is not tracked by git" do
+      it "doesn't stop tracking db/schema.rb" do
+        git_handler.should_receive(:tracks?).with("db/schema.rb").and_return(false)
+        git_handler.should_receive(:remove).with("db/schema.rb").never
+      
+        @command.run
+      end
+    end
+    
     it "adds config/database.yml to .gitconfig" do
       io_handler.should_receive(:file_exists?).with(".gitignore").and_return(true)
       git_handler.should_receive(:add_to_git_ignore).with("config/database.yml", "db/schema.rb")
@@ -338,9 +374,31 @@ describe Webbynode::Commands::Init do
   end
 
   context "when git repo is initialized" do
-    it "should not create a commit" do
+    it "complains if git is in a dirty state" do
       git_handler.should_receive(:present?).and_return(true)
-      git_handler.should_receive(:commit).never
+      git_handler.should_receive(:clean?).and_return(false)
+      
+      lambda { @command.execute }.should raise_error(Webbynode::Command::CommandError,
+        "Cannot initialize: git has pending changes. Execute a git commit or add changes to .gitignore and try again.")
+    end
+    
+    it "shows that a commit is being added" do
+      io_handler.should_receive(:log).with("Commiting Webbynode changes...", :action)
+      git_handler.should_receive(:present?).and_return(true)
+      
+      @command.run
+    end
+    
+    it "adds pending changes" do
+      git_handler.should_receive(:present?).and_return(true)
+      git_handler.should_receive(:add).with(".")
+
+      @command.run
+    end
+    
+    it "commits the changes" do
+      git_handler.should_receive(:present?).and_return(true)
+      git_handler.should_receive(:commit2).with("[Webbynode] Rapid App Deployment Initialization")
 
       @command.run
     end

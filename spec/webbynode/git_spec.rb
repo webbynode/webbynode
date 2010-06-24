@@ -137,6 +137,37 @@ describe Webbynode::Git do
     end
   end
   
+  describe '#remove' do
+    it 'untrack file in git' do
+      io = double("git rm --cached db/schema.rb")
+      io.should_receive(:exec2).with("git rm --cached db/schema.rb").and_return(0)
+      
+      git = Webbynode::Git.new
+      git.stub(:io).and_return(io)
+      git.remove("db/schema.rb").should be_true
+    end
+  end
+  
+  describe '#tracks?' do
+    it 'returns false if git ls-files command returns 1' do
+      io = double("io")
+      io.should_receive(:exec2).with("git ls-files db/schema.rb --error-unmatch").and_return(1)
+
+      git = Webbynode::Git.new
+      git.stub(:io).and_return(io)
+      git.tracks?("db/schema.rb").should be_false
+    end
+
+    it 'returns true if git ls-files command returns something different than 1' do
+      io = double("io")
+      io.should_receive(:exec2).with("git ls-files db/schema.rb --error-unmatch").and_return(0)
+
+      git = Webbynode::Git.new
+      git.stub(:io).and_return(io)
+      git.tracks?("db/schema.rb").should be_true
+    end
+  end
+  
   describe "#init" do
     context "when successful" do
       it "should return true" do

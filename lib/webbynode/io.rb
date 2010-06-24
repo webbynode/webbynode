@@ -17,6 +17,11 @@ module Webbynode
       `#{s}#{redirect_stderr ? " 2>&1" : ""}`
     end
     
+    def exec2(s, redirect_stderr=true)
+      `#{s}#{redirect_stderr ? " 2>&1" : ""}`
+      $?
+    end
+    
     def directory?(s)
       File.directory?(s)
     end

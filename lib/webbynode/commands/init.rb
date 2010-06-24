@@ -12,13 +12,19 @@ module Webbynode::Commands
         return
       end
       
-      webby     = param(:webby)
-      app_name  = io.app_name
+      webby       = param(:webby)
+      app_name    = io.app_name
+      git_present = git.present?
       
       if param(:dns)
         dns_entry = "#{param(:dns)}" 
       else
         dns_entry = app_name
+      end
+      
+      if git_present and !git.clean?
+        raise CommandError, 
+          "Cannot initialize: git has pending changes. Execute a git commit or add changes to .gitignore and try again."
       end
       
       io.log "Initializing application #{app_name} #{dns_entry ? "with dns #{dns_entry}" : ""}", :start
@@ -41,6 +47,9 @@ module Webbynode::Commands
       end
       
       io.log "Initializing directory structure...", :action
+      git.remove("config/database.yml") if git.tracks?("config/database.yml")
+      git.remove("db/schema.rb")        if git.tracks?("db/schema.rb")
+      
       if io.file_exists?(".gitignore")
         git.add_to_git_ignore("config/database.yml", "db/schema.rb")
       else
@@ -61,7 +70,7 @@ module Webbynode::Commands
 
       io.add_setting("engine", option(:engine)) if option(:engine)
       
-      unless git.present?
+      unless git_present
         io.log "Initializing git and applying initial commit...", :action
         git.init 
         git.add "." 
@@ -72,6 +81,12 @@ module Webbynode::Commands
         if ask('Webbynode already initialized. Do you want to overwrite the current settings (y/n)?').downcase == 'y'
           git.delete_remote('webbynode')
         end
+      end
+      
+      if !git.remote_exists?('webbynode') and git_present
+        io.log "Commiting Webbynode changes...", :action
+        git.add "." 
+        git.commit2 "[Webbynode] Rapid App Deployment Initialization"
       end
       
       io.log "Adding webbynode as git remote...", :action

@@ -7,6 +7,7 @@ Rakefile
 assets/webbynode.png
 bin/webbynode
 bin/wn
+changelog.rdoc
 cucumber.yml
 devver.rake
 features/bootstrap.feature

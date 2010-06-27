@@ -52,7 +52,7 @@ module Webbynode
     end
     
     def parse(s)
-      if s =~ /^--(\w+)(=("[^"]+"|[\w]+))*/
+      if s =~ /^--(\w+)(=("[^"]+"|[\w\.]+))*/
         self.value = $3 ? $3.gsub(/"/, "") : true
       end
     end

@@ -1,8 +1,8 @@
 module Webbynode::Commands
   class Init < Webbynode::Command
     summary "Prepares the application on current folder for deployment"
-    parameter :webby, String, "Name or IP of the Webby to deploy to"
-    parameter :dns, String, "The DNS used for this application", :required => false
+    parameter :webby, String, "Name or IP of the Webby to deploy to", :required => false
+    option :dns, String, "The DNS used for this application"
     option :adddns, "Creates the DNS entries for the domain"
     option :engine, "Sets the application engine for the app", :validate => { :in => ['php', 'rack', 'rails', 'rails3'] }
     
@@ -18,12 +18,12 @@ module Webbynode::Commands
       app_name    = io.app_name
       git_present = git.present?
       
-      if param(:dns)
-        dns_entry = "#{param(:dns)}" 
+      if option(:dns)
+        dns_entry = "#{option(:dns)}" 
       else
         dns_entry = app_name
       end
-      
+
       if git_present and !git.clean?
         raise CommandError, 
           "Cannot initialize: git has pending changes. Execute a git commit or add changes to .gitignore and try again."
@@ -34,11 +34,13 @@ module Webbynode::Commands
       if webby =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/
         webby_ip = webby
       else
+        api_webbies = api.webbies
+        webby = api_webbies.first[:name] if api_webbies.size == 1 and !webby
         begin
           io.log "Retrieving IP for Webby #{webby}...", :action
           webby_ip = api.ip_for(webby)
           unless webby_ip
-            if (webbies = api.webbies.keys) and webbies.any?
+            if (webbies = api_webbies.keys) and webbies.any?
               raise CommandError, 
                 "Couldn't find Webby '#{webby}' on your account. Your Webbies are: #{webbies.map { |w| "'#{w}'"}.to_phrase}."
             else
@@ -94,7 +96,7 @@ module Webbynode::Commands
       io.log "Adding webbynode as git remote...", :action
       git.add_remote "webbynode", webby_ip, app_name
       
-      handle_dns param(:dns) if option(:adddns)
+      handle_dns option(:dns) if option(:adddns)
       
       io.log "Application #{app_name} ready for Rapid Deployment", :finish
     rescue Webbynode::GitRemoteAlreadyExistsError

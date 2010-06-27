@@ -7,6 +7,7 @@ describe Webbynode::Commands::Init do
   let(:gemfile)     { double("gemfile").as_null_object.tap { |g| g.stub!(:present?).and_return(false) } }
   
   def create_init(ip="4.3.2.1", host=nil, extra=[])
+    host = "--dns=#{host}" if host
     @command = Webbynode::Commands::Init.new(ip, host, *extra)
     @command.stub!(:gemfile).and_return(gemfile)
     @command.should_receive(:git).any_number_of_times.and_return(git_handler) 
@@ -17,6 +18,57 @@ describe Webbynode::Commands::Init do
     FakeWeb.clean_registry
     create_init
     git_handler.stub!(:remote_exists?).and_return(false)
+  end
+  
+  context "Deployment webby" do
+    let(:api) { double("api").as_null_object }
+    subject do
+      Webbynode::Commands::Init.new.tap do |cmd|
+        cmd.stub!(:git).and_return(git_handler)
+        cmd.stub!(:io).and_return(io_handler)
+        cmd.stub!(:api).and_return(api)
+      end      
+    end
+    
+    it "is detected automatically if user only have one Webby" do
+      webbies   = [{
+        :ip     => "201.81.121.201",
+        :status => "on",
+        :name   => "sandbox",
+        :notes  => "",
+        :plan   => "Webbybeta",
+        :node   => "miami-b15"
+      }]
+      api.should_receive(:webbies).and_return(webbies)
+      api.should_receive(:ip_for).with("sandbox").and_return("201.81.121.201")
+      git_handler.should_receive(:add_remote).with("webbynode", "201.81.121.201", anything())
+      
+      subject.run
+    end
+    
+    it "complains if missing and user has > 1 webby" do
+      pending "Needs to indicate that a Webby is necessary"
+      webbies   = [{
+        :ip     => "201.81.121.201",
+        :status => "on",
+        :name   => "sandbox",
+        :notes  => "",
+        :plan   => "Webbybeta",
+        :node   => "miami-b15"
+      }, {
+        :ip     => "201.81.121.201",
+        :status => "on",
+        :name   => "sandbox",
+        :notes  => "",
+        :plan   => "Webbybeta",
+        :node   => "miami-b15"
+      }]
+      api.should_receive(:webbies).and_return(webbies)
+      
+      git_handler.should_receive(:add_remote).never
+      
+      subject.run
+    end
   end
   
   context "Gemfile checking" do
@@ -86,7 +138,7 @@ describe Webbynode::Commands::Init do
     let(:io) { io = double("Io").as_null_object }
 
     def create_init(ip="4.3.2.1", host=nil, extra=[])
-      @command = Webbynode::Commands::Init.new(ip, host, *extra)
+      @command = Webbynode::Commands::Init.new(ip, "--dns=#{host}", *extra)
       @command.stub!(:gemfile).and_return(gemfile)
       @command.should_receive(:git).any_number_of_times.and_return(git_handler) 
     end
@@ -247,6 +299,7 @@ describe Webbynode::Commands::Init do
   
   it "should try to get Webby's IP if no IP given" do
     api = double("ApiClient")
+    api.stub!(:webbies).and_return(['a', 'b'])
     api.should_receive(:ip_for).with("my_webby_name").and_return("1.2.3.4")
     
     io_handler.should_receive(:app_name).any_number_of_times.and_return("my_app")
@@ -254,7 +307,7 @@ describe Webbynode::Commands::Init do
     git_handler.should_receive(:add_remote).with("webbynode", "1.2.3.4", "my_app")
 
     create_init("my_webby_name")
-    @command.should_receive(:api).and_return(api)
+    @command.stub!(:api).and_return(api)
     @command.run
   end
   

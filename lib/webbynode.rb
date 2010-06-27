@@ -19,7 +19,9 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'parameter')
 require File.join(File.dirname(__FILE__), 'webbynode', 'api_client')
 require File.join(File.dirname(__FILE__), 'webbynode', 'remote_executor')
 require File.join(File.dirname(__FILE__), 'webbynode', 'notify')
+require File.join(File.dirname(__FILE__), 'webbynode', 'updater')
 require File.join(File.dirname(__FILE__), 'webbynode', 'properties')
+require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'apps')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'init')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'push')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'config')
@@ -40,7 +42,7 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'version')
 require File.join(File.dirname(__FILE__), 'webbynode', 'application')
 
 module Webbynode
-  VERSION = '0.2.4'
+  VERSION = '0.2.5'
 end
 
 class Array

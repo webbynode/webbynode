@@ -18,6 +18,34 @@ describe Webbynode::Commands::Push do
     push.after_tasks.stub!(:read_tasks)
   end
   
+  subject do
+    Webbynode::Commands::Push.new.tap do |cmd|
+      cmd.stub!(:io).and_return(io)
+      cmd.stub!(:remote_executor).and_return(re)
+      cmd.stub!(:pushand).and_return(pushand)
+      cmd.stub!(:git).and_return(git)
+      cmd.after_tasks.stub!(:read_tasks)
+    end
+  end
+  
+  context "before pushing" do
+    it "checks for update_rapp script remotely" do
+      re.should_receive(:exec).with(<<-EOS, false, true)
+      if [ ! -f /var/webbynode/update_rapp ]; then
+        cd /var/webbynode
+        wget http://repo.webbynode.com/rapidapps/update_rapp
+        chmod +x update_rapp
+        ln -s -f /var/webbynode/update_rapp /usr/bin/update_rapp
+      fi
+
+      /var/webbynode/update_rapp
+      if [ $? -eq 1 ]; then exit 1; fi
+      EOS
+      
+      subject.execute
+    end
+  end
+  
   context "when the user runs the command" do
     it "should display a message that the application is being pushed to the webby" do
       pushand.should_receive(:parse_remote_app_name).and_return("test.webbynode.com")

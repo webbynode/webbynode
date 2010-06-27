@@ -1,5 +1,6 @@
 module Webbynode::Commands
   class Push < Webbynode::Command
+    include Webbynode::Updater
     
     requires_initialization!
     
@@ -33,8 +34,15 @@ module Webbynode::Commands
       perform_before_tasks if before_tasks.has_tasks?
       
       # Logs a initialization message to the user
-      # Pushes the application to Webbynode
       io.log "Pushing #{app_name}", :start
+      
+      # Checks for server-side updates
+      if check_for_updates
+        io.log "Note: Rapp Engine updated" 
+        io.log ""
+      end
+      
+      # Pushes the application to Webbynode
       io.exec("git push webbynode master", false)
       
       # Reads out the "after push" tasks file to see if there are any tasks that must be performed

@@ -11,7 +11,7 @@ describe Webbynode::RemoteExecutor do
   
   describe "#exec" do
     it "should execute the raw command on the server" do
-      @ssh.should_receive(:execute).with("the same string I pass", false)
+      @ssh.should_receive(:execute).with("the same string I pass", false, false)
       @re.exec "the same string I pass"
     end
   end

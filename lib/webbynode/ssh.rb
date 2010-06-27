@@ -29,7 +29,7 @@ module Webbynode
     
     end
     
-    def execute(script, echo=false)
+    def execute(script, echo=false, ret_exit_code=false)
       connect
       output = ""
       error_output = ""
@@ -59,6 +59,7 @@ module Webbynode
       
       channel.wait
       
+      return exit_code if ret_exit_code
       output
     end
   end

@@ -14,8 +14,8 @@ module Webbynode
       ssh.execute "mkdir -p #{folder}"
     end
     
-    def exec(cmd, echo=false)
-      ssh.execute(cmd, echo)
+    def exec(cmd, echo=false, exit_code=false)
+      ssh.execute(cmd, echo, exit_code)
     end
   end
 end

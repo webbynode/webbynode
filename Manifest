@@ -27,6 +27,7 @@ lib/webbynode/command.rb
 lib/webbynode/commands/add_backup.rb
 lib/webbynode/commands/add_key.rb
 lib/webbynode/commands/alias.rb
+lib/webbynode/commands/apps.rb
 lib/webbynode/commands/change_dns.rb
 lib/webbynode/commands/config.rb
 lib/webbynode/commands/delete.rb
@@ -52,6 +53,7 @@ lib/webbynode/remote_executor.rb
 lib/webbynode/server.rb
 lib/webbynode/ssh.rb
 lib/webbynode/ssh_keys.rb
+lib/webbynode/updater.rb
 spec/fixtures/aliases
 spec/fixtures/api/credentials
 spec/fixtures/api/dns
@@ -79,6 +81,7 @@ spec/webbynode/command_spec.rb
 spec/webbynode/commands/add_backup_spec.rb
 spec/webbynode/commands/add_key_spec.rb
 spec/webbynode/commands/alias_spec.rb
+spec/webbynode/commands/apps_spec.rb
 spec/webbynode/commands/change_dns_spec.rb
 spec/webbynode/commands/config_spec.rb
 spec/webbynode/commands/delete_spec.rb

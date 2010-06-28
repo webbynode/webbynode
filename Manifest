@@ -10,7 +10,7 @@ bin/wn
 changelog.rdoc
 cucumber.yml
 devver.rake
-features/bootstrap.feature
+features/bootstrap.feature.old
 features/step_definitions/command_steps.rb
 features/support/env.rb
 features/support/hooks.rb

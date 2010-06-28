@@ -1,5 +1,3 @@
-require 'jcode'
-
 module Webbynode
   class Command
     Aliases = {}

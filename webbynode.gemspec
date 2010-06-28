@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{webbynode}
-  s.version = "0.2.4"
+  s.version = "0.2.4.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 1.2") if s.respond_to? :required_rubygems_version=
   s.authors = ["Felipe Coury"]
-  s.date = %q{2010-06-24}
+  s.date = %q{2010-06-28}
   s.description = %q{Webbynode Deployment Gem}
   s.email = %q{felipe@webbynode.com}
   s.executables = ["webbynode", "wn"]
@@ -28,14 +28,14 @@ http://guides.webbynode.com/articles/rapidapps
   s.rdoc_options = ["--line-numbers", "--inline-source", "--title", "Webbynode", "--main", "README.rdoc"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{webbynode}
-  s.rubygems_version = %q{1.3.6}
+  s.rubygems_version = %q{1.3.7}
   s.summary = %q{Webbynode Deployment Gem}
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
-    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
+    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<bundler>, [">= 0.9.26"])
       s.add_runtime_dependency(%q<net-ssh>, [">= 2.0.20"])
       s.add_runtime_dependency(%q<highline>, [">= 1.5.2"])

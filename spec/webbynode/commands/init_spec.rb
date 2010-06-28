@@ -31,41 +31,48 @@ describe Webbynode::Commands::Init do
     end
     
     it "is detected automatically if user only have one Webby" do
-      webbies   = [{
-        :ip     => "201.81.121.201",
-        :status => "on",
-        :name   => "sandbox",
-        :notes  => "",
-        :plan   => "Webbybeta",
-        :node   => "miami-b15"
-      }]
+      webbies = {
+        'sandbox' => {
+          :ip     => "201.81.121.201",
+          :status => "on",
+          :name   => "sandbox",
+          :notes  => "",
+          :plan   => "Webbybeta",
+          :node   => "miami-b15"
+        }
+      }
       api.should_receive(:webbies).and_return(webbies)
-      api.should_receive(:ip_for).with("sandbox").and_return("201.81.121.201")
       git_handler.should_receive(:add_remote).with("webbynode", "201.81.121.201", anything())
       
       subject.run
     end
     
     it "complains if missing and user has > 1 webby" do
-      pending "Needs to indicate that a Webby is necessary"
-      webbies   = [{
-        :ip     => "201.81.121.201",
-        :status => "on",
-        :name   => "sandbox",
-        :notes  => "",
-        :plan   => "Webbybeta",
-        :node   => "miami-b15"
-      }, {
-        :ip     => "201.81.121.201",
-        :status => "on",
-        :name   => "sandbox",
-        :notes  => "",
-        :plan   => "Webbybeta",
-        :node   => "miami-b15"
-      }]
+      webbies = {
+        'sandbox' => {
+          :ip     => "201.81.121.201",
+          :status => "on",
+          :name   => "sandbox",
+          :notes  => "",
+          :plan   => "Webbybeta",
+          :node   => "miami-b15"
+        },
+        'webby2' => {
+          :ip     => "67.53.31.2",
+          :status => "on",
+          :name   => "webby2",
+          :notes  => "",
+          :plan   => "Webbybeta",
+          :node   => "miami-b11"
+        }
+      }
       api.should_receive(:webbies).and_return(webbies)
+      io_handler.should_receive(:log).with("Current Webbies in your account:", :action)
+      io_handler.should_receive(:log).with("  - sandbox (201.81.121.201)", :action)
+      io_handler.should_receive(:log).with("  - webby2 (67.53.31.2)", :action)
+      subject.should_receive(:ask).with("Which webby do you want to deploy to:")
       
-      git_handler.should_receive(:add_remote).never
+      # git_handler.should_receive(:add_remote).never
       
       subject.run
     end

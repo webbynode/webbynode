@@ -31,24 +31,7 @@ module Webbynode::Commands
       
       io.log "Initializing application #{app_name} #{dns_entry ? "with dns #{dns_entry}" : ""}", :start
       
-      if webby =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/
-        webby_ip = webby
-      else
-        api_webbies = api.webbies
-        webby = api_webbies.first[:name] if api_webbies.size == 1 and !webby
-        begin
-          io.log "Retrieving IP for Webby #{webby}...", :action
-          webby_ip = api.ip_for(webby)
-          unless webby_ip
-            if (webbies = api_webbies.keys) and webbies.any?
-              raise CommandError, 
-                "Couldn't find Webby '#{webby}' on your account. Your Webbies are: #{webbies.map { |w| "'#{w}'"}.to_phrase}."
-            else
-              raise CommandError, "You don't have any active Webbies on your account."
-            end
-          end
-        end
-      end
+      webby_ip = get_ip(webby)
       
       io.log "Initializing directory structure...", :action
       git.remove("config/database.yml") if git.tracks?("config/database.yml")
@@ -104,6 +87,41 @@ module Webbynode::Commands
     end
     
     private
+    
+    def get_ip(webby)
+      return webby if webby =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/
+        
+      api_webbies = api.webbies
+      
+      unless webby
+        # TODO: raise CommandError id size = 0
+        return api_webbies[api_webbies.keys.first][:ip] if api_webbies.keys.size == 1
+
+        io.log "Current Webbies in your account:", :action
+        io.log ""
+        api_webbies.keys.each do |webby_key|
+          webby = api_webbies[webby_key]
+          io.log "  - #{webby[:name]} (#{webby[:ip]})", :action
+        end
+        
+        io.log ""
+        webby = ask("Which webby do you want to deploy to:")
+      end
+
+      io.log "Retrieving IP for Webby #{webby}...", :action
+      webby_ip = api.ip_for(webby)
+
+      unless webby_ip
+        if (webbies = api_webbies.keys) and webbies.any?
+          raise CommandError, 
+            "Couldn't find Webby '#{webby}' on your account. Your Webbies are: #{webbies.map { |w| "'#{w}'"}.to_phrase}."
+        else
+          raise CommandError, "You don't have any active Webbies on your account."
+        end
+      end
+      
+      webby_ip
+    end
     
     def detect_engine
       unless engine = option(:engine)

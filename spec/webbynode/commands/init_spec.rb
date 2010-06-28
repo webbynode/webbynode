@@ -49,6 +49,14 @@ describe Webbynode::Commands::Init do
     
     it "complains if missing and user has > 1 webby" do
       webbies = {
+        'webby3' => {
+          :ip     => "67.53.31.3",
+          :status => "on",
+          :name   => "webby3",
+          :notes  => "",
+          :plan   => "Webbybeta",
+          :node   => "miami-b11"
+        },
         'sandbox' => {
           :ip     => "201.81.121.201",
           :status => "on",
@@ -68,8 +76,9 @@ describe Webbynode::Commands::Init do
       }
       api.should_receive(:webbies).and_return(webbies)
       io_handler.should_receive(:log).with("Current Webbies in your account:", :action)
-      io_handler.should_receive(:log).with("  - sandbox (201.81.121.201)", :action)
-      io_handler.should_receive(:log).with("  - webby2 (67.53.31.2)", :action)
+      io_handler.should_receive(:log).with("  1. sandbox (201.81.121.201)", :action)
+      io_handler.should_receive(:log).with("  2. webby2 (67.53.31.2)", :action)
+      io_handler.should_receive(:log).with("  3. webby3 (67.53.31.3)", :action)
       subject.should_receive(:ask).with("Which webby do you want to deploy to:")
       
       # git_handler.should_receive(:add_remote).never

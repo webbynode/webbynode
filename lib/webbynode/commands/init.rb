@@ -99,9 +99,9 @@ module Webbynode::Commands
 
         io.log "Current Webbies in your account:", :action
         io.log ""
-        api_webbies.keys.each do |webby_key|
+        api_webbies.keys.sort.each_with_index do |webby_key, i|
           webby = api_webbies[webby_key]
-          io.log "  - #{webby[:name]} (#{webby[:ip]})", :action
+          io.log "  #{i+1}. #{webby[:name]} (#{webby[:ip]})", :action
         end
         
         io.log ""

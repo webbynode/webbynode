@@ -5,6 +5,7 @@ describe Webbynode::Commands::Init do
   let(:git_handler) { double("git").as_null_object }
   let(:io_handler)  { double("io").as_null_object }
   let(:gemfile)     { double("gemfile").as_null_object.tap { |g| g.stub!(:present?).and_return(false) } }
+  let(:api)         { double("api").as_null_object }
   
   def create_init(ip="4.3.2.1", host=nil, extra=[])
     host = "--dns=#{host}" if host
@@ -20,31 +21,8 @@ describe Webbynode::Commands::Init do
     git_handler.stub!(:remote_exists?).and_return(false)
   end
   
-  context 'Checking prerequisites' do
-    subject do
-      Webbynode::Commands::Init.new.tap do |cmd|
-        cmd.stub!(:git).and_return(git_handler)
-        cmd.stub!(:io).and_return(io_handler)
-      end      
-    end
-
-    it "raises an error if git is not found" do
-      io_handler.should_receive(:exec_in_path?).with('git').and_return(false)
-      lambda { subject.execute }.should raise_error(Webbynode::Command::CommandError)
-    end
-  end
-  
-  context "Deployment webby" do
-    let(:api) { double("api").as_null_object }
-    subject do
-      Webbynode::Commands::Init.new.tap do |cmd|
-        cmd.stub!(:git).and_return(git_handler)
-        cmd.stub!(:io).and_return(io_handler)
-        cmd.stub!(:api).and_return(api)
-      end      
-    end
-    
-    it "is detected automatically if user only have one Webby" do
+  subject do
+    Webbynode::Commands::Init.new.tap do |cmd|
       webbies = {
         'sandbox' => {
           :ip     => "201.81.121.201",
@@ -55,7 +33,100 @@ describe Webbynode::Commands::Init do
           :node   => "miami-b15"
         }
       }
-      api.should_receive(:webbies).and_return(webbies)
+      api.stub!(:webbies).and_return(webbies)
+
+      cmd.stub!(:git).and_return(git_handler)
+      cmd.stub!(:io).and_return(io_handler)
+      cmd.stub!(:api).and_return(api)
+    end      
+  end
+
+  context 'Checking prerequisites' do
+    it "raises an error if git is not found" do
+      io_handler.should_receive(:exec_in_path?).with('git').and_return(false)
+      lambda { subject.execute }.should raise_error(Webbynode::Command::CommandError)
+    end
+  end
+  
+  context "Engine detection" do
+    context "when no engine was detected" do
+      it "prompts for the engine" do
+        pending "Work on the menu"
+        subject.stub!(:check_engines).and_return(nil)
+        
+        io_handler.should_receive(:log).with("Supported engines:")
+        io_handler.should_receive(:log).with("  1. Django")
+        io_handler.should_receive(:log).with("  2. PHP")
+        io_handler.should_receive(:log).with("  3. Rack")
+        io_handler.should_receive(:log).with("  4. Rails 2")
+        io_handler.should_receive(:log).with("  5. Rails 3")
+
+        subject.should_receive(:ask).with('Select the engine your app uses:', Integer).and_return(1)
+
+        io_handler.should_receive(:add_setting).with("engine", "django")
+      end
+    end
+    
+    context "when --engine is passed" do
+      subject do
+        Webbynode::Commands::Init.new("--engine=php").tap do |cmd|
+          webbies = {
+            'sandbox' => {
+              :ip     => "201.81.121.201",
+              :status => "on",
+              :name   => "sandbox",
+              :notes  => "",
+              :plan   => "Webbybeta",
+              :node   => "miami-b15"
+            }
+          }
+          api.stub!(:webbies).and_return(webbies)
+
+          cmd.stub!(:git).and_return(git_handler)
+          cmd.stub!(:io).and_return(io_handler)
+          cmd.stub!(:api).and_return(api)
+        end      
+      end
+      
+      it "overrides detection" do
+        io_handler.should_receive(:file_exists?).with("script/rails").never
+        io_handler.should_receive(:add_setting).with("engine", "php")
+
+        subject.run
+      end
+    end
+    
+    it "detects Rails 3 when script/rails is present" do
+      io_handler.stub!(:file_exists?).with("script/rails").and_return(true)
+      io_handler.should_receive(:add_setting).with("engine", "rails3")
+
+      subject.run
+    end
+    
+    it "detects Rails 2 when app app/controllers and config/environent.rb are found" do
+      io_handler.stub!(:file_exists?).with("script/rails").and_return(false)
+      io_handler.stub!(:directory?).with('app').and_return(true)
+      io_handler.stub!(:directory?).with('app/controllers').and_return(true)
+      io_handler.stub!(:file_exists?).with('config/environent.rb').and_return(true)
+
+      io_handler.should_receive(:add_setting).with("engine", "rails")
+
+      subject.run
+    end
+    
+    it "detects Rack when config.ru is found" do
+      io_handler.stub!(:file_exists?).with("script/rails").and_return(false)
+      io_handler.stub!(:directory?).with('app').and_return(false)
+      io_handler.stub!(:file_exists?).with('config.ru').and_return(true)
+
+      io_handler.should_receive(:add_setting).with("engine", "rack")
+
+      subject.run
+    end
+  end
+  
+  context "Deployment webby" do
+    it "is detected automatically if user only have one Webby" do
       git_handler.should_receive(:add_remote).with("webbynode", "201.81.121.201", anything())
       
       subject.run
@@ -89,13 +160,13 @@ describe Webbynode::Commands::Init do
         }
       }
       api.should_receive(:webbies).and_return(webbies)
-      io_handler.should_receive(:log).with("Current Webbies in your account:", anything())
-      io_handler.should_receive(:log).with("  1. sandbox (201.81.121.201)", anything())
-      io_handler.should_receive(:log).with("  2. webby2 (67.53.31.2)", anything())
-      io_handler.should_receive(:log).with("  3. webby3 (67.53.31.3)", anything())
+      io_handler.should_receive(:log).with("Current Webbies in your account:")
+      io_handler.should_receive(:log).with("  1. sandbox (201.81.121.201)")
+      io_handler.should_receive(:log).with("  2. webby2 (67.53.31.2)")
+      io_handler.should_receive(:log).with("  3. webby3 (67.53.31.3)")
       subject.should_receive(:ask).with("Which Webby do you want to deploy to:", Integer).and_return(2)
 
-      io_handler.should_receive(:log).with("Set deployment Webby to webby2.", anything())
+      io_handler.should_receive(:log).with("Set deployment Webby to webby2.")
       git_handler.should_receive(:add_remote).with("webbynode", "67.53.31.2", anything())
       
       subject.run
@@ -109,17 +180,6 @@ describe Webbynode::Commands::Init do
         gemfile.should_receive(:dependencies).and_return(['sqlite3-ruby', 'mysql'])
         
         lambda { @command.execute }.should raise_error(Webbynode::Command::CommandError)
-      end
-    end
-  end
-  
-  context "Rails3 auto detection" do
-    context "when script/rails is present" do
-      it "makes engine=rails3 implicitly" do
-        io_handler.stub!(:file_exists?).with("script/rails").and_return(true)
-        io_handler.should_receive(:add_setting).with("engine", "rails3")
-        
-        @command.run
       end
     end
   end

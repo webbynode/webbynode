@@ -6,12 +6,21 @@ module Webbynode::Commands
     option :adddns, "Creates the DNS entries for the domain"
     option :engine, "Sets the application engine for the app", :validate => { :in => ['php', 'rack', 'rails', 'rails3'] }
     
+    Engines = [
+      # order matters!
+      Webbynode::Engines::Rails3,
+      Webbynode::Engines::Rails,
+      Webbynode::Engines::Rack
+    ]
+    
     def execute
       unless params.any?
         io.log help
         return
       end
 
+      detect_engine
+      
       check_prerequisites
       check_gemfile
       
@@ -58,8 +67,6 @@ module Webbynode::Commands
         io.create_file(".webbynode/config", "")
       end
 
-      detect_engine
-      
       unless git_present
         io.log "Initializing git and applying initial commit..."
         git.init 
@@ -104,15 +111,15 @@ module Webbynode::Commands
         if api_webbies.keys.size == 1
           webby = api_webbies[api_webbies.keys.first]
         else
-          io.log "", :simple
-          io.log "Current Webbies in your account:", :simple
-          io.log "", :simple
+          io.log ""
+          io.log "Current Webbies in your account:"
+          io.log ""
         
           choices = []
           api_webbies.keys.sort.each_with_index do |webby_key, i|
             webby = api_webbies[webby_key]
             choices << webby
-            io.log "  #{i+1}. #{webby[:name]} (#{webby[:ip]})", :simple
+            io.log "  #{i+1}. #{webby[:name]} (#{webby[:ip]})"
           end
         
           io.log "", :simple
@@ -121,12 +128,12 @@ module Webbynode::Commands
         end
         
         io.log "", :simple
-        io.log "Set deployment Webby to #{webby[:name]}.", :simple
+        io.log "Set deployment Webby to #{webby[:name]}."
         
         return webby[:ip]
       end
 
-      io.log "Retrieving IP for Webby #{webby}...", :action
+      io.log "Retrieving IP for Webby #{webby}..."
       webby_ip = api.ip_for(webby)
 
       unless webby_ip
@@ -141,19 +148,31 @@ module Webbynode::Commands
       webby_ip
     end
     
+    def check_engines
+      unless @engine = option(:engine)
+        Engines.each do |engine_class|
+          engine = engine_class.new
+          engine.io = self.io
+          
+          if engine.detected?
+            @engine = engine_class.name.split('::').last.downcase 
+            break
+          end
+        end
+      end
+      @engine
+    end
+    
     def detect_engine
-      unless engine = option(:engine)
-        if rails3?
-          io.log "Detected Rails 3 application...", :action
-          engine = "rails3" 
+      unless @engine = check_engines
+        io.log "Supported engines:"
+        
+        Webbynode::Engines::All.each_with_index do |engine, i|
+          io.log "  #{i+1}. #{engine.class.name.split('::').last}"
         end
       end
       
-      io.add_setting "engine", engine if engine
-    end
-    
-    def rails3?
-      io.file_exists?("script/rails")
+      io.add_setting "engine", @engine if @engine
     end
     
     def check_prerequisites

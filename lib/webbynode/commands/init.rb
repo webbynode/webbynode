@@ -19,6 +19,16 @@ module Webbynode::Commands
         return
       end
 
+      webby       = param(:webby)
+      app_name    = io.app_name
+      git_present = git.present?
+
+      if option(:dns)
+        dns_entry = "#{option(:dns)}" 
+      else
+        dns_entry = app_name
+      end
+
       if git_present and !git.clean?
         raise CommandError, 
           "Cannot initialize: git has pending changes. Execute a git commit or add changes to .gitignore and try again."
@@ -31,16 +41,6 @@ module Webbynode::Commands
       check_prerequisites
       check_gemfile
       
-      webby       = param(:webby)
-      app_name    = io.app_name
-      git_present = git.present?
-      
-      if option(:dns)
-        dns_entry = "#{option(:dns)}" 
-      else
-        dns_entry = app_name
-      end
-
       webby_ip = get_ip(webby)
       
       io.log ""

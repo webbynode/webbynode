@@ -19,6 +19,13 @@ module Webbynode::Commands
         return
       end
 
+      if git_present and !git.clean?
+        raise CommandError, 
+          "Cannot initialize: git has pending changes. Execute a git commit or add changes to .gitignore and try again."
+      end
+      
+      io.log "Initializing application #{app_name} #{dns_entry ? "with dns #{dns_entry}" : ""}", :start
+      
       detect_engine
       
       check_prerequisites
@@ -34,13 +41,6 @@ module Webbynode::Commands
         dns_entry = app_name
       end
 
-      if git_present and !git.clean?
-        raise CommandError, 
-          "Cannot initialize: git has pending changes. Execute a git commit or add changes to .gitignore and try again."
-      end
-      
-      io.log "Initializing application #{app_name} #{dns_entry ? "with dns #{dns_entry}" : ""}", :start
-      
       webby_ip = get_ip(webby)
       
       io.log ""

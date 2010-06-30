@@ -1,5 +1,6 @@
 require 'yaml'
 require 'fileutils'
+require 'rbconfig'
 
 module Webbynode
   class DirectoryNotFound < StandardError; end
@@ -9,8 +10,39 @@ module Webbynode
     
     TemplatesPath = File.join(File.dirname(__FILE__), '..', 'templates')
     
+    def is_windows?
+      Config::CONFIG["host_os"] =~ /mswin|mingw/
+    end
+    
+    def exists_in_path?(file)
+      search_in_path { |f| File.exists?("#{f}/#{file}") }
+    end
+    
+    def exec_in_path?(file)
+      search_in_path do |f| 
+        if is_windows?
+          File.executable?("#{f}/#{file}") || 
+          File.executable?("#{f}/#{file}.exe") || 
+          File.executable?("#{f}/#{file}.bat") || 
+          File.executable?("#{f}/#{file}.cmd")
+        else
+          File.executable?("#{f}/#{file}")
+        end
+      end
+    end
+    
+    def search_in_path(&blk)
+      return false unless block_given?
+      entries = ENV['PATH'].split(is_windows? ? ";" : ":")
+      entries.any? &blk
+    end
+    
     def app_name
       Dir.pwd.split("/").last.gsub(/[\.| ]/, "_")
+    end
+    
+    def mkdir(path)
+      FileUtils.mkdir_p(path)
     end
     
     def exec(s, redirect_stderr=true)
@@ -39,11 +71,15 @@ module Webbynode
     end
     
     def log(text, notify=false)
-      notify = :action unless notify
+      notify = :simple unless notify
 
       case notify
       when :notify
         notify = true
+        puts "#{text}" 
+      
+      when :simple
+        notify = false
         puts "#{text}" 
       
       when :start

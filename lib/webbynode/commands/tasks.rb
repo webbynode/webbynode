@@ -58,7 +58,7 @@ module Webbynode::Commands
     # Ensures the presence of the .webbynode/tasks folder
     # Will create the necessary task files when they are not available
     def ensure_tasks_folder
-      io.exec('mkdir .webbynode/tasks') unless io.directory?(".webbynode/tasks")
+      io.mkdir('.webbynode/tasks') unless io.directory?(".webbynode/tasks")
       %w[before_push after_push].each do |file|
         io.exec("touch .webbynode/tasks/#{file}") unless io.file_exists?(".webbynode/tasks/#{file}")
       end

@@ -51,7 +51,7 @@ describe Webbynode::Commands::Tasks do
       end
       
       it "should create the webbynode tasks folder" do
-        io.should_receive(:exec).with('mkdir .webbynode/tasks')
+        io.should_receive(:mkdir).with('.webbynode/tasks')
         task.execute
       end
       
@@ -76,12 +76,12 @@ describe Webbynode::Commands::Tasks do
       end
       
       it "should create the webbynode folder" do
-        io.should_not_receive(:exec).with('mkdir .webbynode')
+        io.should_not_receive(:mkdir).with('.webbynode')
         task.execute
       end
       
       it "should create the webbynode folder" do
-        io.should_not_receive(:exec).with('mkdir .webbynode/tasks')
+        io.should_not_receive(:mkdir).with('.webbynode/tasks')
         task.execute
       end
       

@@ -11,7 +11,8 @@ module Webbynode::Commands
         io.log help
         return
       end
-      
+
+      check_prerequisites
       check_gemfile
       
       webby       = param(:webby)
@@ -33,7 +34,8 @@ module Webbynode::Commands
       
       webby_ip = get_ip(webby)
       
-      io.log "Initializing directory structure...", :action
+      io.log ""
+      io.log "Initializing directory structure..."
       git.remove("config/database.yml") if git.tracks?("config/database.yml")
       git.remove("db/schema.rb")        if git.tracks?("db/schema.rb")
       
@@ -48,7 +50,8 @@ module Webbynode::Commands
       end
       
       unless io.directory?(".webbynode")
-        io.exec("mkdir -p .webbynode/tasks") 
+        io.mkdir(".webbynode/tasks")
+
         io.create_file(".webbynode/tasks/after_push", "")
         io.create_file(".webbynode/tasks/before_push", "")
         io.create_file(".webbynode/aliases", "")
@@ -58,32 +61,35 @@ module Webbynode::Commands
       detect_engine
       
       unless git_present
-        io.log "Initializing git and applying initial commit...", :action
+        io.log "Initializing git and applying initial commit..."
         git.init 
         git.add "." 
         git.commit "Initial commit"
       end
       
       if git.remote_exists?('webbynode')
-        if ask('Webbynode already initialized. Do you want to overwrite the current settings (y/n)?').downcase == 'y'
+        io.log ""
+        io.log "Webbynode git integration already initialized."
+        if ask('Do you want to overwrite the current settings (y/n)?').downcase == 'y'
           git.delete_remote('webbynode')
         end
+        io.log ""
       end
       
       if !git.remote_exists?('webbynode') and git_present
-        io.log "Commiting Webbynode changes...", :action
+        io.log "Commiting Webbynode changes..."
         git.add "." 
         git.commit2 "[Webbynode] Rapid App Deployment Initialization"
       end
       
-      io.log "Adding webbynode as git remote...", :action
+      io.log "Adding webbynode as git remote..."
       git.add_remote "webbynode", webby_ip, app_name
       
       handle_dns option(:dns) if option(:adddns)
       
       io.log "Application #{app_name} ready for Rapid Deployment", :finish
     rescue Webbynode::GitRemoteAlreadyExistsError
-      io.log "Application already initialized.", true
+      io.log "Application already initialized."
     end
     
     private
@@ -95,17 +101,29 @@ module Webbynode::Commands
       
       unless webby
         # TODO: raise CommandError id size = 0
-        return api_webbies[api_webbies.keys.first][:ip] if api_webbies.keys.size == 1
-
-        io.log "Current Webbies in your account:", :action
-        io.log ""
-        api_webbies.keys.sort.each_with_index do |webby_key, i|
-          webby = api_webbies[webby_key]
-          io.log "  #{i+1}. #{webby[:name]} (#{webby[:ip]})", :action
+        if api_webbies.keys.size == 1
+          webby = api_webbies[api_webbies.keys.first]
+        else
+          io.log "", :simple
+          io.log "Current Webbies in your account:", :simple
+          io.log "", :simple
+        
+          choices = []
+          api_webbies.keys.sort.each_with_index do |webby_key, i|
+            webby = api_webbies[webby_key]
+            choices << webby
+            io.log "  #{i+1}. #{webby[:name]} (#{webby[:ip]})", :simple
+          end
+        
+          io.log "", :simple
+          choice = ask("Which Webby do you want to deploy to:", Integer) { |q| q.in = 1..(api_webbies.size+1) }
+          webby  = choices[choice-1]
         end
         
-        io.log ""
-        webby = ask("Which webby do you want to deploy to:")
+        io.log "", :simple
+        io.log "Set deployment Webby to #{webby[:name]}.", :simple
+        
+        return webby[:ip]
       end
 
       io.log "Retrieving IP for Webby #{webby}...", :action
@@ -136,6 +154,17 @@ module Webbynode::Commands
     
     def rails3?
       io.file_exists?("script/rails")
+    end
+    
+    def check_prerequisites
+      unless io.exec_in_path?('git')
+        raise CommandError, <<-EOS 
+Error: git not found on current path.
+
+In order to use Webbynode Gem for deployment, you must have git installed.
+For more information about installing git: http://book.git-scm.com/2_installing_git.html
+EOS
+      end
     end
     
     def check_gemfile

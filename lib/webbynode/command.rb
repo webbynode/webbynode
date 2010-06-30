@@ -1,3 +1,8 @@
+begin
+  require 'jcode'
+rescue
+end
+
 module Webbynode
   class Command
     Aliases = {}

@@ -20,6 +20,20 @@ describe Webbynode::Commands::Init do
     git_handler.stub!(:remote_exists?).and_return(false)
   end
   
+  context 'Checking prerequisites' do
+    subject do
+      Webbynode::Commands::Init.new.tap do |cmd|
+        cmd.stub!(:git).and_return(git_handler)
+        cmd.stub!(:io).and_return(io_handler)
+      end      
+    end
+
+    it "raises an error if git is not found" do
+      io_handler.should_receive(:exec_in_path?).with('git').and_return(false)
+      lambda { subject.execute }.should raise_error(Webbynode::Command::CommandError)
+    end
+  end
+  
   context "Deployment webby" do
     let(:api) { double("api").as_null_object }
     subject do
@@ -75,13 +89,14 @@ describe Webbynode::Commands::Init do
         }
       }
       api.should_receive(:webbies).and_return(webbies)
-      io_handler.should_receive(:log).with("Current Webbies in your account:", :action)
-      io_handler.should_receive(:log).with("  1. sandbox (201.81.121.201)", :action)
-      io_handler.should_receive(:log).with("  2. webby2 (67.53.31.2)", :action)
-      io_handler.should_receive(:log).with("  3. webby3 (67.53.31.3)", :action)
-      subject.should_receive(:ask).with("Which webby do you want to deploy to:")
-      
-      # git_handler.should_receive(:add_remote).never
+      io_handler.should_receive(:log).with("Current Webbies in your account:", anything())
+      io_handler.should_receive(:log).with("  1. sandbox (201.81.121.201)", anything())
+      io_handler.should_receive(:log).with("  2. webby2 (67.53.31.2)", anything())
+      io_handler.should_receive(:log).with("  3. webby3 (67.53.31.3)", anything())
+      subject.should_receive(:ask).with("Which Webby do you want to deploy to:", Integer).and_return(2)
+
+      io_handler.should_receive(:log).with("Set deployment Webby to webby2.", anything())
+      git_handler.should_receive(:add_remote).with("webbynode", "67.53.31.2", anything())
       
       subject.run
     end
@@ -114,7 +129,7 @@ describe Webbynode::Commands::Init do
       command = Webbynode::Commands::Init.new("10.0.1.1")
       command.stub!(:gemfile).and_return(gemfile)
       command.should_receive(:git).any_number_of_times.and_return(git_handler) 
-      command.should_receive(:ask).with("Webbynode already initialized. Do you want to overwrite the current settings (y/n)?").once.ordered.and_return("n")
+      command.should_receive(:ask).with("Do you want to overwrite the current settings (y/n)?").once.ordered.and_return("n")
 
       git_handler.should_receive(:present?).and_return(true)
       git_handler.should_receive(:remote_exists?).with("webbynode").and_return(true)
@@ -127,7 +142,7 @@ describe Webbynode::Commands::Init do
       command = Webbynode::Commands::Init.new("10.0.1.1")
       command.stub!(:gemfile).and_return(gemfile)
       command.should_receive(:git).any_number_of_times.and_return(git_handler) 
-      command.should_receive(:ask).with("Webbynode already initialized. Do you want to overwrite the current settings (y/n)?").once.ordered.and_return("y")
+      command.should_receive(:ask).with("Do you want to overwrite the current settings (y/n)?").once.ordered.and_return("y")
 
       git_handler.should_receive(:present?).and_return(true)
       git_handler.should_receive(:remote_exists?).with("webbynode").and_return(true)
@@ -404,7 +419,7 @@ describe Webbynode::Commands::Init do
   context "when .webbynode is not present" do
     it "should create the .webbynode system folder and stub files" do
       io_handler.should_receive(:directory?).with(".webbynode").and_return(false)
-      io_handler.should_receive(:exec).with("mkdir -p .webbynode/tasks")
+      io_handler.should_receive(:mkdir).with(".webbynode/tasks")
       io_handler.should_receive(:create_file).with(".webbynode/tasks/after_push", "")
       io_handler.should_receive(:create_file).with(".webbynode/tasks/before_push", "")
       io_handler.should_receive(:create_file).with(".webbynode/aliases", "")
@@ -480,7 +495,7 @@ describe Webbynode::Commands::Init do
     end
     
     it "shows that a commit is being added" do
-      io_handler.should_receive(:log).with("Commiting Webbynode changes...", :action)
+      io_handler.should_receive(:log).with("Commiting Webbynode changes...")
       git_handler.should_receive(:present?).and_return(true)
       
       @command.run
@@ -511,7 +526,7 @@ describe Webbynode::Commands::Init do
       git_handler.should_receive(:present?).and_return(true)
       git_handler.should_receive(:add_remote).and_raise(Webbynode::GitRemoteAlreadyExistsError)
       
-      io_handler.should_receive(:log).with("Application already initialized.", true)
+      io_handler.should_receive(:log).with("Application already initialized.")
       @command.run
     end
   end

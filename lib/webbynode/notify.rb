@@ -1,4 +1,5 @@
 module Webbynode
+
   class Notify
     
     TITLE       = "Webbynode"
@@ -11,8 +12,7 @@ module Webbynode
     end
     
     def self.installed?
-      return false if %x(which growlnotify).chomp.empty?
-      true
+      @installed ||= Io.new.exec_in_path?("growlnotify")
     end
     
   end

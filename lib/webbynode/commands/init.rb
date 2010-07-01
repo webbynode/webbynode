@@ -150,8 +150,9 @@ module Webbynode::Commands
         io.log "Engine '#{option(:engine)}' is invalid." unless engine
       end
       
-      engine ||= resolve_engine
-        
+      engine ||= resolve_engine  
+      engine.new.prepare
+      
       io.add_setting "engine", engine.engine_id
     end
     
@@ -188,49 +189,6 @@ Error: git not found on current path.
 
 In order to use Webbynode Gem for deployment, you must have git installed.
 For more information about installing git: http://book.git-scm.com/2_installing_git.html
-EOS
-      end
-    end
-    
-    def check_gemfile
-      return unless gemfile.present?
-      
-      dependencies = gemfile.dependencies(:without => [:development, :test])
-      if dependencies.include? 'sqlite3-ruby'
-        raise CommandError, <<-EOS
-
-Gemfile dependency problem.
-
-The following gem dependency was found in your Gemfile:
-
-  gem 'sqlite3-ruby', :require => 'sqlite3'
-  
-This dependency will cause an error in production when using Passenger. We recommend you remove it.
-Also, be sure to define the database driver gem for the database type you are using in production (either the mysql or the pg gem).
-
-  gem 'mysql'
-  
-  -or-
-  
-  gem 'pg'
-  
-If you would like to use SQLite3 in your development and test environments,
-you may do so by wrapping the gem definition inside the :test and :development groups.
-
-  group :test do
-    gem 'sqlite3-ruby', :require => 'sqlite3'
-  end
-  
-  -or-
-  
-  group :development do
-    gem 'sqlite3-ruby', :require => 'sqlite3'
-  end
-  
-To learn more about this issue, visit:
-
-  http://guides.webbynode.com/articles/rapidapps/rails3warning.html
-  
 EOS
       end
     end

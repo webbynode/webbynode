@@ -10,6 +10,26 @@ describe Webbynode::Engines::Rails3 do
     end
   end
   
+  describe 'class methods' do
+    subject { Webbynode::Engines::Rails3 }
+
+    its(:engine_id)    { should == 'rails3' }
+    its(:engine_name)  { should == 'Rails 3' }
+    its(:git_excluded) { should == ["config/database.yml", "db/schema.rb"] }
+  end
+  
+  describe '#prepare' do
+    let(:gemfile) { double('gemfile').as_null_object }
+    
+    it "complains if there is a sqlite3-ruby dependency outside of development and test groups in Gemspec" do
+      gemfile.should_receive(:present?).and_return(true)
+      gemfile.should_receive(:dependencies).and_return(['sqlite3-ruby', 'mysql'])
+
+      subject.stub!(:gemfile).and_return(gemfile)
+      lambda { subject.prepare }.should raise_error(Webbynode::Command::CommandError)
+    end
+  end
+  
   describe '#detect' do
     it "if script/rails exists" do
       io.stub!(:file_exists?).with('script/rails').and_return(true)

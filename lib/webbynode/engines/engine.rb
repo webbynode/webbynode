@@ -13,6 +13,9 @@ module Webbynode::Engines
 
   module Engine
     def self.included(base)
+      base.cattr_accessor :git_excluded
+      base.git_excluded = []
+      
       base.send(:attr_accessor, :engine_name)
       base.send(:extend, ClassMethods)
       base.send(:include, InstanceMethods)
@@ -24,11 +27,7 @@ module Webbynode::Engines
       end
       
       def git_excludes(*entries)
-        @@git_excluded = entries
-      end
-      
-      def git_excluded
-        @@git_excluded
+        self.git_excluded = entries
       end
       
       def engine_name
@@ -46,6 +45,14 @@ module Webbynode::Engines
           git.remove(exc) if git.tracks?(exc)
           git.add_to_git_ignore exc
         end
+      end
+      
+      def gemfile
+        @gemfile ||= Webbynode::Gemfile.new
+      end
+      
+      def git
+        @git ||= Webbynode::Git.new
       end
       
       def io

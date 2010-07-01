@@ -46,10 +46,25 @@ describe Webbynode::Commands::Init do
       subject.stub!(:io).and_return(io_handler)
     end
     
+    it "calls prepare once engine is detected" do
+      subject.stub!(:option).with(:engine).and_return('rails')
+      io_handler.should_receive(:add_setting).with('engine', 'rails')
+      
+      rails = double('Rails')
+      rails.should_receive(:prepare)
+
+      Webbynode::Engines::Rails.should_receive(:new).and_return(rails)
+      subject.send(:detect_engine)
+    end
+
     context 'when --engine is passed' do
       it "adds an engine setting" do
-        subject.stub!(:option).with(:engine).and_return('rails')
         io_handler.should_receive(:add_setting).with('engine', 'rails')
+        io_handler.stub!(:add_to_git_ignore)
+        
+        Webbynode::Git.stub(:new).and_return(git_handler)
+        
+        subject.stub!(:option).with(:engine).and_return('rails')
         subject.send(:detect_engine)
       end
     
@@ -84,10 +99,6 @@ describe Webbynode::Commands::Init do
   end
   
   context "Engine detection" do
-    it "call prepare once engine is detected" do
-      pending "Need to make detect_engine call Engine#prepare and also make an Engine instance out of option(:engine)"
-    end
-    
     context "when no engine was detected" do
       it "prompts for the engine" do
         io_handler.should_receive(:log).with("Supported engines:")
@@ -138,7 +149,12 @@ describe Webbynode::Commands::Init do
     it "detects Rails 3 when script/rails is present" do
       io = double("Io").as_null_object
       io.stub!(:file_exists?).with("script/rails").and_return(true)
+      
+      gemfile = double("Gemfile").as_null_object
+      gemfile.stub!(:present?).and_return(false)
 
+      Webbynode::Gemfile.stub(:new).and_return(gemfile)
+      
       Webbynode::Io.stub(:new).and_return(io)
       io_handler.should_receive(:add_setting).with("engine", "rails3")
 
@@ -153,6 +169,7 @@ describe Webbynode::Commands::Init do
       io.stub(:file_exists?).with('config/environent.rb').and_return(true)
 
       Webbynode::Io.stub(:new).and_return(io)
+      Webbynode::Git.stub(:new).and_return(git_handler)
       io_handler.should_receive(:add_setting).with("engine", "rails")
 
       subject.run
@@ -219,19 +236,6 @@ describe Webbynode::Commands::Init do
       
       subject.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
       subject.run
-    end
-  end
-  
-  context "Gemfile checking" do
-    context "when present" do
-      it "complains if there is a sqlite3-ruby dependency outside of development and test groups" do
-        pending "Make Rails Specific"
-        gemfile.should_receive(:present?).and_return(true)
-        gemfile.should_receive(:dependencies).and_return(['sqlite3-ruby', 'mysql'])
-        
-        @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
-        lambda { @command.execute }.should raise_error(Webbynode::Command::CommandError)
-      end
     end
   end
   

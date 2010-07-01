@@ -58,6 +58,10 @@ describe Webbynode::Commands::Init do
   end
   
   context "Engine detection" do
+    it "call prepare once engine is detected" do
+      pending "Need to make detect_engine call Engine#prepare and also make an Engine instance out of option(:engine)"
+    end
+    
     context "when no engine was detected" do
       it "prompts for the engine" do
         io_handler.should_receive(:log).with("Supported engines:")
@@ -70,6 +74,7 @@ describe Webbynode::Commands::Init do
         subject.should_receive(:ask).with('Select the engine your app uses:', Integer).and_return(1)
 
         io_handler.should_receive(:add_setting).with("engine", "django")
+        io_handler.should_receive(:log).with("Initializing with Django engine...")
         subject.run
       end
     end
@@ -464,51 +469,53 @@ describe Webbynode::Commands::Init do
   end
   
   context "when .gitignore is present" do
-    before(:each) do
-      @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
-    end
+    context "using rails engine" do
+      before(:each) do
+        @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+      end
 
-    context "when config/database.yml is already tracked by git" do
-      it "stops tracking config/database.yml" do
-        git_handler.should_receive(:tracks?).with("config/database.yml").and_return(true)
-        git_handler.should_receive(:remove).with("config/database.yml")
+      context "when config/database.yml is already tracked by git" do
+        it "stops tracking config/database.yml" do
+          git_handler.should_receive(:tracks?).with("config/database.yml").and_return(true)
+          git_handler.should_receive(:remove).with("config/database.yml")
+      
+          @command.run
+        end
+      end
+    
+      context "when config/database.yml is not tracked by git" do
+        it "doesn't stop tracking config/database.yml" do
+          git_handler.should_receive(:tracks?).with("config/database.yml").and_return(false)
+          git_handler.should_receive(:remove).with("config/database.yml").never
+      
+          @command.run
+        end
+      end
+    
+      context "when db/schema.rb is already tracked by git" do
+        it "stops tracking db/schema.rb" do
+          git_handler.should_receive(:tracks?).with("db/schema.rb").and_return(true)
+          git_handler.should_receive(:remove).with("db/schema.rb")
+      
+          @command.run
+        end
+      end
+    
+      context "when db/schema.rb is not tracked by git" do
+        it "doesn't stop tracking db/schema.rb" do
+          git_handler.should_receive(:tracks?).with("db/schema.rb").and_return(false)
+          git_handler.should_receive(:remove).with("db/schema.rb").never
+      
+          @command.run
+        end
+      end
+    
+      it "adds config/database.yml to .gitconfig" do
+        io_handler.should_receive(:file_exists?).with(".gitignore").and_return(true)
+        git_handler.should_receive(:add_to_git_ignore).with("config/database.yml", "db/schema.rb")
       
         @command.run
       end
-    end
-    
-    context "when config/database.yml is not tracked by git" do
-      it "doesn't stop tracking config/database.yml" do
-        git_handler.should_receive(:tracks?).with("config/database.yml").and_return(false)
-        git_handler.should_receive(:remove).with("config/database.yml").never
-      
-        @command.run
-      end
-    end
-    
-    context "when db/schema.rb is already tracked by git" do
-      it "stops tracking db/schema.rb" do
-        git_handler.should_receive(:tracks?).with("db/schema.rb").and_return(true)
-        git_handler.should_receive(:remove).with("db/schema.rb")
-      
-        @command.run
-      end
-    end
-    
-    context "when db/schema.rb is not tracked by git" do
-      it "doesn't stop tracking db/schema.rb" do
-        git_handler.should_receive(:tracks?).with("db/schema.rb").and_return(false)
-        git_handler.should_receive(:remove).with("db/schema.rb").never
-      
-        @command.run
-      end
-    end
-    
-    it "adds config/database.yml to .gitconfig" do
-      io_handler.should_receive(:file_exists?).with(".gitignore").and_return(true)
-      git_handler.should_receive(:add_to_git_ignore).with("config/database.yml", "db/schema.rb")
-      
-      @command.run
     end
   end
   

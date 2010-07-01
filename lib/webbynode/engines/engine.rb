@@ -9,7 +9,7 @@ module Webbynode::Engines
 
   module Engine
     def self.included(base)
-      base.send(:attr_writer, :engine_name)
+      base.send(:attr_accessor, :engine_name)
       base.send(:extend, ClassMethods)
       base.send(:include, InstanceMethods)
     end
@@ -17,6 +17,14 @@ module Webbynode::Engines
     module ClassMethods
       def set_name(name)
         @engine_name = name
+      end
+      
+      def git_excludes(*entries)
+        @@git_excluded = entries
+      end
+      
+      def git_excluded
+        @@git_excluded
       end
       
       def engine_name
@@ -29,6 +37,13 @@ module Webbynode::Engines
     end
     
     module InstanceMethods
+      def prepare
+        self.class.git_excluded.each do |exc|
+          git.remove(exc) if git.tracks?(exc)
+          git.add_to_git_ignore exc
+        end
+      end
+      
       def io
         @io ||= Webbynode::Io.new
       end

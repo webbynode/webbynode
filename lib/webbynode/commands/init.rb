@@ -12,6 +12,8 @@ module Webbynode::Commands
         return
       end
 
+      check_prerequisites
+
       webby       = param(:webby)
       app_name    = io.app_name
       git_present = git.present?
@@ -31,13 +33,14 @@ module Webbynode::Commands
       
       detect_engine
       
-      check_prerequisites
       # RAILS: check_gemfile
       
       webby_ip = get_ip(webby)
       
       io.log ""
       io.log "Initializing directory structure..."
+      
+      # TODO RAILS: this should be rails specific
       git.remove("config/database.yml") if git.tracks?("config/database.yml")
       git.remove("db/schema.rb")        if git.tracks?("db/schema.rb")
       
@@ -150,12 +153,11 @@ module Webbynode::Commands
     end
     
     def choose_engine
-      engines = Webbynode::Engines::All
-      
       io.log ""
       io.log "Supported engines:"
       io.log ""
       
+      engines = Webbynode::Engines::All
       engines.each_with_index do |engine, i|
         io.log "  #{i+1}. #{engine.engine_name.split('::').last}"
       end
@@ -166,7 +168,7 @@ module Webbynode::Commands
       engine = engines[choice-1]
       
       io.log ""
-      io.log "Initializing with #{engine.name} engine..."
+      io.log "Initializing with #{engine.engine_name} engine..."
       
       engine
     end

@@ -2,6 +2,27 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 
 describe Webbynode::Io do
+  describe '#sed' do
+    it 'replaces a regexp' do
+      text = read_fixture('settings.py')
+      File.should_receive(:read).with('settings.template.py').and_return(text)      
+      File.should_receive(:open).with('settings.template.py', 'w').and_yield(file = double('File'))
+      file.should_receive(:write) do |contents| 
+        pass = contents.include?("'ENGINE': '@app_engine'")
+      end
+      
+      output = subject.sed('settings.template.py', /'ENGINE': '[^ ,]*'/, "'ENGINE': '@app_engine@'")
+      # output.should =~ /'ENGINE': '@app_engine@'/
+    end
+  end
+  
+  describe '#copy_file' do
+    it "copies the file" do
+      FileUtils.should_receive(:cp).with('settings.py', 'settings.template.py')
+      subject.copy_file 'settings.py', 'settings.template.py'
+    end
+  end
+  
   describe "#app_name" do
     context "when successful" do
       it "should return the current folder" do
@@ -18,6 +39,13 @@ describe Webbynode::Io do
   
   describe '#add_setting' do
     let(:io) { Webbynode::Io.new }
+    
+    it "creates .webbynode directory if needed" do
+      io.should_receive(:properties).with(".webbynode/settings").and_return(stub('props').as_null_object)
+      io.should_receive(:directory?).with(".webbynode").and_return(false)
+      io.should_receive(:mkdir).with(".webbynode")
+      io.add_setting("engine", "php")
+    end
 
     it "should add a key to the property file .webbynode/settings" do
       props = mock("Hash")

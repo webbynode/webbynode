@@ -75,7 +75,11 @@ describe Webbynode::Commands::Init do
           io_handler.should_receive(:add_setting).with('engine', 'django')
           io_handler.should_receive(:log).with("Engine 'kawaboonga' is invalid.")
 
-          subject.should_receive(:choose_engine).and_return(Webbynode::Engines::Django)
+          django = stub('Django').as_null_object
+          django.should_receive(:engine_id).and_return('django')
+          
+          subject.should_receive(:choose_engine).and_return(django)
+          
           subject.send(:detect_engine)
         end
       end
@@ -85,7 +89,7 @@ describe Webbynode::Commands::Init do
   context 'Checking prerequisites' do
     it "raises an error if git is not found" do
       io_handler.should_receive(:exec_in_path?).with('git').and_return(false)
-      subject .stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+      subject.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
       lambda { subject.execute }.should raise_error(Webbynode::Command::CommandError)
     end
   end
@@ -112,6 +116,7 @@ describe Webbynode::Commands::Init do
 
         io_handler.should_receive(:add_setting).with("engine", "django")
         io_handler.should_receive(:log).with("Initializing with Django engine...")
+        Webbynode::Engines::Django.stub!(:new).and_return(double('Django').as_null_object)
         subject.run
       end
     end
@@ -482,71 +487,6 @@ describe Webbynode::Commands::Init do
     
       @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
       @command.run
-    end
-  end
-  
-  context "when .gitignore is not present" do
-    before(:each) do
-      @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
-    end
-
-    it "should create the standard .gitignore" do
-      io_handler.should_receive(:file_exists?).with(".gitignore").and_return(false)
-      git_handler.should_receive(:add_git_ignore)
-      
-      @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
-      @command.run
-    end
-  end
-  
-  context "when .gitignore is present" do
-    context "using rails engine" do
-      before(:each) do
-        @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
-      end
-
-      context "when config/database.yml is already tracked by git" do
-        it "stops tracking config/database.yml" do
-          git_handler.should_receive(:tracks?).with("config/database.yml").and_return(true)
-          git_handler.should_receive(:remove).with("config/database.yml")
-      
-          @command.run
-        end
-      end
-    
-      context "when config/database.yml is not tracked by git" do
-        it "doesn't stop tracking config/database.yml" do
-          git_handler.should_receive(:tracks?).with("config/database.yml").and_return(false)
-          git_handler.should_receive(:remove).with("config/database.yml").never
-      
-          @command.run
-        end
-      end
-    
-      context "when db/schema.rb is already tracked by git" do
-        it "stops tracking db/schema.rb" do
-          git_handler.should_receive(:tracks?).with("db/schema.rb").and_return(true)
-          git_handler.should_receive(:remove).with("db/schema.rb")
-      
-          @command.run
-        end
-      end
-    
-      context "when db/schema.rb is not tracked by git" do
-        it "doesn't stop tracking db/schema.rb" do
-          git_handler.should_receive(:tracks?).with("db/schema.rb").and_return(false)
-          git_handler.should_receive(:remove).with("db/schema.rb").never
-      
-          @command.run
-        end
-      end
-    
-      it "adds config/database.yml to .gitconfig" do
-        io_handler.should_receive(:file_exists?).with(".gitignore").and_return(true)
-        git_handler.should_receive(:add_to_git_ignore).with("config/database.yml", "db/schema.rb")
-      
-        @command.run
-      end
     end
   end
   

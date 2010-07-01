@@ -33,23 +33,11 @@ module Webbynode::Commands
       
       detect_engine
       
-      # RAILS: check_gemfile
-      
       webby_ip = get_ip(webby)
       
       io.log ""
       io.log "Initializing directory structure..."
       
-      # TODO RAILS: this should be rails specific
-      git.remove("config/database.yml") if git.tracks?("config/database.yml")
-      git.remove("db/schema.rb")        if git.tracks?("db/schema.rb")
-      
-      if io.file_exists?(".gitignore")
-        git.add_to_git_ignore("config/database.yml", "db/schema.rb")
-      else
-        git.add_git_ignore 
-      end
-
       unless io.file_exists?(".pushand")
         io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name} #{dns_entry}\n", true)
       end

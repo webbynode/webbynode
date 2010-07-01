@@ -44,16 +44,22 @@ describe Webbynode::Commands::Init do
   context 'Checking prerequisites' do
     it "raises an error if git is not found" do
       io_handler.should_receive(:exec_in_path?).with('git').and_return(false)
+      subject .stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
       lambda { subject.execute }.should raise_error(Webbynode::Command::CommandError)
+    end
+  end
+  
+  context "Engine validation" do
+    context "when there is a validation error" do
+      it "displays the error and exits" do
+        
+      end
     end
   end
   
   context "Engine detection" do
     context "when no engine was detected" do
       it "prompts for the engine" do
-        pending "Work on the menu"
-        subject.stub!(:check_engines).and_return(nil)
-        
         io_handler.should_receive(:log).with("Supported engines:")
         io_handler.should_receive(:log).with("  1. Django")
         io_handler.should_receive(:log).with("  2. PHP")
@@ -64,6 +70,7 @@ describe Webbynode::Commands::Init do
         subject.should_receive(:ask).with('Select the engine your app uses:', Integer).and_return(1)
 
         io_handler.should_receive(:add_setting).with("engine", "django")
+        subject.run
       end
     end
     
@@ -97,27 +104,35 @@ describe Webbynode::Commands::Init do
     end
     
     it "detects Rails 3 when script/rails is present" do
-      io_handler.stub!(:file_exists?).with("script/rails").and_return(true)
+      io = double("Io").as_null_object
+      io.stub!(:file_exists?).with("script/rails").and_return(true)
+
+      Webbynode::Io.stub(:new).and_return(io)
       io_handler.should_receive(:add_setting).with("engine", "rails3")
 
       subject.run
     end
     
     it "detects Rails 2 when app app/controllers and config/environent.rb are found" do
-      io_handler.stub!(:file_exists?).with("script/rails").and_return(false)
-      io_handler.stub!(:directory?).with('app').and_return(true)
-      io_handler.stub!(:directory?).with('app/controllers').and_return(true)
-      io_handler.stub!(:file_exists?).with('config/environent.rb').and_return(true)
+      io = double("Io").as_null_object
+      io.stub(:file_exists?).with("script/rails").and_return(false)
+      io.stub(:directory?).with('app').and_return(true)
+      io.stub(:directory?).with('app/controllers').and_return(true)
+      io.stub(:file_exists?).with('config/environent.rb').and_return(true)
 
+      Webbynode::Io.stub(:new).and_return(io)
       io_handler.should_receive(:add_setting).with("engine", "rails")
 
       subject.run
     end
     
     it "detects Rack when config.ru is found" do
-      io_handler.stub!(:file_exists?).with("script/rails").and_return(false)
-      io_handler.stub!(:directory?).with('app').and_return(false)
-      io_handler.stub!(:file_exists?).with('config.ru').and_return(true)
+      io = double("Io")
+      io.stub!(:file_exists?).with("script/rails").and_return(false)
+      io.stub!(:directory?).with('app').and_return(false)
+      io.stub!(:file_exists?).with('config.ru').and_return(true)
+
+      Webbynode::Io.stub!(:new).and_return(io)
 
       io_handler.should_receive(:add_setting).with("engine", "rack")
 
@@ -129,6 +144,7 @@ describe Webbynode::Commands::Init do
     it "is detected automatically if user only have one Webby" do
       git_handler.should_receive(:add_remote).with("webbynode", "201.81.121.201", anything())
       
+      subject.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
       subject.run
     end
     
@@ -169,6 +185,7 @@ describe Webbynode::Commands::Init do
       io_handler.should_receive(:log).with("Set deployment Webby to webby2.")
       git_handler.should_receive(:add_remote).with("webbynode", "67.53.31.2", anything())
       
+      subject.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
       subject.run
     end
   end
@@ -176,39 +193,41 @@ describe Webbynode::Commands::Init do
   context "Gemfile checking" do
     context "when present" do
       it "complains if there is a sqlite3-ruby dependency outside of development and test groups" do
+        pending "Make Rails Specific"
         gemfile.should_receive(:present?).and_return(true)
         gemfile.should_receive(:dependencies).and_return(['sqlite3-ruby', 'mysql'])
         
+        @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
         lambda { @command.execute }.should raise_error(Webbynode::Command::CommandError)
       end
     end
   end
   
   context "when already initialized" do
+    subject do
+      Webbynode::Commands::Init.new("10.0.1.1").tap do |cmd|
+        cmd.stub!(:gemfile).and_return(gemfile)
+        cmd.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+        cmd.stub!(:git).and_return(git_handler) 
+      end
+    end
+    
     it "keep the same remotes when answer is no to overwriting" do
-      command = Webbynode::Commands::Init.new("10.0.1.1")
-      command.stub!(:gemfile).and_return(gemfile)
-      command.should_receive(:git).any_number_of_times.and_return(git_handler) 
-      command.should_receive(:ask).with("Do you want to overwrite the current settings (y/n)?").once.ordered.and_return("n")
-
       git_handler.should_receive(:present?).and_return(true)
       git_handler.should_receive(:remote_exists?).with("webbynode").and_return(true)
       git_handler.should_receive(:delete_remote).with("webbynode").never
       
-      command.run
+      subject.should_receive(:ask).with("Do you want to overwrite the current settings (y/n)?").once.ordered.and_return("n")
+      subject.run
     end
 
     it "delete webbynode remote when answer is yes to overwriting" do
-      command = Webbynode::Commands::Init.new("10.0.1.1")
-      command.stub!(:gemfile).and_return(gemfile)
-      command.should_receive(:git).any_number_of_times.and_return(git_handler) 
-      command.should_receive(:ask).with("Do you want to overwrite the current settings (y/n)?").once.ordered.and_return("y")
-
       git_handler.should_receive(:present?).and_return(true)
       git_handler.should_receive(:remote_exists?).with("webbynode").and_return(true)
       git_handler.should_receive(:delete_remote).with("webbynode")
       
-      command.run
+      subject.should_receive(:ask).with("Do you want to overwrite the current settings (y/n)?").once.ordered.and_return("y")
+      subject.run
     end
   end
   
@@ -231,9 +250,10 @@ describe Webbynode::Commands::Init do
     def create_init(ip="4.3.2.1", host=nil, extra=[])
       @command = Webbynode::Commands::Init.new(ip, "--dns=#{host}", *extra)
       @command.stub!(:gemfile).and_return(gemfile)
-      @command.should_receive(:git).any_number_of_times.and_return(git_handler) 
+      @command.stub!(:git).and_return(git_handler) 
+      @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
     end
-
+    
     it "should setup DNS using Webbynode API" do
       create_init("10.0.1.1", "new.rubyista.info", "--adddns")
 
@@ -327,6 +347,7 @@ describe Webbynode::Commands::Init do
     props.stub(:save)
 
     create_init("my_webby_name")
+    @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
     @command.api.should_receive(:io).any_number_of_times.and_return(io_handler)
     @command.api.should_receive(:ask).with("API token:   ").and_return("234def")
     @command.api.should_receive(:ask).with("Login email: ").and_return("abc123")
@@ -349,6 +370,7 @@ describe Webbynode::Commands::Init do
     create_init("my_webby_name")
 
     @command.api.should_receive(:ip_for).and_raise(Webbynode::ApiClient::Unauthorized)
+    @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
     @command.run
 
     stdout.should =~ /Your credentials didn't match any Webbynode account./
@@ -366,6 +388,7 @@ describe Webbynode::Commands::Init do
 
     create_init("my_webby_name")
     @command.should_receive(:api).any_number_of_times.and_return(api)
+    @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
     @command.run
     
     stdout.should =~ /Couldn't find Webby 'my_webby_name' on your account. Your Webbies are/
@@ -383,6 +406,7 @@ describe Webbynode::Commands::Init do
 
     create_init("my_webby_name")
     @command.should_receive(:api).any_number_of_times.and_return(api)
+    @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
     @command.run
     
     stdout.should =~ /You don't have any active Webbies on your account./
@@ -399,6 +423,7 @@ describe Webbynode::Commands::Init do
 
     create_init("my_webby_name")
     @command.stub!(:api).and_return(api)
+    @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
     @command.run
   end
   
@@ -408,6 +433,7 @@ describe Webbynode::Commands::Init do
       io_handler.should_receive(:app_name).any_number_of_times.and_return("application_name")
       io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 application_name application_name\n", true)
     
+      @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
       @command.run
     end
   
@@ -418,20 +444,30 @@ describe Webbynode::Commands::Init do
       io_handler.should_receive(:app_name).any_number_of_times.and_return("application_name")
       io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 application_name my.com.br\n", true)
     
+      @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
       @command.run
     end
   end
   
   context "when .gitignore is not present" do
+    before(:each) do
+      @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+    end
+
     it "should create the standard .gitignore" do
       io_handler.should_receive(:file_exists?).with(".gitignore").and_return(false)
       git_handler.should_receive(:add_git_ignore)
       
+      @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
       @command.run
     end
   end
   
   context "when .gitignore is present" do
+    before(:each) do
+      @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+    end
+
     context "when config/database.yml is already tracked by git" do
       it "stops tracking config/database.yml" do
         git_handler.should_receive(:tracks?).with("config/database.yml").and_return(true)
@@ -477,6 +513,10 @@ describe Webbynode::Commands::Init do
   end
   
   context "when .webbynode is not present" do
+    before(:each) do
+      @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+    end
+
     it "should create the .webbynode system folder and stub files" do
       io_handler.should_receive(:directory?).with(".webbynode").and_return(false)
       io_handler.should_receive(:mkdir).with(".webbynode/tasks")
@@ -489,6 +529,10 @@ describe Webbynode::Commands::Init do
   end
   
   context "when .pushand is not present" do
+    before(:each) do
+      @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+    end
+
     it "should be created and made an executable" do
       io_handler.should_receive(:file_exists?).with(".pushand").and_return(false)
       io_handler.should_receive(:app_name).any_number_of_times.and_return("mah_app")
@@ -499,6 +543,10 @@ describe Webbynode::Commands::Init do
   end
   
   context "when .pushand is present" do
+    before(:each) do
+      @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+    end
+
     it "should not be created" do
       io_handler.should_receive(:file_exists?).with(".pushand").and_return(true)
       io_handler.should_receive(:create_file).never
@@ -508,6 +556,10 @@ describe Webbynode::Commands::Init do
   end
   
   context "when git repo doesn't exist yet" do
+    before(:each) do
+      @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+    end
+
     it "should create a new git repo" do
       git_handler.should_receive(:present?).and_return(false)
       git_handler.should_receive(:init)
@@ -546,6 +598,10 @@ describe Webbynode::Commands::Init do
   end
 
   context "when git repo is initialized" do
+    before(:each) do
+      @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+    end
+    
     it "complains if git is in a dirty state" do
       git_handler.should_receive(:present?).and_return(true)
       git_handler.should_receive(:clean?).and_return(false)

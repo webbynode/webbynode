@@ -6,13 +6,6 @@ module Webbynode::Commands
     option :adddns, "Creates the DNS entries for the domain"
     option :engine, "Sets the application engine for the app", :validate => { :in => ['php', 'rack', 'rails', 'rails3'] }
     
-    Engines = [
-      # order matters!
-      Webbynode::Engines::Rails3,
-      Webbynode::Engines::Rails,
-      Webbynode::Engines::Rack
-    ]
-    
     def execute
       unless params.any?
         io.log help
@@ -39,7 +32,7 @@ module Webbynode::Commands
       detect_engine
       
       check_prerequisites
-      check_gemfile
+      # RAILS: check_gemfile
       
       webby_ip = get_ip(webby)
       
@@ -148,31 +141,40 @@ module Webbynode::Commands
       webby_ip
     end
     
-    def check_engines
-      unless @engine = option(:engine)
-        Engines.each do |engine_class|
-          engine = engine_class.new
-          engine.io = self.io
-          
-          if engine.detected?
-            @engine = engine_class.name.split('::').last.downcase 
-            break
-          end
-        end
-      end
-      @engine
-    end
-    
     def detect_engine
-      unless @engine = check_engines
-        io.log "Supported engines:"
-        
-        Webbynode::Engines::All.each_with_index do |engine, i|
-          io.log "  #{i+1}. #{engine.class.name.split('::').last}"
-        end
+      unless engine_id = option(:engine)
+        engine = resolve_engine
+        engine_id = engine.engine_id
       end
       
-      io.add_setting "engine", @engine if @engine
+      io.add_setting "engine", engine_id
+    end
+    
+    def resolve_engine
+      engine = Webbynode::Engines.detect
+      engine ||= choose_engine
+    end
+    
+    def choose_engine
+      engines = Webbynode::Engines::All
+      
+      io.log ""
+      io.log "Supported engines:"
+      io.log ""
+      
+      engines.each_with_index do |engine, i|
+        io.log "  #{i+1}. #{engine.engine_name.split('::').last}"
+      end
+      
+      io.log ""
+
+      choice = ask("Select the engine your app uses:", Integer) { |q| q.in = 1..(engines.size+1) }
+      engine = engines[choice-1]
+      
+      io.log ""
+      io.log "Initializing with #{engine.name} engine..."
+      
+      engine
     end
     
     def check_prerequisites

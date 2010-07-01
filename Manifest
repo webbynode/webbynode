@@ -41,6 +41,13 @@ lib/webbynode/commands/stop.rb
 lib/webbynode/commands/tasks.rb
 lib/webbynode/commands/version.rb
 lib/webbynode/commands/webbies.rb
+lib/webbynode/engines/all.rb
+lib/webbynode/engines/django.rb
+lib/webbynode/engines/engine.rb
+lib/webbynode/engines/php.rb
+lib/webbynode/engines/rack.rb
+lib/webbynode/engines/rails.rb
+lib/webbynode/engines/rails3.rb
 lib/webbynode/gemfile.rb
 lib/webbynode/git.rb
 lib/webbynode/io.rb
@@ -92,6 +99,11 @@ spec/webbynode/commands/remote_spec.rb
 spec/webbynode/commands/tasks_spec.rb
 spec/webbynode/commands/version_spec.rb
 spec/webbynode/commands/webbies_spec.rb
+spec/webbynode/engines/django_spec.rb
+spec/webbynode/engines/php_spec.rb
+spec/webbynode/engines/rack_spec.rb
+spec/webbynode/engines/rails3_spec.rb
+spec/webbynode/engines/rails_spec.rb
 spec/webbynode/gemfile_spec.rb
 spec/webbynode/git_spec.rb
 spec/webbynode/io_spec.rb

@@ -6,7 +6,7 @@ module Webbynode::Engines
     Webbynode::Engines::Rails,
     Webbynode::Engines::Rails3,
   ]
-  
+
   Detectable = [
     # order matters!
     Webbynode::Engines::Rails3,

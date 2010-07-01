@@ -40,6 +40,32 @@ describe Webbynode::Commands::Init do
       cmd.stub!(:api).and_return(api)
     end      
   end
+  
+  describe '#detect_engine' do
+    before(:each) do
+      subject.stub!(:io).and_return(io_handler)
+    end
+    
+    context 'when --engine is passed' do
+      it "adds an engine setting" do
+        subject.stub!(:option).with(:engine).and_return('rails')
+        io_handler.should_receive(:add_setting).with('engine', 'rails')
+        subject.send(:detect_engine)
+      end
+    
+      context 'with invalid engine' do
+        it "reports the error and show engines for user to choose" do
+          subject.stub!(:option).with(:engine).and_return('kawaboonga')
+
+          io_handler.should_receive(:add_setting).with('engine', 'django')
+          io_handler.should_receive(:log).with("Engine 'kawaboonga' is invalid.")
+
+          subject.should_receive(:choose_engine).and_return(Webbynode::Engines::Django)
+          subject.send(:detect_engine)
+        end
+      end
+    end
+  end
 
   context 'Checking prerequisites' do
     it "raises an error if git is not found" do
@@ -101,6 +127,7 @@ describe Webbynode::Commands::Init do
       end
       
       it "overrides detection" do
+        io_handler.should_receive(:log).with(/Engine '.*' is invalid/).never
         io_handler.should_receive(:file_exists?).with("script/rails").never
         io_handler.should_receive(:add_setting).with("engine", "php")
 

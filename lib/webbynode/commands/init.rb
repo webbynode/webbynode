@@ -145,11 +145,19 @@ module Webbynode::Commands
     end
     
     def detect_engine
-      io.add_setting "engine", option(:engine) || resolve_engine.engine_id
+      if option(:engine)
+        engine = Webbynode::Engines.find(option(:engine)) 
+        io.log "Engine '#{option(:engine)}' is invalid." unless engine
+      end
+      
+      engine ||= resolve_engine
+        
+      io.add_setting "engine", engine.engine_id
     end
     
     def resolve_engine
-      engine = Webbynode::Engines.detect || choose_engine
+      engine = Webbynode::Engines.detect
+      engine ||= choose_engine
     end
     
     def choose_engine

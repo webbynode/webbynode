@@ -1,6 +1,19 @@
 # Load Spec Helper
 require File.join(File.expand_path(File.dirname(__FILE__)), '../..', 'spec_helper')
 
+describe Webbynode::Engines do
+  subject { Webbynode::Engines }
+  describe '#find' do
+    it "returns the proper engine, by engine_name" do
+      subject.find('rails').should == Webbynode::Engines::Rails
+      subject.find('rails3').should == Webbynode::Engines::Rails3
+      subject.find('django').should == Webbynode::Engines::Django
+      subject.find('rack').should == Webbynode::Engines::Rack
+      subject.find('php').should == Webbynode::Engines::Php
+    end
+  end
+end
+
 describe Webbynode::Engines::Engine do
   let(:git) { double("Git") }
   subject do

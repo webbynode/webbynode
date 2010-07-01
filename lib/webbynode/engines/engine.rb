@@ -6,6 +6,10 @@ module Webbynode::Engines
     end
     return nil
   end
+  
+  def self.find(engine_id)
+    All.find { |e| e.engine_id == engine_id }
+  end
 
   module Engine
     def self.included(base)

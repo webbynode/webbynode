@@ -10,6 +10,14 @@ describe Webbynode::Engines::Rack do
     end
   end
   
+  describe 'class methods' do
+    subject { Webbynode::Engines::Rack }
+
+    its(:engine_id)    { should == 'rack' }
+    its(:engine_name)  { should == 'Rack' }
+    its(:git_excluded) { should be_empty }
+  end
+  
   describe '#detect' do
     it "if script/rails exists" do
       io.stub!(:file_exists?).with('config.ru').and_return(true)

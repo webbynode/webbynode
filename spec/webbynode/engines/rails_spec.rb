@@ -10,6 +10,14 @@ describe Webbynode::Engines::Rails do
     end
   end
   
+  describe 'class methods' do
+    subject { Webbynode::Engines::Rails }
+
+    its(:engine_id)    { should == 'rails' }
+    its(:engine_name)  { should == 'Rails 2' }
+    its(:git_excluded) { should == ["config/database.yml", "db/schema.rb"] }
+  end
+  
   describe '#detect' do
     it "returns true if app app/controllers and config/environent.rb are found" do
       io.stub!(:directory?).with('app').and_return(true)

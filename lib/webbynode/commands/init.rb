@@ -142,17 +142,11 @@ module Webbynode::Commands
     end
     
     def detect_engine
-      unless engine_id = option(:engine)
-        engine = resolve_engine
-        engine_id = engine.engine_id
-      end
-      
-      io.add_setting "engine", engine_id
+      io.add_setting "engine", option(:engine) || resolve_engine.engine_id
     end
     
     def resolve_engine
-      engine = Webbynode::Engines.detect
-      engine ||= choose_engine
+      engine = Webbynode::Engines.detect || choose_engine
     end
     
     def choose_engine

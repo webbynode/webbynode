@@ -2,4 +2,8 @@ pkg
 .webbynode
 .pushand
 .devver
-.DS_Store
+.DS_Storesettings.py
+settings.py
+*.pyc
+*.pyo
+docs/_build

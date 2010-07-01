@@ -37,11 +37,17 @@ module Webbynode
       entries.any? &blk
     end
     
+    def sed(file, from, to)
+      contents = File.read(file).gsub(from, to)
+      File.open(file, 'w') { |f| f.write(contents) }
+    end
+    
     def app_name
       Dir.pwd.split("/").last.gsub(/[\.| ]/, "_")
     end
     
     def mkdir(path)
+      # TODO: raise "Tried to create real folder: #{path}" if $testing
       FileUtils.mkdir_p(path)
     end
     
@@ -68,6 +74,10 @@ module Webbynode
     
     def open_file(f, a, &blk)
       File.open(f, a, &blk)
+    end
+    
+    def copy_file(from, to)
+      FileUtils.cp(from, to)
     end
     
     def log(text, notify=false)
@@ -157,7 +167,7 @@ module Webbynode
     end
     
     def add_line(file, line)
-      return if File.read(file) =~ /^#{line}$/
+      return if File.read(file).include?("#{line}")
       File.open(file, 'a') { |f| f.puts line }
     end
     
@@ -181,6 +191,7 @@ module Webbynode
     end
     
     def with_setting(&blk)
+      mkdir('.webbynode') unless directory?('.webbynode')
       with_settings_for ".webbynode/settings", &blk
     end
     

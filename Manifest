@@ -23,6 +23,7 @@ lib/templates/help
 lib/webbynode.rb
 lib/webbynode/api_client.rb
 lib/webbynode/application.rb
+lib/webbynode/attribute_accessors.rb
 lib/webbynode/command.rb
 lib/webbynode/commands/add_backup.rb
 lib/webbynode/commands/add_key.rb
@@ -81,6 +82,7 @@ spec/fixtures/git/config/config_5
 spec/fixtures/git/status/clean
 spec/fixtures/git/status/dirty
 spec/fixtures/pushand
+spec/fixtures/settings.py
 spec/spec_helper.rb
 spec/webbynode/api_client_spec.rb
 spec/webbynode/application_spec.rb
@@ -100,6 +102,7 @@ spec/webbynode/commands/tasks_spec.rb
 spec/webbynode/commands/version_spec.rb
 spec/webbynode/commands/webbies_spec.rb
 spec/webbynode/engines/django_spec.rb
+spec/webbynode/engines/engine_spec.rb
 spec/webbynode/engines/php_spec.rb
 spec/webbynode/engines/rack_spec.rb
 spec/webbynode/engines/rails3_spec.rb

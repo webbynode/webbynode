@@ -5,6 +5,11 @@ module Webbynode::Engines
     git_excludes 'settings.py', '*.pyc', '*.pyo', 'docs/_build'
     
     def prepare
+      unless io.file_exists?('settings.py')
+        raise Webbynode::Command::CommandError, 
+          "Couldn't create the settings template because settings.py was not found. Please check and try again."
+      end
+      
       unless io.file_exists?('settings.template.py')
         io.log 'Creating settings.template.py from your settings.py...'
         io.copy_file 'settings.py', 'settings.template.py'

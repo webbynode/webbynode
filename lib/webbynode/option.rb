@@ -14,7 +14,9 @@ module Webbynode
       @value = nil
       @options = args.pop if args.last.is_a?(Hash)
       @options ||= {}
-      @options[:required] = true if @options[:required].nil?
+
+      @original_options = @options.clone
+      @options[:required] = false if @options[:required].nil?
       
       @name = args[0]
       if args[1].is_a?(String)
@@ -33,13 +35,26 @@ module Webbynode
     end
     
     def valid?
+      return true if !required? and value.nil?
       @errors = []
       if (validations = @options[:validate])
-        validations.each_pair do |key, value|
-          @errors << send("#{key}_error", value) unless send(key, value)
+        if validations.is_a?(Hash)
+          validations.each_pair do |key, value|
+            @errors << send("#{key}_error", value) unless send(key, value)
+          end
+        else
+          @errors << send("#{validations}_error", value) unless send(validations, value)
         end
       end
       @errors.empty?
+    end
+    
+    def integer(value)
+      Integer(value) rescue false
+    end
+    
+    def integer_error(value)
+      "Invalid value '#{value}' for #{self.class.name.split("::").last.downcase} '#{self.name}'. It should be an integer."
     end
     
     def in(allowed_values)
@@ -70,7 +85,7 @@ module Webbynode
     end
     
     def required?
-      @options[:required]
+      @options[:required] == true
     end
     
     def take

@@ -204,7 +204,8 @@ module Webbynode
     end
     
     def remote_executor
-      @remote_executor ||= Webbynode::RemoteExecutor.new(git.parse_remote_ip)
+      git.parse_remote_ip
+      @remote_executor ||= Webbynode::RemoteExecutor.new(git.remote_ip, git.remote_port)
     end
     
     def pushand
@@ -311,6 +312,7 @@ module Webbynode
       end
 
       settings[:parameters].each { |p| p.validate! }
+      settings[:options].each { |p| p.validate! }
     end
     
     def handle_dns(dns)

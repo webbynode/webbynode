@@ -41,6 +41,37 @@ describe Webbynode::Commands::Init do
     end      
   end
   
+  describe 'using alternate port' do
+    subject do 
+      Webbynode::Commands::Init.new('2.1.2.3', '--port=2020').tap do |cmd|
+        cmd.stub!(:git_present).and_return(:false)
+      end
+    end
+    
+    it "calls add_remote with the specified port" do
+      git_handler.stub!(:present?).and_return(:false)
+      git_handler.should_receive(:add_remote).with("webbynode", "2.1.2.3", anything(), 2020)
+
+      subject.stub!(:git).and_return(git_handler)
+      subject.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+
+      subject.run
+    end
+    
+    it "fails when port is not numeric" do
+      git_handler.stub!(:present?).and_return(:false)
+
+      cmd = Webbynode::Commands::Init.new('2.1.2.3', '--port=nonvalid')
+      cmd.stub!(:git).and_return(git_handler)
+      cmd.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+      
+      cmd.should_receive(:puts).any_number_of_times do |str| 
+        str.include?("Invalid value 'nonvalid' for option 'port'. It should be an integer.")
+      end
+      cmd.run
+    end
+  end
+  
   describe '#detect_engine' do
     before(:each) do
       subject.stub!(:io).and_return(io_handler)

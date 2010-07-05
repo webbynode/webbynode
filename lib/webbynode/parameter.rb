@@ -2,7 +2,7 @@ module Webbynode
   class Parameter < Webbynode::Option
     def initialize(*args)
       super
-      @options[:required] = true if @options[:required].nil?
+      @options[:required] = true if @original_options[:required].nil?
     end
     
     def validate!

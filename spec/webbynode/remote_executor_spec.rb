@@ -2,10 +2,28 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 
 describe Webbynode::RemoteExecutor do
-  let(:ssh) { double('Ssh') }
+  let(:ssh) { double('Ssh').as_null_object }
   subject do
     Webbynode::RemoteExecutor.new("2.2.2.2").tap do |re|
       re.stub!(:ssh).and_return(ssh)
+    end
+  end
+  
+  describe "#new" do
+    subject { Webbynode::RemoteExecutor.new("2.1.2.2", 2020) }
+    
+    its(:port) { should == 2020 }
+    
+    it "takes an optional port as parameter" do
+      Webbynode::Ssh.should_receive(:new).with("2.1.2.2", 2020).and_return(ssh)
+      subject.exec "hello mom", false, false
+    end
+  end
+  
+  describe '#remote_home' do
+    it "returns the home folder for the git user" do
+      subject.should_receive(:exec).with('pwd').and_return("/var/rapp\n")
+      subject.remote_home.should == '/var/rapp'
     end
   end
   

@@ -4,6 +4,7 @@ module Webbynode::Commands
     parameter :webby, String, "Name or IP of the Webby to deploy to", :required => false
     option :dns, String, "The DNS used for this application"
     option :adddns, "Creates the DNS entries for the domain"
+    option :port, "Specifies an alternate SSH port to connect to Webby", :validate => :integer
     option :engine, "Sets the application engine for the app", :validate => { :in => ['php', 'rack', 'rails', 'rails3'] }
     
     def execute
@@ -74,7 +75,9 @@ module Webbynode::Commands
       end
       
       io.log "Adding webbynode as git remote..."
-      git.add_remote "webbynode", webby_ip, app_name
+      options = ["webbynode", webby_ip, app_name]
+      options << option(:port).to_i if option(:port)
+      git.add_remote *options
       
       handle_dns option(:dns) if option(:adddns)
       

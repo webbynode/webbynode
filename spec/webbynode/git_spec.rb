@@ -2,6 +2,12 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 
 describe Webbynode::Git do
+  let(:re) { double('RemoteExecutor') }
+
+  before(:each) do
+    Webbynode::RemoteExecutor.stub!(:new).and_return(re)
+  end
+  
   def should_raise_when_response(exception, command, response, &blk)
     io_handler = mock("io")
     io_handler.should_receive(:exec).with(command).and_return(response)
@@ -192,30 +198,40 @@ describe Webbynode::Git do
   end
   
   describe "#add_remote" do
+    before(:each) do
+      re.should_receive(:remote_home).and_return('/var/rapp')
+    end
+    
+    it "connects to the remote IP to get home folder" do
+      Webbynode::RemoteExecutor.should_receive(:new).with("1.2.3.4", 389).and_return(re)
+      
+      subject.should_receive(:exec).with("git remote add webbynode ssh://git@1.2.3.4:389/var/rapp/the_repo")
+      subject.add_remote("webbynode", "1.2.3.4", "the_repo", 389)
+    end
+    
     context "when successfull" do
       it "should create a new remote" do
         io_handler = mock("io")
-        io_handler.should_receive(:exec).with("git remote add webbynode git@1.2.3.4:the_repo").and_return("")
+        io_handler.should_receive(:exec).with("git remote add webbynode ssh://git@1.2.3.4:22/var/rapp/the_repo").and_return("")
 
-        git = Webbynode::Git.new
-        git.should_receive(:io).and_return(io_handler)
-        git.add_remote("webbynode", "1.2.3.4", "the_repo").should be_true
+        subject.should_receive(:io).and_return(io_handler)
+        subject.add_remote("webbynode", "1.2.3.4", "the_repo").should be_true
       end
     end
     
     context "when unsuccessfull" do
       it "should raise exception if not a git repo" do
-        should_raise_notgitrepo("git remote add other git@5.6.7.8:a_repo") { |git| git.add_remote("other", "5.6.7.8", "a_repo") }
+        should_raise_notgitrepo("git remote add other ssh://git@5.6.7.8:22/var/rapp/a_repo") { |git| git.add_remote("other", "5.6.7.8", "a_repo") }
       end
     
       it "should return raise exception if the remote already exists" do
-        should_raise(Webbynode::GitRemoteAlreadyExistsError, "git remote add other git@5.6.7.8:a_repo") { |git| 
+        should_raise(Webbynode::GitRemoteAlreadyExistsError, "git remote add other ssh://git@5.6.7.8:22/var/rapp/a_repo") { |git| 
           git.add_remote("other", "5.6.7.8", "a_repo")
         }
       end  
       
       it "should raise a generic Git error when another error occurs" do
-        should_raise_giterror("git remote add other git@5.6.7.8:a_repo") { |git| git.add_remote("other", "5.6.7.8", "a_repo") }
+        should_raise_giterror("git remote add other ssh://git@5.6.7.8:22/var/rapp/a_repo") { |git| git.add_remote("other", "5.6.7.8", "a_repo") }
       end
     end
   end
@@ -375,26 +391,45 @@ describe Webbynode::Git do
     end
   end
 
+  describe "parsing the remote url" do
+    let(:io_handler) { mock("io").as_null_object }
 
-  describe "#parse_remote_ip" do
-    context "when successful" do
-      it "should parse the configuration file" do
-        git = Webbynode::Git.new
-        git.should_receive(:parse_config)
-        git.parse_remote_ip
-      end
-    
-      it "should extract the remote ip from the parsed configuration file" do
-        io_handler = mock("io")
-        io_handler.as_null_object
-      
+    describe '#parse_remote_url' do
+      it "returns the URL for the new config model" do
         git = Webbynode::Git.new
         git.stub!(:remote_webbynode?).and_return(true)
         git.should_receive(:io).and_return(io_handler)
-        File.should_receive(:open).exactly(:once).with(".git/config").and_return(read_fixture('git/config/config'))
-        git.parse_remote_ip
-        git.config.should_not be_empty
-        git.remote_ip.should eql('1.2.3.4')
+        File.should_receive(:open).exactly(:once).with(".git/config").and_return(read_fixture('git/config/new_config'))
+
+        git.parse_remote_url.should == 'ssh://git@1.2.3.4:122/var/rapp/webbynode'
+      end
+    end
+
+    describe '#parse_remote_ip' do
+      context "old format" do
+        it "should extract the remote ip and port from the parsed configuration file" do
+          git = Webbynode::Git.new
+          git.stub!(:remote_webbynode?).and_return(true)
+          git.should_receive(:io).and_return(io_handler)
+          File.should_receive(:open).exactly(:once).with(".git/config").and_return(read_fixture('git/config/config'))
+          git.parse_remote_ip
+          git.config.should_not be_empty
+          git.remote_ip.should eql('1.2.3.4')
+          git.remote_port.should eql(22)
+        end
+      end
+      
+      context "new format" do
+        it "should extract the remote ip and port from the parsed configuration file" do
+          git = Webbynode::Git.new
+          git.stub!(:remote_webbynode?).and_return(true)
+          git.should_receive(:io).and_return(io_handler)
+          File.should_receive(:open).exactly(:once).with(".git/config").and_return(read_fixture('git/config/new_config'))
+          git.parse_remote_ip
+          git.config.should_not be_empty
+          git.remote_ip.should eql('1.2.3.4')
+          git.remote_port.should eql(122)
+        end
       end
     end
   end

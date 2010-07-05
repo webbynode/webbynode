@@ -36,8 +36,19 @@ describe Webbynode::Option do
     end
   end
   
-  describe "validating" do
-    it "should validate against values if :in passed" do
+  describe "validations" do
+    it "assures value is numerif if :numeric passed" do
+      opt = Webbynode::Option.new(:option1, "My option", :validate => :integer )
+      opt.value = 'c'
+      
+      error = "Invalid value 'c' for option 'option1'. It should be an integer."
+      
+      opt.should_not be_valid
+      opt.errors.should be_include(error)
+      lambda { opt.validate! }.should raise_error(Webbynode::Command::InvalidCommand, error)
+    end
+    
+    it "assures values match if :in passed" do
       opt = Webbynode::Option.new(:option1, "My option", :validate => { :in => ['a', 'b'] })
       opt.value = 'c'
       opt.should_not be_valid

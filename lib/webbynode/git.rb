@@ -6,7 +6,7 @@ module Webbynode
   class GitRemoteCouldNotRemoveError < StandardError; end
 
   class Git
-    attr_accessor :config, :remote_ip
+    attr_accessor :config, :remote_ip, :remote_port
     
     def present?
       io.directory?(".git")
@@ -45,8 +45,10 @@ module Webbynode
       exec "git add #{what}"
     end
     
-    def add_remote(name, host, repo)
-      exec("git remote add #{name} git@#{host}:#{repo}") do |output|
+    def add_remote(name, host, repo, port=22)
+      home = RemoteExecutor.new(host, port).remote_home
+
+      exec("git remote add #{name} ssh://git@#{host}:#{port}#{home}/#{repo}") do |output|
         # raise an exception if remote already exists
         raise GitRemoteAlreadyExistsError, output if output =~ /remote \w+ already exists/
         
@@ -108,9 +110,31 @@ module Webbynode
       end
     end
     
+    def init_config
+      @config ||= parse_config
+    end
+    
+    def parse_remote_url
+      init_config
+      @remote_url ||= @config["remote"]["webbynode"]["url"]
+    end
+    
     def parse_remote_ip
-      @config     ||= parse_config
-      @remote_ip  ||= ($2 if @config["remote"]["webbynode"]["url"] =~ /^(\w+)@(.+):(.+)$/) if @config
+      init_config
+      
+      # new remote format
+      if parse_remote_url =~ /^ssh:\/\/(\w+)@(.+)\/(.+)$/
+        if $2 =~ /(.*):(\d*)\/(.*)$/
+          @remote_ip   ||= $1
+          @remote_port ||= $2.to_i
+          @remote_home ||= "/#{$3}"
+        end
+      else
+        @remote_ip   ||= ($2 if @config["remote"]["webbynode"]["url"] =~ /^(\w+)@(.+):(.+)$/) if @config
+        @remote_port ||= 22
+      end
+      
+      @remote_ip
     end
     
     def remote_exists?(remote)

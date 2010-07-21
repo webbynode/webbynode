@@ -12,7 +12,16 @@ module Webbynode
 
       begin
         IO.foreach(file) do |line|
-          self[$1.strip.to_s] = $2.strip if line = ~ /([^=]*)=(.*)\/\/(.*)/ || line =~ /([^=]*)=(.*)/
+          if line = ~ /([^=]*)=(.*)\/\/(.*)/ || line =~ /([^=]*)=(.*)/
+            key = $1.strip.to_s
+            value = $2.strip 
+            
+            if value =~ /^\((.*)\)$/
+              value = $1.split(' ')
+            end
+            
+            self[key] = value
+          end
         end
       rescue
       end

@@ -57,6 +57,30 @@ describe Webbynode::Io do
     end
   end
   
+  describe '#add_multi_setting' do
+    let(:io) { Webbynode::Io.new }
+    it "creates an entry with the elements" do
+      props = mock("Hash")
+      props.should_receive(:[]=).with('addons', '(a b c)')
+      props.should_receive(:save)
+
+      io.should_receive(:properties).with(".webbynode/settings").and_return(props)
+      io.add_multi_setting("addons", ['a', 'b', 'c'])
+    end
+  end
+  
+  describe '#load_setting' do
+    let(:io) { Webbynode::Io.new }
+    it "loads the properties file" do
+      props = stub("Properties")
+      props.should_receive(:[]).with('addons').and_return(['a', 'b', 'c'])
+
+      # Properties.should_receive(:initialize).with(".webbynode/settings", true).and_return(props)
+      io.should_receive(:properties).with(".webbynode/settings").and_return(props)
+      io.load_setting("addons").should == ['a', 'b', 'c']
+    end
+  end
+  
   describe '#remove_setting' do
     let(:io) { Webbynode::Io.new }
 

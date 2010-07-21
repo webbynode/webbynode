@@ -207,6 +207,14 @@ module Webbynode
       with_setting { |s| s[key] = value }
     end
     
+    def add_multi_setting(key, values)
+      with_setting { |s| s[key] = "(#{values.join(" ")})" }
+    end
+    
+    def load_setting(key)
+      properties(".webbynode/settings")[key]
+    end
+    
     def config_multi_add(key, new_value)
       raise "Missing Webbynode config file" unless file_exists?(".webbynode/config")
       config = read_yaml(".webbynode/config")

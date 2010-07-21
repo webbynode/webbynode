@@ -53,6 +53,8 @@ module Webbynode::Commands
       end
       
       @addons = io.load_setting('addons') || []
+      @addons = [] unless @addons.is_a?(Array)
+      @addons
     end
     
     def show_summary
@@ -66,7 +68,7 @@ module Webbynode::Commands
       io.log("")
       
       addons = io.load_setting("addons")
-      if addons && addons.any?
+      if addons && addons.is_a?(Array) && addons.any?
         io.log('Currently selected add-ons:')
         io.log('')
         io.log("   #{addons.join(', ')}")

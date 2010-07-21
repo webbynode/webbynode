@@ -27,6 +27,12 @@ describe Webbynode::Commands::Addons do
       subject.execute
     end
     
+    it "handles malformed addons setting" do
+      io.should_receive(:load_setting).with('addons').and_return('somemalformedthing')
+      io.should_receive(:log).with("No add-ons currently selected. Use 'wn addons add <name>' do add.")
+      subject.execute
+    end
+
     it "doesn't show installed addons if none installed" do
       io.should_receive(:load_setting).with('addons').and_return(nil)
       io.should_receive(:log).with('Currently selected add-ons').never
@@ -118,7 +124,7 @@ describe Webbynode::Commands::Addons do
     
     context "with an invalid addon" do
       subject do
-        Webbynode::Commands::Addons.new('remove', 'nothing').tap do |cmd|
+        Webbynode::Commands::Addons.new('add', 'nothing').tap do |cmd|
           cmd.stub!(:io).and_return(io)
         end
       end
@@ -136,6 +142,13 @@ describe Webbynode::Commands::Addons do
         end
       end
       
+      it "handles malformed addons setting" do
+        io.should_receive(:load_setting).with('addons').and_return('somerandomstuff')
+        io.should_receive(:add_multi_setting).with('addons', ['mongodb'])
+        io.should_receive(:log).with("Add-on 'mongodb' added")
+        subject.execute
+      end
+
       context "when setting does not exist" do
         it "create the array" do
           io.should_receive(:load_setting).with('addons').and_return(nil)

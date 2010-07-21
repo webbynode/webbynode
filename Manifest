@@ -35,6 +35,7 @@ lib/webbynode/commands/config.rb
 lib/webbynode/commands/delete.rb
 lib/webbynode/commands/help.rb
 lib/webbynode/commands/init.rb
+lib/webbynode/commands/open.rb
 lib/webbynode/commands/push.rb
 lib/webbynode/commands/remote.rb
 lib/webbynode/commands/restart.rb
@@ -102,6 +103,7 @@ spec/webbynode/commands/config_spec.rb
 spec/webbynode/commands/delete_spec.rb
 spec/webbynode/commands/help_spec.rb
 spec/webbynode/commands/init_spec.rb
+spec/webbynode/commands/open_spec.rb
 spec/webbynode/commands/push_spec.rb
 spec/webbynode/commands/remote_spec.rb
 spec/webbynode/commands/tasks_spec.rb

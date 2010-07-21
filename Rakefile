@@ -15,6 +15,7 @@ Echoe.new('webbynode', '0.2.5.beta2') do |p|
     ['net-ssh', '>=2.0.20'],
     ['highline', '>=1.5.2'],
     ['httparty', '>=0.4.5'],
+    ['launchy',  '>=0.3.7'],
     ['domainatrix','>=0.0.7'],
   ]
   # p.dependencies = [

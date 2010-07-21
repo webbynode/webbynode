@@ -28,7 +28,7 @@ module Webbynode
       remote_executor.create_folder("~/.ssh")
       
       key_contents = io.read_file(key_file)
-      remote_executor.exec "echo \"#{key_contents}\" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys"
+      remote_executor.exec "grep \"#{key_contents}\" ~/.ssh/authorized_keys || (echo \"#{key_contents}\" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys)"
     end
     
     def application_pushed?

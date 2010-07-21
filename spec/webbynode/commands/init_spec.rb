@@ -16,6 +16,8 @@ describe Webbynode::Commands::Init do
   end
   
   before(:each) do
+    server = stub('Server').as_null_object
+    Webbynode::Server.stub!(:new).and_return(server)
     FakeWeb.clean_registry
     create_init
     git_handler.stub!(:remote_exists?).and_return(false)

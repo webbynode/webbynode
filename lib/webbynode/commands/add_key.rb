@@ -1,3 +1,5 @@
+LocalSshKey = "#{ENV['HOME']}/.ssh/id_rsa.pub"
+
 module Webbynode::Commands
   class AddKey < Webbynode::Command
     requires_initialization!
@@ -5,8 +7,6 @@ module Webbynode::Commands
     summary "Adds your ssh public key to your Webby, making deployments easy"
     option :passphrase, "If present, passphrase will be used when creating a new SSH key", :take => :words
 
-    LocalSshKey = "#{ENV['HOME']}/.ssh/id_rsa.pub"
-    
     add_alias "addkey"
     
     def execute

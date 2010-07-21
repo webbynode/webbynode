@@ -77,11 +77,20 @@ module Webbynode::Commands
       io.log "Adding webbynode as git remote..."
       options = ["webbynode", webby_ip, app_name]
       options << option(:port).to_i if option(:port)
+
+      Webbynode::Server.new(webby_ip).add_ssh_key LocalSshKey, nil
+
       git.add_remote *options
       
       handle_dns option(:dns) if option(:adddns)
       
       io.log "Application #{app_name} ready for Rapid Deployment", :finish
+    rescue Webbynode::InvalidAuthentication
+      io.log "Could not connect to webby: invalid authentication.", true
+
+    rescue Webbynode::PermissionError
+      io.log "Could not create an SSH key: permission error.", true
+
     rescue Webbynode::GitRemoteAlreadyExistsError
       io.log "Application already initialized."
     end

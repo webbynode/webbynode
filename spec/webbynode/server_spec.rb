@@ -70,7 +70,7 @@ describe Webbynode::Server do
 
         it "should upload the local key to the server" do
           @io.should_receive(:read_file).with("abc").and_return("key_contents")
-          @re.should_receive(:exec).with('echo "key_contents" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys')
+          @re.should_receive(:exec).with("grep \"key_contents\" ~/.ssh/authorized_keys || (echo \"key_contents\" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys)")
 
           @server.add_ssh_key "abc"
         end

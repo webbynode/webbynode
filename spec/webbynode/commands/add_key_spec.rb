@@ -5,7 +5,7 @@ describe Webbynode::Commands::AddKey do
   let(:server) { double("server") }
   
   it "should have a constant pointing to the ssh key location" do
-    Webbynode::Commands::AddKey::LocalSshKey.should == "#{ENV['HOME']}/.ssh/id_rsa.pub"
+    LocalSshKey.should == "#{ENV['HOME']}/.ssh/id_rsa.pub"
   end
   
   it "should be aliased to addkey" do
@@ -15,7 +15,7 @@ describe Webbynode::Commands::AddKey do
   
   context "when successful" do
     it "should upload the local ssh key into the server" do
-      server.should_receive(:add_ssh_key).with(Webbynode::Commands::AddKey::LocalSshKey, nil)
+      server.should_receive(:add_ssh_key).with(LocalSshKey, nil)
 
       cmd = Webbynode::Commands::AddKey.new
       cmd.should_receive(:server).any_number_of_times.and_return(server)
@@ -23,7 +23,7 @@ describe Webbynode::Commands::AddKey do
     end
 
     it "should create an ssh key with a provided passphrase" do
-      server.should_receive(:add_ssh_key).with(Webbynode::Commands::AddKey::LocalSshKey, "my_passphrase")
+      server.should_receive(:add_ssh_key).with(LocalSshKey, "my_passphrase")
 
       cmd = Webbynode::Commands::AddKey.new("--passphrase=my_passphrase")
       cmd.should_receive(:server).any_number_of_times.and_return(server)

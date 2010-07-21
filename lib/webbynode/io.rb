@@ -137,8 +137,8 @@ module Webbynode
     end
     
     def create_local_key(passphrase="")
-      unless File.exists?(Webbynode::Commands::AddKey::LocalSshKey)
-        exec "ssh-keygen -t rsa -N \"#{passphrase}\" -f #{Webbynode::Commands::AddKey::LocalSshKey}"
+      unless File.exists?(LocalSshKey)
+        exec "ssh-keygen -t rsa -N \"#{passphrase}\" -f #{LocalSshKey}"
       end
     end
     

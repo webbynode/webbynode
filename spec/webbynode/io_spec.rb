@@ -97,20 +97,20 @@ describe Webbynode::Io do
   describe '#create_local_key' do
     describe "when key file missing" do
       before(:each) do
-        File.should_receive(:exists?).with(Webbynode::Commands::AddKey::LocalSshKey).and_return(false)
+        File.should_receive(:exists?).with(LocalSshKey).and_return(false)
         @io = Webbynode::Io.new
       end
 
       context "with no passphrase" do
         it "should create the key with an empty passphrase" do
-          @io.should_receive(:exec).with("ssh-keygen -t rsa -N \"\" -f #{Webbynode::Commands::AddKey::LocalSshKey}").and_return("")
+          @io.should_receive(:exec).with("ssh-keygen -t rsa -N \"\" -f #{LocalSshKey}").and_return("")
           @io.create_local_key
         end
       end
       
       context "with a passphrase" do
         it "should create the key with the provided passphrase" do
-          @io.should_receive(:exec).with("ssh-keygen -t rsa -N \"passphrase\" -f #{Webbynode::Commands::AddKey::LocalSshKey}").and_return("")
+          @io.should_receive(:exec).with("ssh-keygen -t rsa -N \"passphrase\" -f #{LocalSshKey}").and_return("")
           @io.create_local_key("passphrase")
         end
       end
@@ -118,7 +118,7 @@ describe Webbynode::Io do
     
     describe "when key already exists" do
       before(:each) do
-        File.should_receive(:exists?).with(Webbynode::Commands::AddKey::LocalSshKey).and_return(true)
+        File.should_receive(:exists?).with(LocalSshKey).and_return(true)
         @io = Webbynode::Io.new
       end
 

@@ -30,11 +30,12 @@ Echoe.new('webbynode', '0.2.5.beta2') do |p|
       Webbynode Rapid Deployment Gem
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-This deployment engine is highly experimental and
-should be considered beta code for now.
+Thank you for installing Webbynode gem. You're now
+able to deploy and manage your applications from
+the comfort of your command line.
 
-For a quickstart:
-http://guides.webbynode.com/articles/rapidapps
+Please read our guide for a quickstart:
+http://guides.webbynode.com/articles/rapidapps/
 
 "
 end

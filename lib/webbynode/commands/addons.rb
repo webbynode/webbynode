@@ -73,7 +73,7 @@ module Webbynode::Commands
         io.log('')
         io.log("   #{addons.join(', ')}")
       else        
-        io.log("No add-ons currently selected. Use 'wn addons add <name>' do add.")
+        io.log("No add-ons currently selected. Use 'wn addons add <name>' to add.")
       end
       io.log('')
       

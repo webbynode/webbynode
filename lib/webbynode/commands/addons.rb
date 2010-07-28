@@ -1,6 +1,6 @@
 module Webbynode::Commands
   class Addons < Webbynode::Command
-    SUPPORTED_ADDONS = ["mongodb", "redis", "memcached"]
+    SUPPORTED_ADDONS = ["mongodb", "redis", "memcached", "beanstalkd"]
 
     summary "Manages you application's add-ons"
     parameter :action, "add, remove or show", 
@@ -60,11 +60,12 @@ module Webbynode::Commands
     def show_summary
       io.log('Available add-ons:')
       io.log("")
-      io.log('   Key         Name       Description')
-      io.log('  ----------- ---------- ------------------------')
-      io.log('   mongodb     MongoDB    Document based database engine')
-      io.log('   redis       Redis      Advanced key-value store')
-      io.log('   memcached   Memcached  Distributed memory object caching system')
+      io.log('   Key          Name        Description')
+      io.log('  ------------ ----------- ------------------------')
+      io.log('   beanstalkd   Beanstalk   Simple, fast workqueue service')
+      io.log('   memcached    Memcached   Distributed memory object caching system')
+      io.log('   mongodb      MongoDB     Document based database engine')
+      io.log('   redis        Redis       Advanced key-value store')
       io.log("")
       
       addons = io.load_setting("addons")

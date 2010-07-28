@@ -12,11 +12,12 @@ describe Webbynode::Commands::Addons do
 
     it "shows all available addons" do
       io.should_receive(:log).with('Available add-ons:')
-      io.should_receive(:log).with('   Key         Name       Description')
-      io.should_receive(:log).with('  ----------- ---------- ------------------------')
-      io.should_receive(:log).with('   mongodb     MongoDB    Document based database engine')
-      io.should_receive(:log).with('   redis       Redis      Advanced key-value store')
-      io.should_receive(:log).with('   memcached   Memcached  Distributed memory object caching system')
+      io.should_receive(:log).with('   Key          Name        Description')
+      io.should_receive(:log).with('  ------------ ----------- ------------------------')
+      io.should_receive(:log).with('   beanstalkd   Beanstalk   Simple, fast workqueue service')
+      io.should_receive(:log).with('   memcached    Memcached   Distributed memory object caching system')
+      io.should_receive(:log).with('   mongodb      MongoDB     Document based database engine')
+      io.should_receive(:log).with('   redis        Redis       Advanced key-value store')
       subject.execute
     end
     
@@ -29,14 +30,14 @@ describe Webbynode::Commands::Addons do
     
     it "handles malformed addons setting" do
       io.should_receive(:load_setting).with('addons').and_return('somemalformedthing')
-      io.should_receive(:log).with("No add-ons currently selected. Use 'wn addons add <name>' do add.")
+      io.should_receive(:log).with("No add-ons currently selected. Use 'wn addons add <name>' to add.")
       subject.execute
     end
 
     it "doesn't show installed addons if none installed" do
       io.should_receive(:load_setting).with('addons').and_return(nil)
       io.should_receive(:log).with('Currently selected add-ons').never
-      io.should_receive(:log).with("No add-ons currently selected. Use 'wn addons add <name>' do add.")
+      io.should_receive(:log).with("No add-ons currently selected. Use 'wn addons add <name>' to add.")
       subject.execute
     end
   end

@@ -125,5 +125,4 @@ spec/webbynode/push_and_spec.rb
 spec/webbynode/remote_executor_spec.rb
 spec/webbynode/server_spec.rb
 spec/webbynode/ssh_spec.rb
-tags
 webbynode.gemspec

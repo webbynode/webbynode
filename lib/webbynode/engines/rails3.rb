@@ -10,6 +10,7 @@ module Webbynode::Engines
     
     def prepare
       check_gemfile
+      super
     end
     
     private

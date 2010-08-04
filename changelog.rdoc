@@ -1,12 +1,95 @@
 = CHANGELOG
 
+== 2010-08-04 Felipe Coury
+
+* Properties class properly saves array values. Fixes #23
+
+== 2010-08-03 Felipe Coury
+
+* Fixed a failing test by pending it with explanatory message.
+* Fixed bug where database.yml was not being excluded from git.
+
+== 2010-07-28 Felipe Coury
+
+* Added Beanstalk
+
+== 2010-07-22 Felipe Coury
+
+* Fixed spelling in addons command
+* New installation message
+
+== 2010-07-21 Felipe Coury
+
+* Prevents errors if addons param is malformed
+
+== 2010-07-20 Felipe Coury
+
+* Added `wn open' command. Closes #22
+* Adds SSH key when initializing. Closes #15
+* Added support for addons. Closes #20
+
+== 2010-07-04 Felipe Coury
+
+* Error message when using Django engine and settings.py isn't found
+* Updated gemspec and Manifest
+* Now all commands work with an alternate SSH port when wn init --port=PORT is used. Fixed a small bug on options validation. Fixes #19
+* Handles connection refused when attempting to run commands
+* Changed AWS S3 back help text to point to the correct URL. Fixes #17
+
+== 2010-07-01 Felipe Coury
+
+* Bumped gem version to 0.2.5.beta2.
+* Added Django initialization code for handling .gitignore and settings.template.py creation.
+* Taken Rails-specific code out of init command.
+* Added prepare to Engine and extracted Gemfile detection code to Rails3 engine class.
+* Added engine_id, engine_name and git_excluded specs for engines
+* Invalid engine shows error message and triggers interactive engine selection.
+* Starting of Engine-specific preparation and validation code (WIP)
+* Refactoring on the Engine detection methods.
+* Engine detection refactoring (work in progress).
+
+== 2010-06-30 Felipe Coury
+
+* Fixed order of settings
+* Detects pontential problems before engine detection
+* Engine detection refactoring
+* Marked gem as 0.2.5.beta1. Closes #12. Closes #13.
+
+== 2010-06-29 Felipe Coury
+
+* Made webbynode gem compatible with Windows.
+
+== 2010-06-28 Felipe Coury
+
+* Merge commit '0.2.4.1'
+* Removed jcode as a dependency. Fixes #8.
+* Removed cucumber.yml for the time being
+* Improved wn init feedback
+
+== 2010-06-27 Felipe Coury
+
+* When user has only one Webby, assumes it when `init' command is used. When user has multiple Webbies and the param is omitted, shows a list of user's Webbies.
+* Removed features temporarily
+* Init command now takes DNS entry as an option (--dns=xyz) and started simplification of wn init, making the webby parameter optional if user only have one Webby.
+* Fixed option parsing to allow xyz.abc.def
+* Renamed feature for the time being
+
+== 2010-06-26 Felipe Coury
+
+* Rapp automatic updates support Command `wn apps' - lists all the current apps on a Webby Bumped Gem version
+
 == 2010-06-24 Felipe Coury
 
+* Added changelog
 * Rails 3 autodetection
 * Small typo on Gemfile error message
 * Uses bundler to check for sqlite3-ruby dependency in Gemfile. If found, issues an error message with proper instructions. Closes #6.
 * Fixed version command
 * Stops tracking db/schema.rb and config/database.yml if there is an existing git repo. Closes #7. Doesn't allow init to run if current app in on a dirty git state.
+
+== 2010-06-24 Michael van Rooijen
+
+* Adjusted the Gemfile error text.
 
 == 2010-06-23 Felipe Coury
 

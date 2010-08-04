@@ -9,7 +9,6 @@ bin/webbynode
 bin/wn
 changelog.rdoc
 cucumber.yml.old
-devver.rake
 inactive_features/bootstrap.feature
 inactive_features/step_definitions/command_steps.rb
 inactive_features/support/env.rb

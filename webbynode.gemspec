@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 1.2") if s.respond_to? :required_rubygems_version=
   s.authors = ["Felipe Coury"]
-  s.date = %q{2010-08-03}
+  s.date = %q{2010-08-04}
   s.description = %q{Webbynode Deployment Gem}
   s.email = %q{felipe@webbynode.com}
   s.executables = ["webbynode", "wn"]

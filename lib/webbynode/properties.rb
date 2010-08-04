@@ -26,7 +26,7 @@ module Webbynode
       rescue
       end
     end
-
+    
     def to_s
       output = "File name #{@file}\n"
       self.each { |key, value| output += " #{key} = #{value}\n" }
@@ -45,8 +45,18 @@ module Webbynode
 
     def save
       file = File.new(@file, "w+")
-      self.each { |key, value| file.puts "#{key}=#{value}\n" }
+      self.converted.each { |key, value| file.puts "#{key}=#{value}\n" }
       file.close
+    end
+    
+    def converted
+      hash = self.clone
+      hash.each do |k, v|
+        if v.is_a?(Array)
+          hash[k] = "(#{v.join(" ")})"
+        end
+      end
+      hash
     end
   end
 end

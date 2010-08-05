@@ -103,14 +103,16 @@ describe Webbynode::Io do
 
       context "with no passphrase" do
         it "should create the key with an empty passphrase" do
-          @io.should_receive(:exec).with("ssh-keygen -t rsa -N \"\" -f #{LocalSshKey}").and_return("")
+          @io.should_receive(:mkdir).with(File.dirname(LocalSshKey))
+          @io.should_receive(:exec).with(%Q(ssh-keygen -t rsa -N "" -f "#{LocalSshKey.gsub(/\.pub$/, "")}")).and_return("")
           @io.create_local_key
         end
       end
       
       context "with a passphrase" do
         it "should create the key with the provided passphrase" do
-          @io.should_receive(:exec).with("ssh-keygen -t rsa -N \"passphrase\" -f #{LocalSshKey}").and_return("")
+          @io.should_receive(:mkdir).with(File.dirname(LocalSshKey))
+          @io.should_receive(:exec).with(%Q(ssh-keygen -t rsa -N "passphrase" -f "#{LocalSshKey.gsub(/\.pub$/, "")}")).and_return("")
           @io.create_local_key("passphrase")
         end
       end

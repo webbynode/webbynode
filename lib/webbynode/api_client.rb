@@ -5,7 +5,7 @@ module Webbynode
     include HTTParty
     base_uri "https://manager.webbynode.com/api/yaml"
 
-    CREDENTIALS_FILE = "#{ENV['HOME']}/.webbynode"
+    CREDENTIALS_FILE = "#{Io.home_dir}/.webbynode"
 
     Unauthorized = Class.new(StandardError)
     InactiveZone = Class.new(StandardError)

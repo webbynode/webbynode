@@ -10,8 +10,12 @@ module Webbynode
     
     TemplatesPath = File.join(File.dirname(__FILE__), '..', 'templates')
     
-    def is_windows?
+    def self.is_windows?
       Config::CONFIG["host_os"] =~ /mswin|mingw/
+    end
+    
+    def is_windows?
+      Io.is_windows?
     end
     
     def exists_in_path?(file)
@@ -136,9 +140,23 @@ module Webbynode
       exit
     end
     
+    def self.home_dir
+      if is_windows?
+        if ENV['USERPROFILE'].nil?
+          userdir = "C:/My Documents/"
+        else
+          userdir = ENV['USERPROFILE']
+        end
+      else
+        userdir = ENV['HOME'] unless ENV['HOME'].nil?
+      end
+    end
+    
     def create_local_key(passphrase="")
       unless File.exists?(LocalSshKey)
-        exec "ssh-keygen -t rsa -N \"#{passphrase}\" -f #{LocalSshKey}"
+        mkdir File.dirname(LocalSshKey)
+        key_file = LocalSshKey.gsub(/\.pub$/, "")
+        exec "ssh-keygen -t rsa -N \"#{passphrase}\" -f \"#{key_file}\""
       end
     end
     
@@ -176,7 +194,7 @@ module Webbynode
     end
     
     def general_settings
-      @general_settings ||= properties("#{ENV['HOME']}/.webbynode")
+      @general_settings ||= properties("#{Io.home_dir}/.webbynode")
     end
     
     def with_settings_for(file, &blk)

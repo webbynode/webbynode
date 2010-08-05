@@ -31,14 +31,14 @@ describe Webbynode::Server do
       context "when unsuccessful" do
         it "should create a local SSH key with empty passphrase" do
           @io.should_receive(:file_exists?).with("xyz").and_return(false)
-          @io.should_receive(:create_local_key).with("xyz", "")
+          @io.should_receive(:create_local_key).with("")
       
           @server.add_ssh_key "xyz"
         end
 
         it "should create a local SSH key with the provided passphrase" do
           @io.should_receive(:file_exists?).with("abc").and_return(false)
-          @io.should_receive(:create_local_key).with("abc", "my_passphrase")
+          @io.should_receive(:create_local_key).with("my_passphrase")
       
           @server.add_ssh_key "abc", "my_passphrase"
         end

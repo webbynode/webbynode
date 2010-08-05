@@ -24,7 +24,7 @@ module Webbynode
     end
 
     def add_ssh_key(key_file, passphrase="")
-      io.create_local_key(key_file, passphrase) unless io.file_exists?(key_file)
+      io.create_local_key(passphrase) unless io.file_exists?(key_file)
       remote_executor.create_folder("~/.ssh")
       
       key_contents = io.read_file(key_file)

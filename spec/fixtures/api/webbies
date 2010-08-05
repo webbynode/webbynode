@@ -12,15 +12,15 @@ Content-Length: 222
 
 --- 
 webbies: 
-- :ip: 201.81.121.201
-  :status: "on"
-  :name: sandbox
-  :notes: 
-  :plan: Webbybeta
-  :node: miami-b15
-- :ip: 61.21.71.31
-  :status: "on"
-  :name: webby3067
-  :notes: 
-  :plan: Webbybeta
-  :node: miami-b02
+- ip: 201.81.121.201
+  status: "on"
+  name: sandbox
+  notes: 
+  plan: Webbybeta
+  node: miami-b15
+- ip: 61.21.71.31
+  status: "on"
+  name: webby3067
+  notes: 
+  plan: Webbybeta
+  node: miami-b02

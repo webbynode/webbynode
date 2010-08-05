@@ -18,10 +18,10 @@ module Webbynode::Commands
       api.webbies.each_pair do |name, webby|
         str = "  "
         str << name.ljust(16)
-        str << webby[:ip].ljust(16)
-        str << webby[:node].ljust(10)
-        str << webby[:plan].ljust(16)
-        str << webby[:status]
+        str << webby['ip'].ljust(16)
+        str << webby['node'].ljust(10)
+        str << webby['plan'].ljust(16)
+        str << webby['status']
         
         puts str
       end

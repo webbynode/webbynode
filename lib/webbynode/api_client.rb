@@ -62,7 +62,7 @@ module Webbynode
     end
     
     def ip_for(hostname)
-      (webbies[hostname] || {})[:ip]
+      (webbies[hostname] || {})['ip']
     end
     
     def webbies
@@ -72,7 +72,7 @@ module Webbynode
         @webbies = response
       end
       
-      @webbies['webbies'].inject({}) { |h, webby| h[webby[:name]] = webby; h }
+      @webbies['webbies'].inject({}) { |h, webby| h[webby['name']] = webby; h }
     end
     
     def credentials

@@ -115,7 +115,7 @@ module Webbynode::Commands
           api_webbies.keys.sort.each_with_index do |webby_key, i|
             webby = api_webbies[webby_key]
             choices << webby
-            io.log "  #{i+1}. #{webby[:name]} (#{webby[:ip]})"
+            io.log "  #{i+1}. #{webby['name']} (#{webby['ip']})"
           end
         
           io.log "", :simple
@@ -124,9 +124,9 @@ module Webbynode::Commands
         end
         
         io.log "", :simple
-        io.log "Set deployment Webby to #{webby[:name]}."
+        io.log "Set deployment Webby to #{webby['name']}."
         
-        return webby[:ip]
+        return webby['ip']
       end
 
       io.log "Retrieving IP for Webby #{webby}..."

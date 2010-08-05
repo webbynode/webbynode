@@ -27,12 +27,12 @@ describe Webbynode::Commands::Init do
     Webbynode::Commands::Init.new.tap do |cmd|
       webbies = {
         'sandbox' => {
-          :ip     => "201.81.121.201",
-          :status => "on",
-          :name   => "sandbox",
-          :notes  => "",
-          :plan   => "Webbybeta",
-          :node   => "miami-b15"
+          "ip"     => "201.81.121.201",
+          "status" => "on",
+          "name"   => "sandbox",
+          "notes"  => "",
+          "plan"   => "Webbybeta",
+          "node"   => "miami-b15"
         }
       }
       api.stub!(:webbies).and_return(webbies)
@@ -159,12 +159,12 @@ describe Webbynode::Commands::Init do
         Webbynode::Commands::Init.new("--engine=php").tap do |cmd|
           webbies = {
             'sandbox' => {
-              :ip     => "201.81.121.201",
-              :status => "on",
-              :name   => "sandbox",
-              :notes  => "",
-              :plan   => "Webbybeta",
-              :node   => "miami-b15"
+              "ip"     => "201.81.121.201",
+              "status" => "on",
+              "name"   => "sandbox",
+              "notes"  => "",
+              "plan"   => "Webbybeta",
+              "node"   => "miami-b15"
             }
           }
           api.stub!(:webbies).and_return(webbies)
@@ -238,28 +238,28 @@ describe Webbynode::Commands::Init do
     it "complains if missing and user has > 1 webby" do
       webbies = {
         'webby3' => {
-          :ip     => "67.53.31.3",
-          :status => "on",
-          :name   => "webby3",
-          :notes  => "",
-          :plan   => "Webbybeta",
-          :node   => "miami-b11"
+          "ip"     => "67.53.31.3",
+          "status" => "on",
+          "name"   => "webby3",
+          "notes"  => "",
+          "plan"   => "Webbybeta",
+          "node"   => "miami-b11"
         },
         'sandbox' => {
-          :ip     => "201.81.121.201",
-          :status => "on",
-          :name   => "sandbox",
-          :notes  => "",
-          :plan   => "Webbybeta",
-          :node   => "miami-b15"
+          "ip"     => "201.81.121.201",
+          "status" => "on",
+          "name"   => "sandbox",
+          "notes"  => "",
+          "plan"   => "Webbybeta",
+          "node"   => "miami-b15"
         },
         'webby2' => {
-          :ip     => "67.53.31.2",
-          :status => "on",
-          :name   => "webby2",
-          :notes  => "",
-          :plan   => "Webbybeta",
-          :node   => "miami-b11"
+          "ip"     => "67.53.31.2",
+          "status" => "on",
+          "name"   => "webby2",
+          "notes"  => "",
+          "plan"   => "Webbybeta",
+          "node"   => "miami-b11"
         }
       }
       api.should_receive(:webbies).and_return(webbies)

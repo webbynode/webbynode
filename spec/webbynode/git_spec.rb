@@ -31,7 +31,7 @@ describe Webbynode::Git do
     should_raise_when_response Webbynode::GitNotRepoError, command, 
       "fatal: Not a git repository (or any of the parent directories): .git", &blk
   end
-  
+
   it "should have an io instance" do
     pending "Check out why this is being mocked"
     Webbynode::Git.new.io.class.should == Webbynode::Io
@@ -266,6 +266,16 @@ describe Webbynode::Git do
       it "should raise a generic Git error when another error occurs" do
         should_raise_giterror("git add something") { |git| git.add("something") }
       end
+    end
+
+      
+    it "raises no error when just a warning is issued" do
+      io_handler = mock("io")
+      io_handler.should_receive(:exec).with("git add .").and_return("warning: LF will be replaced by CRLF in public/placeholder")
+      
+      git = Webbynode::Git.new
+      git.should_receive(:io).and_return(io_handler)
+      lambda { git.add "." }.should_not raise_error
     end
   end
 

@@ -153,21 +153,24 @@ module Webbynode
     
     private
     
-      def exec(cmd, &blk)
-        handle_output io.exec(cmd), &blk
-      end
-      
-      def handle_output(output, &blk)
-        raise GitNotRepoError, output if output =~ /Not a git repository/
+    def warning?(output)
+      output =~ /^warning: /
+    end
+    
+    def exec(cmd, &blk)
+      handle_output io.exec(cmd), &blk
+    end
+    
+    def handle_output(output, &blk)
+      raise GitNotRepoError, output if output =~ /Not a git repository/
 
-        if blk
-          raise GitError, output unless blk.call(output)
-        else
-          raise GitError, output unless output.nil? or output.empty?
-        end
-      
-        true
+      if blk
+        raise GitError, output unless blk.call(output)
+      else
+        raise GitError, output unless output.nil? or output.empty? or warning?(output)
       end
     
+      true
+    end
   end
 end

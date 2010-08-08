@@ -39,18 +39,18 @@ module Webbynode::Commands
       io.log ""
       io.log "Initializing directory structure..."
       
-      unless io.file_exists?(".pushand")
-        io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name} #{dns_entry}\n", true)
+      if pushand_exists = io.file_exists?(".pushand")
+        io.log ""
+        io.log "It seems this application was initialized before."
+        overwrite = ask('Do you want to initialize it again (y/n)?').downcase == 'y'
       end
       
-      unless io.directory?(".webbynode")
-        io.mkdir(".webbynode/tasks")
-
-        io.create_file(".webbynode/tasks/after_push", "")
-        io.create_file(".webbynode/tasks/before_push", "")
-        io.create_file(".webbynode/aliases", "")
-        io.create_file(".webbynode/config", "")
+      if overwrite || !pushand_exists
+        io.log ""
+        io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name} #{dns_entry}\n", true)
       end
+
+      create_webbynode_tree
 
       unless git_present
         io.log "Initializing git and applying initial commit..."
@@ -62,16 +62,16 @@ module Webbynode::Commands
       if git.remote_exists?('webbynode')
         io.log ""
         io.log "Webbynode git integration already initialized."
-        if ask('Do you want to overwrite the current settings (y/n)?').downcase == 'y'
+        if overwrite || ask('Do you want to overwrite the current settings (y/n)?').downcase == 'y'
           git.delete_remote('webbynode')
         end
         io.log ""
       end
       
-      if !git.remote_exists?('webbynode') and git_present
+      if overwrite or (!git.remote_exists?('webbynode') and git_present)
         io.log "Commiting Webbynode changes..."
         git.add "." 
-        git.commit2 "[Webbynode] Rapid App Deployment Initialization"
+        git.commit2 "[Webbynode] Rapid App Deployment Reinitialization"
       end
       
       io.log "Adding webbynode as git remote..."
@@ -191,6 +191,15 @@ In order to use Webbynode Gem for deployment, you must have git installed.
 For more information about installing git: http://book.git-scm.com/2_installing_git.html
 EOS
       end
+    end
+    
+    def create_webbynode_tree
+      io.mkdir(".webbynode/tasks")
+      
+      io.create_if_missing(".webbynode/tasks/after_push", "")
+      io.create_if_missing(".webbynode/tasks/before_push", "")
+      io.create_if_missing(".webbynode/aliases", "")
+      io.create_if_missing(".webbynode/config", "")
     end
   end
 end

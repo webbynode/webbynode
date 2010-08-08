@@ -167,6 +167,10 @@ module Webbynode
       ::FileUtils.chmod 0755, file_name if executable
     end
     
+    def create_if_missing(file_name, contents, executable=nil)
+      create_file(file_name, contents, executable) unless file_exists?(file_name)
+    end
+    
     def delete_file(file_name)
       File.delete(file_name)
     end

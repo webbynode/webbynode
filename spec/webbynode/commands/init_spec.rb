@@ -13,6 +13,7 @@ describe Webbynode::Commands::Init do
     @command.stub!(:gemfile).and_return(gemfile)
     @command.should_receive(:git).any_number_of_times.and_return(git_handler) 
     @command.should_receive(:io).any_number_of_times.and_return(io_handler)
+    io_handler.stub!(:file_exists?).with(".pushand").and_return(false)
   end
   
   before(:each) do
@@ -47,10 +48,13 @@ describe Webbynode::Commands::Init do
     subject do 
       Webbynode::Commands::Init.new('2.1.2.3', '--port=2020').tap do |cmd|
         cmd.stub!(:git_present).and_return(:false)
+        cmd.stub!(:io).and_return(io_handler)
       end
     end
     
     it "calls add_remote with the specified port" do
+      io_handler.stub!(:file_exists?).with(".pushand").and_return(false)
+
       git_handler.stub!(:present?).and_return(:false)
       git_handler.should_receive(:add_remote).with("webbynode", "2.1.2.3", anything(), 2020)
 
@@ -283,7 +287,23 @@ describe Webbynode::Commands::Init do
         cmd.stub!(:gemfile).and_return(gemfile)
         cmd.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
         cmd.stub!(:git).and_return(git_handler) 
+        cmd.stub!(:io).and_return(io_handler) 
       end
+    end
+    
+    it "doesn't ask if user already agreed to reinitialize" do
+      io_handler.should_receive(:file_exists?).with(".pushand").and_return(true)
+      io_handler.should_receive(:app_name).any_number_of_times.and_return("mah_app")
+      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 mah_app mah_app\n", true)
+
+      subject.should_receive(:ask).with("Do you want to initialize it again (y/n)?").once.ordered.and_return("y")
+      
+      git_handler.should_receive(:present?).and_return(true)
+      git_handler.should_receive(:remote_exists?).with("webbynode").and_return(true)
+      git_handler.should_receive(:delete_remote).with("webbynode")
+
+      subject.should_receive(:ask).with("Do you want to overwrite the current settings (y/n)?").never
+      subject.run
     end
     
     it "keep the same remotes when answer is no to overwriting" do
@@ -326,6 +346,7 @@ describe Webbynode::Commands::Init do
       @command.stub!(:gemfile).and_return(gemfile)
       @command.stub!(:git).and_return(git_handler) 
       @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+      io.stub!(:file_exists?).with(".pushand").and_return(false)
     end
     
     it "should setup DNS using Webbynode API" do
@@ -383,6 +404,8 @@ describe Webbynode::Commands::Init do
       # the DNS setting should remove any dns_aliases on .webbynode/settings
       io = Webbynode::Io.new
       io.should_receive(:remove_setting).with("dns_alias")
+      io.stub!(:file_exists?).and_return(false)
+      # io.should_receive(:file_exists?).with(".pushand").and_return(false)
 
       @command.should_receive(:api).any_number_of_times.and_return(api)
       @command.should_receive(:io).any_number_of_times.and_return(io)
@@ -401,6 +424,8 @@ describe Webbynode::Commands::Init do
       # the DNS setting should remove any dns_aliases on .webbynode/settings
       io = Webbynode::Io.new
       io.should_receive(:remove_setting).with("dns_alias")
+      io.stub!(:file_exists?).and_return(false)
+      # io.stub!(:file_exists?).with(".pushand").and_return(false)
 
       @command.should_receive(:api).any_number_of_times.and_return(api)
       @command.should_receive(:io).any_number_of_times.and_return(io)
@@ -524,18 +549,31 @@ describe Webbynode::Commands::Init do
   end
   
   context "when .webbynode is not present" do
+    let(:io)  { double('io').as_null_object }
+    let(:git) { double('git').as_null_object }
+    subject do 
+      Webbynode::Commands::Init.new("10.0.1.1").tap do |cmd|
+        cmd.stub!(:io).and_return(io)
+        cmd.stub!(:git).and_return(git)
+        cmd.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+        cmd.stub!(:ask)
+      end
+    end
+    
     before(:each) do
-      @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+      git.stub(:remote_exists?).and_return(false)
+      io.should_receive(:file_exists?).with('.pushand').and_return(false)
     end
 
-    it "should create the .webbynode system folder and stub files" do
-      io_handler.should_receive(:directory?).with(".webbynode").and_return(false)
-      io_handler.should_receive(:mkdir).with(".webbynode/tasks")
-      io_handler.should_receive(:create_file).with(".webbynode/tasks/after_push", "")
-      io_handler.should_receive(:create_file).with(".webbynode/tasks/before_push", "")
-      io_handler.should_receive(:create_file).with(".webbynode/aliases", "")
+    it "creates the .webbynode system folder and stub files" do
+      io.should_receive(:mkdir).with(".webbynode/tasks")
+
+      io.should_receive(:create_if_missing).with(".webbynode/tasks/after_push", "")
+      io.should_receive(:create_if_missing).with(".webbynode/tasks/before_push", "")
+      io.should_receive(:create_if_missing).with(".webbynode/aliases", "")
+      io.should_receive(:create_if_missing).with(".webbynode/config", "")
       
-      @command.run
+      subject.run
     end
   end
   
@@ -558,9 +596,25 @@ describe Webbynode::Commands::Init do
       @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
     end
 
-    it "should not be created" do
+    it "isn't replaced if user answers no" do
       io_handler.should_receive(:file_exists?).with(".pushand").and_return(true)
-      io_handler.should_receive(:create_file).never
+      io_handler.should_receive(:create_file).with(".pushand").never
+      io_handler.should_receive(:log).with("It seems this application was initialized before.")
+      @command.should_receive(:ask).with("Do you want to initialize it again (y/n)?").once.ordered.and_return("n")
+      
+      @command.run
+    end
+
+    it "is replaced if user answers yes" do
+      io_handler.should_receive(:file_exists?).with(".pushand").and_return(true)
+      io_handler.should_receive(:app_name).any_number_of_times.and_return("mah_app")
+      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 mah_app mah_app\n", true)
+      
+      io_handler.should_receive(:log).with("Commiting Webbynode changes...")
+      git_handler.should_receive(:add).with(".")
+      git_handler.should_receive(:commit2).with("[Webbynode] Rapid App Deployment Reinitialization")
+
+      @command.should_receive(:ask).with("Do you want to initialize it again (y/n)?").once.ordered.and_return("y")
       
       @command.run
     end
@@ -637,7 +691,7 @@ describe Webbynode::Commands::Init do
     
     it "commits the changes" do
       git_handler.should_receive(:present?).and_return(true)
-      git_handler.should_receive(:commit2).with("[Webbynode] Rapid App Deployment Initialization")
+      git_handler.should_receive(:commit2).with("[Webbynode] Rapid App Deployment Reinitialization")
 
       @command.run
     end

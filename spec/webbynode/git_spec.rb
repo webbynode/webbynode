@@ -32,11 +32,6 @@ describe Webbynode::Git do
       "fatal: Not a git repository (or any of the parent directories): .git", &blk
   end
 
-  it "should have an io instance" do
-    pending "Check out why this is being mocked"
-    Webbynode::Git.new.io.class.should == Webbynode::Io
-  end
-  
   describe "#delete_remote" do
     it "executes remote rm command for the specificed remote" do
       git = Webbynode::Git.new

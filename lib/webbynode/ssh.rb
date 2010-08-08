@@ -22,12 +22,12 @@ module Webbynode
         @password ||= ask("Enter your deployment password for #{@remote_ip}: ") { |q| q.echo = '' }
         @conn     ||= Net::SSH.start(@remote_ip, 'git', :port => @port, :password => @password)  
       rescue Net::SSH::AuthenticationFailed
-        io.log "Could not connect to server: invalid authentication.", true
+        io.log "Could not connect to server: invalid authentication."
         exit
       end
       
     rescue Net::SSH::Disconnect
-      io.log "Could not connect to the server: Wrong IP or Server Offline.", true
+      io.log "Could not connect to the server: Wrong IP or Server Offline."
       exit
     
     end

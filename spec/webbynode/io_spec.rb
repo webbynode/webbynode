@@ -218,6 +218,20 @@ describe Webbynode::Io do
     end
   end
   
+  describe '#create_if_missing' do
+    it "creates the file if it doesn't exist" do
+      subject.should_receive(:file_exists?).with("a").and_return(false)
+      subject.should_receive(:create_file).with("a", "contents", true)
+      subject.create_if_missing("a", "contents", true)
+    end
+    
+    it "does nothing if file exists" do
+      subject.should_receive(:file_exists?).with("a").and_return(true)
+      subject.should_receive(:create_file).never
+      subject.create_if_missing("a", "contents")
+    end
+  end
+  
   describe "#exec" do
     context "when successful" do
       it "should execute the command and retrieve the output" do

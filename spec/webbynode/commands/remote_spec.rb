@@ -24,7 +24,7 @@ describe Webbynode::Commands::Remote do
   end
   
   it "should notify the user" do
-    io.should_receive(:log).with("Performing the requested remote command..", true)
+    io.should_receive(:log).with("Performing the requested remote command..")
     remote.run
   end
  

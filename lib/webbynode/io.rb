@@ -167,7 +167,7 @@ module Webbynode
       ::FileUtils.chmod 0755, file_name if executable
     end
     
-    def create_if_missing(file_name, contents, executable=nil)
+    def create_if_missing(file_name, contents="", executable=nil)
       create_file(file_name, contents, executable) unless file_exists?(file_name)
     end
     
@@ -189,6 +189,7 @@ module Webbynode
     end
     
     def add_line(file, line)
+      create_if_missing(file)
       return if File.read(file).include?("#{line}")
       File.open(file, 'a') { |f| f.puts line }
     end

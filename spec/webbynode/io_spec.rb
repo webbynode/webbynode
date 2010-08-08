@@ -171,6 +171,24 @@ describe Webbynode::Io do
   end
   
   describe '#add_line' do
+    before(:each) do
+      subject.stub(:create_if_missing)
+    end
+    
+    context "when file doesn't exist yet" do
+      it "creates the file" do
+        file = stub('file')
+        
+        File.should_receive(:read).with('.gitignore').and_return('')
+        
+        File.should_receive(:open).with('.gitignore', 'a').and_yield(file)
+        file.should_receive(:puts).with('new_line')
+
+        subject.should_receive(:create_if_missing).with(".gitignore")
+        subject.add_line '.gitignore', 'new_line'
+      end
+    end
+    
     context "when line doesn't exist yet" do
       it "adds one line to a file" do
         file = stub('file')
@@ -180,8 +198,7 @@ describe Webbynode::Io do
         File.should_receive(:open).with('.gitignore', 'a').and_yield(file)
         file.should_receive(:puts).with('new_line')
         
-        io = Webbynode::Io.new
-        io.add_line '.gitignore', 'new_line'
+        subject.add_line '.gitignore', 'new_line'
       end
     end
     
@@ -190,8 +207,7 @@ describe Webbynode::Io do
         File.should_receive(:read).with('.gitignore').and_return('new_line')
         File.should_receive(:open).with('.gitignore', 'a').never
         
-        io = Webbynode::Io.new
-        io.add_line '.gitignore', 'new_line'
+        subject.add_line '.gitignore', 'new_line'
       end
     end
   end

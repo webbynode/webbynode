@@ -5,6 +5,7 @@ module Webbynode::Engines
     Webbynode::Engines::Rack,
     Webbynode::Engines::Rails,
     Webbynode::Engines::Rails3,
+    Webbynode::Engines::NodeJS,
   ]
 
   Detectable = [

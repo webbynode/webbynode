@@ -64,6 +64,11 @@ module Webbynode
       $?
     end
     
+    def exec3(s, redirect_stderr=false)
+      result = `#{s}#{redirect_stderr ? " 2>&1" : ""}`
+      [$? == 0, result]
+    end
+    
     def directory?(s)
       File.directory?(s)
     end
@@ -110,7 +115,7 @@ module Webbynode
       
       when :warning
         notify = false
-        puts "            WARNING: #{text}"
+        puts "WARNING: #{text}"
       
       when :action
         notify = false

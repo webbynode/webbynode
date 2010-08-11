@@ -258,6 +258,16 @@ describe Webbynode::Io do
     end
   end
   
+  describe "#exec3" do
+    context "when successful" do
+      it "executes the command and retrieve the output and exit code" do
+        io = Webbynode::Io.new
+        io.should_receive(:`).with("ls -la").and_return("output for ls -la")
+        io.exec3("ls -la").should == [false, "output for ls -la"]
+      end
+    end
+  end
+  
   describe "#read_file" do
     context "when successful" do
       it "should return file contents" do

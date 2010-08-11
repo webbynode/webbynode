@@ -36,7 +36,9 @@ describe Webbynode::Commands::ChangeDns do
     it "should perform a commit of .pushand" do
       io.should_receive(:file_exists?).with(".webbynode/settings").and_return(false)
       git.should_receive(:add).with(".pushand")
-      git.should_receive(:commit).with("Changed DNS to \"the.newdns.com\"")
+      git.should_receive(:commit3).
+        with("Changed DNS to \"the.newdns.com\"").
+        and_return([true, "blah"])
       cmd.run
     end
 
@@ -44,8 +46,17 @@ describe Webbynode::Commands::ChangeDns do
       io.should_receive(:file_exists?).with(".webbynode/settings").and_return(true)
       git.should_receive(:add).with(".pushand")
       git.should_receive(:add).with(".webbynode/settings")
-      git.should_receive(:commit).with("Changed DNS to \"the.newdns.com\"")
+      git.should_receive(:commit3).with("Changed DNS to \"the.newdns.com\"").and_return([true, "blah"])
       cmd.run
+    end
+  end
+  
+  context "when commit fails" do
+    it "reports the error" do
+      io.should_receive(:file_exists?).with(".webbynode/settings").and_return(false)
+      git.should_receive(:add).with(".pushand")
+      git.should_receive(:commit3).with("Changed DNS to \"the.newdns.com\"").and_return([false, "Some git error"])
+      lambda { cmd.execute }.should raise_error(Webbynode::Command::CommandError)
     end
   end
 end

@@ -80,6 +80,11 @@ module Webbynode
       io.exec2("git commit -m \"#{comments}\"") == 0
     end
     
+    def commit3(comments)
+      comments.gsub! /"/, '\"'
+      io.exec3("git commit -m \"#{comments}\"")
+    end
+    
     def commit(comments)
       comments.gsub! /"/, '\"'
       exec("git commit -m \"#{comments}\"") do |output|

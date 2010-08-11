@@ -21,7 +21,12 @@ module Webbynode::Commands
 
       git.add ".pushand"
       git.add ".webbynode/settings" if io.file_exists?(".webbynode/settings")
-      git.commit2 "Changed DNS to \"#{param(:dns_entry)}\""
+      result = git.commit3("Changed DNS to \"#{param(:dns_entry)}\"")
+      
+      unless result[0]
+        io.log ""
+        raise CommandError, "Error from git commit:\n#{result[1]}"
+      end
 
       io.log "Your application will start responding to #{param(:dns_entry)} after next deployment."
     end

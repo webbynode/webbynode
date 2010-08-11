@@ -273,9 +273,20 @@ describe Webbynode::Git do
       lambda { git.add "." }.should_not raise_error
     end
   end
+  
+  describe '#commit3' do
+    it "adds objects to git" do
+      io_handler = mock("io")
+      io_handler.should_receive(:exec3).with('git commit -m "Commit comment"').and_return([0, "[master (root-commit) 8f590c7] Commit comment"])
+
+      git = Webbynode::Git.new
+      git.should_receive(:io).and_return(io_handler)
+      git.commit3("Commit comment").should == [0, "[master (root-commit) 8f590c7] Commit comment"]
+    end
+  end
 
   describe "#commit" do
-    context "when successfull" do
+    context "when successful" do
       it "should add objects to git" do
         io_handler = mock("io")
         io_handler.should_receive(:exec).with('git commit -m "Commit comment"').and_return("[master (root-commit) 8f590c7] Commit comment

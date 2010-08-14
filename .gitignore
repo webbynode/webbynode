@@ -7,3 +7,5 @@ settings.py
 *.pyc
 *.pyo
 docs/_build
+config/database.yml
+db/schema.rb

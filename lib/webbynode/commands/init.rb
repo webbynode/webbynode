@@ -6,85 +6,51 @@ module Webbynode::Commands
     option :adddns, "Creates the DNS entries for the domain"
     option :port, "Specifies an alternate SSH port to connect to Webby", :validate => :integer
     option :engine, "Sets the application engine for the app", :validate => { :in => ['php', 'rack', 'rails', 'rails3'] }
+    option :trial, "Initializes this app for Rapp Trial"
     
     def execute
       unless params.any?
         io.log help
         return
       end
+      
+      io.log "Webbynode Rapp - http://rapp.webbynode.com"
+
+      @overwrite   = false
 
       check_prerequisites
-
-      webby       = param(:webby)
-      app_name    = io.app_name
-      git_present = git.present?
-
-      if option(:dns)
-        dns_entry = "#{option(:dns)}" 
+      check_initialized
+      
+      @webby       = param(:webby)
+      @app_name    = io.app_name
+      @git_present = git.present?
+      @dns_entry   = option(:dns) ? "#{option(:dns)}" : @app_name
+      
+      unless option(:trial)
+        @webby_ip = get_ip(@webby)
       else
-        dns_entry = app_name
-      end
-
-      if git_present and !git.clean?
-        raise CommandError, 
-          "Cannot initialize: git has pending changes. Execute a git commit or add changes to .gitignore and try again."
+        @webby_ip = "trial.webbyapp.com"
       end
       
-      io.log "Initializing application #{app_name} #{dns_entry ? "with dns #{dns_entry}" : ""}", :start
+      check_git_clean if @git_present
+      
+      $stderr.puts "I am here with #{@webby_ip}"
+      
+      io.log "Initializing application #{@app_name} #{@dns_entry ? "with dns #{@dns_entry}" : ""}", :start
       
       detect_engine
-      
-      webby_ip = get_ip(webby)
       
       io.log ""
       io.log "Initializing directory structure..."
       
-      if pushand_exists = io.file_exists?(".pushand")
-        io.log ""
-        io.log "It seems this application was initialized before."
-        overwrite = ask('Do you want to initialize it again (y/n)?').downcase == 'y'
-      end
-      
-      if overwrite || !pushand_exists
-        io.log ""
-        io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name} #{dns_entry}\n", true)
-      end
-
+      create_pushand
       create_webbynode_tree
-
-      unless git_present
-        io.log "Initializing git and applying initial commit..."
-        git.init 
-        git.add "." 
-        git.commit "Initial commit"
-      end
-      
-      if git.remote_exists?('webbynode')
-        io.log ""
-        io.log "Webbynode git integration already initialized."
-        if overwrite || ask('Do you want to overwrite the current settings (y/n)?').downcase == 'y'
-          git.delete_remote('webbynode')
-        end
-        io.log ""
-      end
-      
-      if overwrite or (!git.remote_exists?('webbynode') and git_present)
-        io.log "Commiting Webbynode changes..."
-        git.add "." 
-        git.commit2 "[Webbynode] Rapid App Deployment Reinitialization"
-      end
-      
-      io.log "Adding webbynode as git remote..."
-      options = ["webbynode", webby_ip, app_name]
-      options << option(:port).to_i if option(:port)
-
-      Webbynode::Server.new(webby_ip).add_ssh_key LocalSshKey, nil
-
-      git.add_remote *options
+      create_git_commit unless @git_present
+      create_git_remote
       
       handle_dns option(:dns) if option(:adddns)
       
-      io.log "Application #{app_name} ready for Rapid Deployment", :finish
+      io.log "Application #{@app_name} ready for Rapid Deployment", :finish
     rescue Webbynode::InvalidAuthentication
       io.log "Could not connect to webby: invalid authentication.", true
 
@@ -96,6 +62,80 @@ module Webbynode::Commands
     end
     
     private
+    
+    def check_git_clean
+      unless git.clean?
+        raise CommandError, 
+          "Cannot initialize: git has pending changes. Execute a git commit or add changes to .gitignore and try again."
+      end
+    end
+    
+    def check_initialized
+      return unless pushand_exists?
+      
+      io.log ""
+      io.log "It seems this application was initialized before."
+      
+      unless ask('Do you want to initialize it again (y/n)?').downcase == 'y'
+        puts ""
+        raise CommandError, 'Initialization aborted.'
+      end
+      
+      @overwrite = true
+    end
+    
+    def pushand_exists?
+      io.file_exists?(".pushand")
+    end
+    
+    def create_pushand
+      return if pushand_exists? && !@overwrite
+
+      io.log ""
+      io.create_file(".pushand", "#! /bin/bash\nphd $0 #{@app_name} #{@dns_entry}\n", true)
+    end
+    
+    def create_git_commit
+      io.log "Initializing git and applying initial commit..."
+      git.init 
+      git.add "." 
+      git.commit "Initial commit"
+    end
+    
+    def delete_remote
+      return unless git.remote_exists?('webbynode')
+      
+      io.log ""
+      io.log "Webbynode git integration already initialized."
+      if @overwrite || ask('Do you want to overwrite the current settings (y/n)?').downcase == 'y'
+        git.delete_remote('webbynode')
+      end
+      io.log ""
+    end
+    
+    def commit_changes
+      if @overwrite or (!git.remote_exists?('webbynode') and @git_present)
+        io.log "Commiting Webbynode changes..."
+        git.add "." 
+        git.commit2 "[Webbynode] Rapid App Deployment Reinitialization"
+      end
+    end
+    
+    def add_remote
+      io.log "Adding webbynode as git remote..."
+      options = ["webbynode", @webby_ip, @app_name]
+      options << option(:port).to_i if option(:port)
+
+      Webbynode::Server.new(@webby_ip).add_ssh_key LocalSshKey, nil
+
+      git.add_remote *options
+    end
+    
+    def create_git_remote
+      delete_remote 
+      commit_changes
+      add_remote
+    end
     
     def get_ip(webby)
       return webby if webby =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/

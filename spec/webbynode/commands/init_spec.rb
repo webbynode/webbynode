@@ -44,6 +44,27 @@ describe Webbynode::Commands::Init do
     end      
   end
   
+  describe 'in trial mode' do
+    subject do 
+      Webbynode::Commands::Init.new('--trial').tap do |cmd|
+        cmd.stub!(:io).and_return(io_handler)
+      end
+    end
+    
+    before(:each) do
+      subject.stub(:check_git_clean)
+      subject.stub(:detect_engine)
+    end
+
+    it "checks for username and password" do
+      # io_handler.should_receive(:general_settings).and_return({ 'rapp_username' => 'user', 'rapp_password' => 'secret' })
+      io_handler.should_receive(:app_name).and_return('trial_app')
+      git_handler.should_receive(:add_remote).with('webbynode', 'trial.webbyapp.com', 'trial_app')
+      subject.should_receive(:get_ip).never
+      subject.run
+    end
+  end
+  
   describe 'using alternate port' do
     subject do 
       Webbynode::Commands::Init.new('2.1.2.3', '--port=2020').tap do |cmd|
@@ -292,7 +313,7 @@ describe Webbynode::Commands::Init do
     end
     
     it "doesn't ask if user already agreed to reinitialize" do
-      io_handler.should_receive(:file_exists?).with(".pushand").and_return(true)
+      subject.stub!(:pushand_exists?).and_return(true)
       io_handler.should_receive(:app_name).any_number_of_times.and_return("mah_app")
       io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 mah_app mah_app\n", true)
 
@@ -528,7 +549,7 @@ describe Webbynode::Commands::Init do
   
   context "determining host" do
     it "should assume host is app's name when not given" do
-      io_handler.should_receive(:file_exists?).with(".pushand").and_return(false)
+      @command.should_receive(:pushand_exists?).any_number_of_times.and_return(false)
       io_handler.should_receive(:app_name).any_number_of_times.and_return("application_name")
       io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 application_name application_name\n", true)
     
@@ -562,7 +583,7 @@ describe Webbynode::Commands::Init do
     
     before(:each) do
       git.stub(:remote_exists?).and_return(false)
-      io.should_receive(:file_exists?).with('.pushand').and_return(false)
+      subject.should_receive(:pushand_exists?).any_number_of_times.and_return(false)
     end
 
     it "creates the .webbynode system folder and stub files" do
@@ -597,16 +618,16 @@ describe Webbynode::Commands::Init do
     end
 
     it "isn't replaced if user answers no" do
-      io_handler.should_receive(:file_exists?).with(".pushand").and_return(true)
-      io_handler.should_receive(:create_file).with(".pushand").never
+      @command.stub(:pushand_exists?).and_return(true)
+      # io_handler.should_receive(:create_file).with(".pushand").never
       io_handler.should_receive(:log).with("It seems this application was initialized before.")
       @command.should_receive(:ask).with("Do you want to initialize it again (y/n)?").once.ordered.and_return("n")
       
-      @command.run
+      lambda { @command.execute }.should raise_error(Webbynode::Command::CommandError)
     end
 
     it "is replaced if user answers yes" do
-      io_handler.should_receive(:file_exists?).with(".pushand").and_return(true)
+      @command.stub(:pushand_exists?).and_return(true)
       io_handler.should_receive(:app_name).any_number_of_times.and_return("mah_app")
       io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 mah_app mah_app\n", true)
       

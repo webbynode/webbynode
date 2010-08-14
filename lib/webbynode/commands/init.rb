@@ -25,21 +25,8 @@ module Webbynode::Commands
       @app_name    = io.app_name
       @git_present = git.present?
       @dns_entry   = option(:dns) ? "#{option(:dns)}" : @app_name
-      
-      unless option(:trial)
-        @webby_ip = get_ip(@webby)
-        @git_user = "git"
-      else
-        @webby_ip = "trial.webbyapp.com"
-        @git_user = io.general_settings['rapp_username']
-        
-        unless @git_user
-          @git_user = ask('Enter your Rapp trial user: ')
-          io.add_general_setting 'rapp_username', @git_user
-        end
-        
-        @git_home = "/home/#{@git_user}" 
-      end
+
+      handle_trial
       
       check_git_clean if @git_present
       
@@ -58,6 +45,7 @@ module Webbynode::Commands
       handle_dns option(:dns) if option(:adddns)
       
       io.log "Application #{@app_name} ready for Rapid Deployment", :finish
+      
     rescue Webbynode::InvalidAuthentication
       io.log "Could not connect to webby: invalid authentication.", true
 
@@ -89,6 +77,23 @@ module Webbynode::Commands
       end
       
       @overwrite = true
+    end
+    
+    def handle_trial
+      unless option(:trial)
+        @webby_ip = get_ip(@webby)
+        @git_user = "git"
+      else
+        @webby_ip = "trial.webbyapp.com"
+        @git_user = io.general_settings['rapp_username']
+        
+        unless @git_user
+          @git_user = ask('Enter your Rapp trial user: ')
+          io.add_general_setting 'rapp_username', @git_user
+        end
+        
+        @git_home = "/home/#{@git_user}" 
+      end
     end
     
     def pushand_exists?

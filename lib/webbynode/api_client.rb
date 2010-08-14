@@ -1,5 +1,3 @@
-require 'httparty'
-
 module Webbynode
   class ApiClient
     include HTTParty

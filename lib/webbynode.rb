@@ -2,6 +2,7 @@ $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
 require 'rubygems'
+require 'httparty'
 require 'domainatrix'
 require 'net/ssh'
 require 'highline/import'
@@ -20,6 +21,7 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'api_client')
 require File.join(File.dirname(__FILE__), 'webbynode', 'remote_executor')
 require File.join(File.dirname(__FILE__), 'webbynode', 'notify')
 require File.join(File.dirname(__FILE__), 'webbynode', 'updater')
+require File.join(File.dirname(__FILE__), 'webbynode', 'trial')
 require File.join(File.dirname(__FILE__), 'webbynode', 'properties')
 require File.join(File.dirname(__FILE__), 'webbynode', 'attribute_accessors')
 require File.join(File.dirname(__FILE__), 'webbynode', 'engines', 'engine')
@@ -49,6 +51,7 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'help')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'open')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'webbies')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'version')
+require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'user')
 require File.join(File.dirname(__FILE__), 'webbynode', 'application')
 
 module Webbynode

@@ -1,0 +1,9 @@
+HTTP/1.1 200 OK
+Content-Type: text/html
+Connection: keep-alive
+Status: 200
+X-Powered-By: Phusion Passenger (mod_rails/mod_rack) 2.2.15
+Content-Length: 50
+Server: nginx/0.7.67 + Phusion Passenger 2.2.15 (mod_rails/mod_rack)
+
+{ success: true, message: 'User fcoury created' }

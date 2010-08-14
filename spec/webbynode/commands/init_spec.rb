@@ -47,7 +47,9 @@ describe Webbynode::Commands::Init do
   describe 'in trial mode' do
     subject do 
       Webbynode::Commands::Init.new('--trial').tap do |cmd|
+        cmd.stub!(:git).and_return(git_handler)
         cmd.stub!(:io).and_return(io_handler)
+        cmd.stub!(:api).and_return(api)
       end
     end
     
@@ -56,10 +58,22 @@ describe Webbynode::Commands::Init do
       subject.stub(:detect_engine)
     end
 
-    it "checks for username and password" do
-      # io_handler.should_receive(:general_settings).and_return({ 'rapp_username' => 'user', 'rapp_password' => 'secret' })
+    it "uses rapp_username when found" do
+      io_handler.should_receive(:general_settings).and_return({ 'rapp_username' => 'user' })
       io_handler.should_receive(:app_name).and_return('trial_app')
-      git_handler.should_receive(:add_remote).with('webbynode', 'trial.webbyapp.com', 'trial_app')
+      git_handler.should_receive(:add_remote).with('user', 'webbynode', 'trial.webbyapp.com', 'trial_app', :home => '/home/user')
+
+      subject.should_receive(:get_ip).never
+      subject.run
+    end
+    
+    it "asks for trial username when not found" do
+      io_handler.should_receive(:general_settings).and_return({})
+      io_handler.should_receive(:app_name).and_return('trial_app')
+      subject.should_receive(:ask).with('Enter your Rapp trial user: ').and_return('user')
+      io_handler.should_receive(:add_general_setting).with('rapp_username', 'user')
+      git_handler.should_receive(:add_remote).with('user', 'webbynode', 'trial.webbyapp.com', 'trial_app', :home => '/home/user')
+
       subject.should_receive(:get_ip).never
       subject.run
     end
@@ -77,7 +91,7 @@ describe Webbynode::Commands::Init do
       io_handler.stub!(:file_exists?).with(".pushand").and_return(false)
 
       git_handler.stub!(:present?).and_return(:false)
-      git_handler.should_receive(:add_remote).with("webbynode", "2.1.2.3", anything(), 2020)
+      git_handler.should_receive(:add_remote).with("git", "webbynode", "2.1.2.3", anything(), :port => 2020)
 
       subject.stub!(:git).and_return(git_handler)
       subject.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
@@ -254,7 +268,7 @@ describe Webbynode::Commands::Init do
   
   context "Deployment webby" do
     it "is detected automatically if user only have one Webby" do
-      git_handler.should_receive(:add_remote).with("webbynode", "201.81.121.201", anything())
+      git_handler.should_receive(:add_remote).with("git", "webbynode", "201.81.121.201", anything(), {})
       
       subject.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
       subject.run
@@ -295,7 +309,7 @@ describe Webbynode::Commands::Init do
       subject.should_receive(:ask).with("Which Webby do you want to deploy to:", Integer).and_return(2)
 
       io_handler.should_receive(:log).with("Set deployment Webby to webby2.")
-      git_handler.should_receive(:add_remote).with("webbynode", "67.53.31.2", anything())
+      git_handler.should_receive(:add_remote).with("git", "webbynode", "67.53.31.2", anything(), {})
       
       subject.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
       subject.run
@@ -539,7 +553,7 @@ describe Webbynode::Commands::Init do
     
     io_handler.should_receive(:app_name).any_number_of_times.and_return("my_app")
     git_handler.should_receive(:present?).and_return(false)
-    git_handler.should_receive(:add_remote).with("webbynode", "1.2.3.4", "my_app")
+    git_handler.should_receive(:add_remote).with("git", "webbynode", "1.2.3.4", "my_app", {})
 
     create_init("my_webby_name")
     @command.stub!(:api).and_return(api)
@@ -656,7 +670,7 @@ describe Webbynode::Commands::Init do
     it "should add a new remote" do
       io_handler.should_receive(:app_name).any_number_of_times.and_return("my_app")
       git_handler.should_receive(:present?).and_return(false)
-      git_handler.should_receive(:add_remote).with("webbynode", "4.3.2.1", "my_app")
+      git_handler.should_receive(:add_remote).with("git", "webbynode", "4.3.2.1", "my_app", {})
 
       @command.run
     end

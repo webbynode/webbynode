@@ -1,14 +1,15 @@
 module Webbynode  
   class RemoteExecutor
-    attr_accessor :ip, :port
+    attr_accessor :ip, :user, :port
         
-    def initialize(ip, port=nil)
+    def initialize(ip, user=nil, port=nil)
       @ip = ip
+      @user = user
       @port = port
     end
     
     def ssh
-      @ssh ||= Ssh.new(ip, port)
+      @ssh ||= Ssh.new(ip, user, port)
     end
     
     def create_folder(folder)

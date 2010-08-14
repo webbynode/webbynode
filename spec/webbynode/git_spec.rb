@@ -195,14 +195,21 @@ describe Webbynode::Git do
   
   describe "#add_remote" do
     before(:each) do
-      re.should_receive(:remote_home).and_return('/var/rapp')
+      re.stub(:remote_home).and_return('/var/rapp')
     end
     
     it "connects to the remote IP to get home folder" do
       Webbynode::RemoteExecutor.should_receive(:new).with("1.2.3.4", 389).and_return(re)
       
       subject.should_receive(:exec).with("git remote add webbynode ssh://git@1.2.3.4:389/var/rapp/the_repo")
-      subject.add_remote("webbynode", "1.2.3.4", "the_repo", 389)
+      subject.add_remote("git", "webbynode", "1.2.3.4", "the_repo", :port => 389)
+    end
+    
+    it "doesn't connect when home is specified" do
+      Webbynode::RemoteExecutor.should_receive(:new).never
+      
+      subject.should_receive(:exec).with("git remote add webbynode ssh://git@1.2.3.4:389/home/user/the_repo")
+      subject.add_remote("git", "webbynode", "1.2.3.4", "the_repo", :port => 389, :home => "/home/user")
     end
     
     context "when successfull" do
@@ -211,23 +218,23 @@ describe Webbynode::Git do
         io_handler.should_receive(:exec).with("git remote add webbynode ssh://git@1.2.3.4:22/var/rapp/the_repo").and_return("")
 
         subject.should_receive(:io).and_return(io_handler)
-        subject.add_remote("webbynode", "1.2.3.4", "the_repo").should be_true
+        subject.add_remote("git", "webbynode", "1.2.3.4", "the_repo").should be_true
       end
     end
     
     context "when unsuccessfull" do
       it "should raise exception if not a git repo" do
-        should_raise_notgitrepo("git remote add other ssh://git@5.6.7.8:22/var/rapp/a_repo") { |git| git.add_remote("other", "5.6.7.8", "a_repo") }
+        should_raise_notgitrepo("git remote add other ssh://git@5.6.7.8:22/var/rapp/a_repo") { |git| git.add_remote("git", "other", "5.6.7.8", "a_repo") }
       end
     
       it "should return raise exception if the remote already exists" do
         should_raise(Webbynode::GitRemoteAlreadyExistsError, "git remote add other ssh://git@5.6.7.8:22/var/rapp/a_repo") { |git| 
-          git.add_remote("other", "5.6.7.8", "a_repo")
+          git.add_remote("git", "other", "5.6.7.8", "a_repo")
         }
       end  
       
       it "should raise a generic Git error when another error occurs" do
-        should_raise_giterror("git remote add other ssh://git@5.6.7.8:22/var/rapp/a_repo") { |git| git.add_remote("other", "5.6.7.8", "a_repo") }
+        should_raise_giterror("git remote add other ssh://git@5.6.7.8:22/var/rapp/a_repo") { |git| git.add_remote("git", "other", "5.6.7.8", "a_repo") }
       end
     end
   end
@@ -433,6 +440,7 @@ describe Webbynode::Git do
           git.config.should_not be_empty
           git.remote_ip.should eql('1.2.3.4')
           git.remote_port.should eql(22)
+          git.remote_user.should eql('git')
         end
       end
       
@@ -446,6 +454,7 @@ describe Webbynode::Git do
           git.config.should_not be_empty
           git.remote_ip.should eql('1.2.3.4')
           git.remote_port.should eql(122)
+          git.remote_user.should eql('git')
         end
       end
     end

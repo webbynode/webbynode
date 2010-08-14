@@ -10,12 +10,12 @@ describe Webbynode::RemoteExecutor do
   end
   
   describe "#new" do
-    subject { Webbynode::RemoteExecutor.new("2.1.2.2", 2020) }
+    subject { Webbynode::RemoteExecutor.new("2.1.2.2", 'user', 2020) }
     
     its(:port) { should == 2020 }
     
     it "takes an optional port as parameter" do
-      Webbynode::Ssh.should_receive(:new).with("2.1.2.2", 2020).and_return(ssh)
+      Webbynode::Ssh.should_receive(:new).with("2.1.2.2", 'user', 2020).and_return(ssh)
       subject.exec "hello mom", false, false
     end
   end

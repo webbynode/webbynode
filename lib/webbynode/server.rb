@@ -4,11 +4,13 @@ module Webbynode
   class ApplicationNotDeployed < StandardError; end
   
   class Server
-    attr_accessor :ip
+    attr_accessor :ip, :user, :port
     
-    def initialize(ip)
-      @ssh  = Ssh.new(ip)
+    def initialize(ip, user, port)
+      @ssh  = Ssh.new(ip, user, port)
       @ip   = ip
+      @user = user
+      @port = port
     end
     
     def io
@@ -16,7 +18,7 @@ module Webbynode
     end
    
     def remote_executor
-      @remote_executor ||= Webbynode::RemoteExecutor.new(ip)
+      @remote_executor ||= Webbynode::RemoteExecutor.new(ip, user, port)
     end
     
     def pushand

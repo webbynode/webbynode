@@ -200,12 +200,12 @@ module Webbynode
     end
     
     def server
-      @server ||= Webbynode::Server.new(git.parse_remote_ip)
+      @server ||= Webbynode::Server.new(git.parse_remote_ip, git.remote_user, git.remote_port)
     end
     
     def remote_executor
       git.parse_remote_ip
-      @remote_executor ||= Webbynode::RemoteExecutor.new(git.remote_ip, git.remote_port)
+      @remote_executor ||= Webbynode::RemoteExecutor.new(git.remote_ip, git.remote_user, git.remote_port)
     end
     
     def pushand

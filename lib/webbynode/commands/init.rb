@@ -28,13 +28,20 @@ module Webbynode::Commands
       
       unless option(:trial)
         @webby_ip = get_ip(@webby)
+        @git_user = "git"
       else
         @webby_ip = "trial.webbyapp.com"
+        @git_user = io.general_settings['rapp_username']
+        
+        unless @git_user
+          @git_user = ask('Enter your Rapp trial user: ')
+          io.add_general_setting 'rapp_username', @git_user
+        end
+        
+        @git_home = "/home/#{@git_user}" 
       end
       
       check_git_clean if @git_present
-      
-      $stderr.puts "I am here with #{@webby_ip}"
       
       io.log "Initializing application #{@app_name} #{@dns_entry ? "with dns #{@dns_entry}" : ""}", :start
       
@@ -123,12 +130,15 @@ module Webbynode::Commands
     
     def add_remote
       io.log "Adding webbynode as git remote..."
-      options = ["webbynode", @webby_ip, @app_name]
-      options << option(:port).to_i if option(:port)
+      options = {}
+      options[:port] = option(:port).to_i if option(:port)
+      options[:home] = @git_home if @git_home
 
-      Webbynode::Server.new(@webby_ip).add_ssh_key LocalSshKey, nil
+      params = [@git_user, "webbynode", @webby_ip, @app_name, options]
 
-      git.add_remote *options
+      Webbynode::Server.new(@webby_ip, @git_user, option(:port) || 22).add_ssh_key LocalSshKey, nil
+
+      git.add_remote *params
     end
     
     def create_git_remote

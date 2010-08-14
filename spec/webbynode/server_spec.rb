@@ -3,11 +3,21 @@ require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 
 describe Webbynode::Server do
   it "should have an Io instance" do
-    Webbynode::Server.new("1.2.3.4").io.class.should == Webbynode::Io
+    Webbynode::Server.new("1.2.3.4", "git", 22).io.class.should == Webbynode::Io
   end
 
   it "should have a RemoteExecutor instance" do
-    Webbynode::Server.new("1.2.3.4").remote_executor.class.should == Webbynode::RemoteExecutor
+    Webbynode::Server.new("1.2.3.4", "git", 22).remote_executor.class.should == Webbynode::RemoteExecutor
+  end
+  
+  describe '#new' do
+    it "creates an SSH connection with proper settings" do
+      Webbynode::Ssh.should_receive(:new).with("1.2.3.4", "git", 22)
+      server = Webbynode::Server.new("1.2.3.4", "git", 22)
+      server.ip.should == "1.2.3.4"
+      server.user.should == "git"
+      server.port.should == 22
+    end
   end
 
   describe "#add_ssh_key" do
@@ -21,7 +31,7 @@ describe Webbynode::Server do
       @pushand = mock("PushAnd")
       @pushand.as_null_object
     
-      @server = Webbynode::Server.new("1.2.3.4")
+      @server = Webbynode::Server.new("1.2.3.4", "git", 22)
       @server.should_receive(:io).any_number_of_times.and_return(@io)
       @server.should_receive(:remote_executor).any_number_of_times.and_return(@re)
       @server.should_receive(:pushand).any_number_of_times.and_return(@pushand)

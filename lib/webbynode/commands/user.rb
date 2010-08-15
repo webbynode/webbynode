@@ -6,6 +6,16 @@ module Webbynode::Commands
     def execute
       io.log "Rapp Trial - http://rapp.webbynode.com"
       io.log ""
+      
+      if user = io.general_settings['rapp_username']
+        io.log "User #{user} is already configured for Rapp Trial."
+        if ask('Do you want to overwrite this settings (y/n)?') != 'y'
+          io.log ""
+          io.log "Aborted."
+          return
+        end 
+      end
+      
       io.log "Rapp Trial is a good way to try Webbynode's Rapp Engine without being a subscriber."
       io.log "You can deploy your application and it will be online for up to 24 hours. We delete"
       io.log "all applications at 2AM EST, but your user will remain valid."

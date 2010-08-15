@@ -39,6 +39,7 @@ lib/webbynode/commands/restart.rb
 lib/webbynode/commands/start.rb
 lib/webbynode/commands/stop.rb
 lib/webbynode/commands/tasks.rb
+lib/webbynode/commands/user.rb
 lib/webbynode/commands/version.rb
 lib/webbynode/commands/webbies.rb
 lib/webbynode/engines/all.rb
@@ -61,6 +62,7 @@ lib/webbynode/remote_executor.rb
 lib/webbynode/server.rb
 lib/webbynode/ssh.rb
 lib/webbynode/ssh_keys.rb
+lib/webbynode/trial.rb
 lib/webbynode/updater.rb
 spec/fixtures/aliases
 spec/fixtures/api/credentials
@@ -87,6 +89,7 @@ spec/fixtures/git/status/clean
 spec/fixtures/git/status/dirty
 spec/fixtures/pushand
 spec/fixtures/settings.py
+spec/fixtures/trial/user_add
 spec/spec_helper.rb
 spec/webbynode/api_client_spec.rb
 spec/webbynode/application_spec.rb
@@ -105,6 +108,7 @@ spec/webbynode/commands/open_spec.rb
 spec/webbynode/commands/push_spec.rb
 spec/webbynode/commands/remote_spec.rb
 spec/webbynode/commands/tasks_spec.rb
+spec/webbynode/commands/user_spec.rb
 spec/webbynode/commands/version_spec.rb
 spec/webbynode/commands/webbies_spec.rb
 spec/webbynode/engines/django_spec.rb
@@ -124,4 +128,5 @@ spec/webbynode/push_and_spec.rb
 spec/webbynode/remote_executor_spec.rb
 spec/webbynode/server_spec.rb
 spec/webbynode/ssh_spec.rb
+spec/webbynode/trial_spec.rb
 webbynode.gemspec

@@ -47,7 +47,7 @@ module Webbynode
     
     def add_remote(user, name, host, repo, options={})
       port = options[:port] || 22
-      home = options[:home] || RemoteExecutor.new(host, port).remote_home
+      home = options[:home] || RemoteExecutor.new(host, user, port).remote_home
 
       exec("git remote add #{name} ssh://#{user}@#{host}:#{port}#{home}/#{repo}") do |output|
         # raise an exception if remote already exists

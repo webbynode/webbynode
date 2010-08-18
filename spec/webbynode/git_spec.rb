@@ -199,7 +199,7 @@ describe Webbynode::Git do
     end
     
     it "connects to the remote IP to get home folder" do
-      Webbynode::RemoteExecutor.should_receive(:new).with("1.2.3.4", 389).and_return(re)
+      Webbynode::RemoteExecutor.should_receive(:new).with("1.2.3.4", "git", 389).and_return(re)
       
       subject.should_receive(:exec).with("git remote add webbynode ssh://git@1.2.3.4:389/var/rapp/the_repo")
       subject.add_remote("git", "webbynode", "1.2.3.4", "the_repo", :port => 389)

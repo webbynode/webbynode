@@ -220,6 +220,7 @@ describe Webbynode::Command do
       cmd.run
       
       stdout.should =~ /Your credentials didn't match any Webbynode account./
+      stdout.should =~ /For more information: http:\/\/wbno.de\/credts./
     end
   end
     

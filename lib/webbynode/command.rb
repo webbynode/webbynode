@@ -272,6 +272,7 @@ module Webbynode
         execute
       rescue Webbynode::ApiClient::Unauthorized
         puts "Your credentials didn't match any Webbynode account."
+        puts "For more information: http://wbno.de/credts."
       rescue CommandError
         # io.log $!
         puts $!

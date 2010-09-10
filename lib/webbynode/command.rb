@@ -1,6 +1,6 @@
 begin
   require 'jcode'
-rescue
+rescue LoadError
 end
 
 module Webbynode

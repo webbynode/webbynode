@@ -131,4 +131,3 @@ spec/webbynode/remote_executor_spec.rb
 spec/webbynode/server_spec.rb
 spec/webbynode/ssh_spec.rb
 spec/webbynode/trial_spec.rb
-webbynode.gemspec

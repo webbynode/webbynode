@@ -1,6 +1,7 @@
 module Webbynode::Engines
   All = [
     Webbynode::Engines::Django,
+    Webbynode::Engines::WSGI,
     Webbynode::Engines::Php,
     Webbynode::Engines::Rack,
     Webbynode::Engines::Rails,

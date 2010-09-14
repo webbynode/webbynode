@@ -179,10 +179,11 @@ describe Webbynode::Commands::Init do
       it "prompts for the engine" do
         io_handler.should_receive(:log).with("Supported engines:")
         io_handler.should_receive(:log).with("  1. Django")
-        io_handler.should_receive(:log).with("  2. PHP")
-        io_handler.should_receive(:log).with("  3. Rack")
-        io_handler.should_receive(:log).with("  4. Rails 2")
-        io_handler.should_receive(:log).with("  5. Rails 3")
+        io_handler.should_receive(:log).with("  2. WSGI")
+        io_handler.should_receive(:log).with("  3. PHP")
+        io_handler.should_receive(:log).with("  4. Rack")
+        io_handler.should_receive(:log).with("  5. Rails 2")
+        io_handler.should_receive(:log).with("  6. Rails 3")
 
         subject.should_receive(:ask).with('Select the engine your app uses:', Integer).and_return(1)
 

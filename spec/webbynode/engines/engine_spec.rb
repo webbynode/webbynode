@@ -8,6 +8,7 @@ describe Webbynode::Engines do
       subject.find('rails').should == Webbynode::Engines::Rails
       subject.find('rails3').should == Webbynode::Engines::Rails3
       subject.find('django').should == Webbynode::Engines::Django
+      subject.find('nodejs').should == Webbynode::Engines::NodeJS
       subject.find('rack').should == Webbynode::Engines::Rack
       subject.find('php').should == Webbynode::Engines::Php
     end

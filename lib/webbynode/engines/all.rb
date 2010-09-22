@@ -13,6 +13,7 @@ module Webbynode::Engines
     # order matters!
     Webbynode::Engines::Rails3,
     Webbynode::Engines::Rails,
-    Webbynode::Engines::Rack
+    Webbynode::Engines::Rack,
+    Webbynode::Engines::NodeJS
   ]
 end

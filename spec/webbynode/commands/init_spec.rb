@@ -79,6 +79,29 @@ describe Webbynode::Commands::Init do
     end
   end
   
+  describe 'when the SSH known_hosts key differs' do
+    it "gives an user friendly explanation" do
+      io_handler.stub!(:file_exists?).with(".pushand").and_return(false)
+
+      git_handler.stub!(:present?).and_return(:false)
+
+      subject.stub!(:git).and_return(git_handler)
+      subject.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+
+      subject.should_receive(:add_remote).and_raise(Net::SSH::HostKeyMismatch.new("fingerprint 91:b5:b6:08:91:61:f7:d7:66:ec:c0:a9:53:16:c6:84 does not match for \"208.88.124.171\""))
+      
+      io_handler.should_receive(:log).with("Error pushing to your server:")
+      io_handler.should_receive(:log).with("  fingerprint 91:b5:b6:08:91:61:f7:d7:66:ec:c0:a9:53:16:c6:84 does not match for \"208.88.124.171\"")
+      io_handler.should_receive(:log).with("This usually happens because you redeployed the server and the fingerprint changed.")
+      io_handler.should_receive(:log).with("To fix this error:")
+      io_handler.should_receive(:log).with("  1. Edit #{Webbynode::Io.home_dir}/.ssh/known_hosts file")
+      io_handler.should_receive(:log).with("     or the proper known hosts file for your SSH service.")
+      io_handler.should_receive(:log).with("  2. Remove the line that starts with the IP 201.81.121.201.")
+      
+      subject.run
+    end
+  end
+  
   describe 'using alternate port' do
     subject do 
       Webbynode::Commands::Init.new('2.1.2.3', '--port=2020').tap do |cmd|

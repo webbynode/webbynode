@@ -46,6 +46,19 @@ module Webbynode::Commands
       
       io.log "Application #{@app_name} ready for Rapid Deployment", :finish
       
+    rescue Net::SSH::HostKeyMismatch
+      io.log ""
+      io.log "Error pushing to your server:"
+      io.log "  #{$!}"
+      io.log ""
+      io.log "This usually happens because you redeployed the server and the fingerprint changed."
+      io.log ""
+      io.log "To fix this error:"
+      io.log "  1. Edit #{Webbynode::Io.home_dir}/.ssh/known_hosts file"
+      io.log "     or the proper known hosts file for your SSH service."
+      io.log "  2. Remove the line that starts with the IP #{@webby_ip}."
+      io.log ""
+
     rescue Webbynode::InvalidAuthentication
       io.log "Could not connect to webby: invalid authentication.", true
 

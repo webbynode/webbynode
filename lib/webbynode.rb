@@ -53,6 +53,7 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'open')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'webbies')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'version')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'user')
+require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'settings')
 require File.join(File.dirname(__FILE__), 'webbynode', 'application')
 
 module Webbynode

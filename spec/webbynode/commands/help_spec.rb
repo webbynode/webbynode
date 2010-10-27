@@ -40,4 +40,11 @@ describe Webbynode::Commands::Help do
     stdout =~ /params/
     stdout =~ /options/
   end
+  
+  it "shows an error when command not found" do
+    cmd = Webbynode::Commands::Help.new("i_dont_exist")
+    cmd.run
+    
+    stdout.should =~ /Command "i_dont_exist" doesn't exist/
+  end
 end

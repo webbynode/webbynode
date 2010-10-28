@@ -11,7 +11,7 @@ module Webbynode::Commands
         io.log ""
         
         ssh = remote_executor.ssh
-        ssh.console
+        ssh.console(pushand.parse_remote_app_name)
       else
         io.log "Console only works for Rails 3 apps."
       end

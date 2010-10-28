@@ -6,6 +6,7 @@ require 'httparty'
 require 'domainatrix'
 require 'net/ssh'
 require 'highline/import'
+require 'readline'
 require 'pp'
 
 require File.join(File.dirname(__FILE__), 'webbynode', 'io')
@@ -54,10 +55,11 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'webbies')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'version')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'user')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'settings')
+require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'console')
 require File.join(File.dirname(__FILE__), 'webbynode', 'application')
 
 module Webbynode
-  VERSION = '1.0.3'
+  VERSION = '1.0.4.beta1'
 end
 
 class Array

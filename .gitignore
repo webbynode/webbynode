@@ -9,3 +9,4 @@ settings.py
 docs/_build
 config/database.yml
 db/schema.rb
+.redcar/tags

@@ -59,7 +59,7 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'console')
 require File.join(File.dirname(__FILE__), 'webbynode', 'application')
 
 module Webbynode
-  VERSION = '1.0.4.beta1'
+  VERSION = '1.0.4.beta2'
 end
 
 class Array

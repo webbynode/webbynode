@@ -33,6 +33,49 @@ module Webbynode
     
     end
     
+    def console
+      connect
+      input = 'something'
+      ch = @conn.open_channel do |ch|
+        ch.request_pty do |ch, success|
+          abort "Error requesting pty" unless success
+        end
+
+        ch.env "PATH", "/usr/bin:/usr/local/bin:/opt/ruby-enterprise/bin"
+        ch.exec "cd stackfu-backend; rails console production" do |ch, success|
+          abort "Could not connect to rails console" unless success
+
+          ch.on_data do |ch, data|
+            next if data.chomp == input.chomp || data.chomp == ''
+            if data =~ /^irb(.*)[\>|\*] /
+              prompt = ''
+              data.each_with_index do |s, i|
+                if s =~ /^irb(.*)[\>|\*] /
+                  prompt = s
+                else
+                  print s unless s.chomp == input.chomp
+                end
+              end
+
+              # print data
+              input = "#{Readline.readline(prompt, true)}\n" 
+              ch.send_data(input) 
+            else
+              puts data
+            end
+          end
+
+          ch.on_extended_data do |ch, type, data|
+            puts data
+          end
+        end
+
+        @conn.loop
+      end
+      
+      ch.wait
+    end
+    
     def execute(script, echo=false, ret_exit_code=false)
       connect
       output = ""

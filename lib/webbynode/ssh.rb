@@ -42,7 +42,7 @@ module Webbynode
         end
 
         ch.env "PATH", "/usr/bin:/usr/local/bin:/opt/ruby-enterprise/bin"
-        ch.exec "cd stackfu-backend; rails console production" do |ch, success|
+        ch.exec "cd #{io.app_name}; rails console production" do |ch, success|
           abort "Could not connect to rails console" unless success
 
           ch.on_data do |ch, data|

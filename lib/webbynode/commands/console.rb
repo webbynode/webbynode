@@ -1,5 +1,7 @@
 module Webbynode::Commands
   class Console < Webbynode::Command
+    summary "Opens a Rails 3 console session"
+    
     def execute
       unless server.application_pushed?
         io.log "Before being able to run remote commands from your webby, you must first push your application to it."

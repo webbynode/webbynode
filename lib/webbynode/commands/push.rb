@@ -43,7 +43,7 @@ module Webbynode::Commands
       end
       
       # Pushes the application to Webbynode
-      io.exec("git push webbynode master", false)
+      io.exec("git push webbynode +HEAD:master", false)
       
       # Reads out the "after push" tasks file to see if there are any tasks that must be performed
       # It will perform the "after push" tasks if there are any available

@@ -196,6 +196,7 @@ describe Webbynode::Io do
         File.should_receive(:read).with('.gitignore').and_return('')
         
         File.should_receive(:open).with('.gitignore', 'a').and_yield(file)
+        File.should_receive(:puts).with("").never
         file.should_receive(:puts).with('new_line')
         
         subject.add_line '.gitignore', 'new_line'
@@ -207,6 +208,20 @@ describe Webbynode::Io do
         File.should_receive(:read).with('.gitignore').and_return('new_line')
         File.should_receive(:open).with('.gitignore', 'a').never
         
+        subject.add_line '.gitignore', 'new_line'
+      end
+    end
+    
+    context "when line doesn't exist but file doesn't have a new line at the end" do
+      it "adds the line after a new line" do
+        file = stub('file')
+
+        File.should_receive(:read).with('.gitignore').and_return("first_line\nsecond_line")
+
+        File.should_receive(:open).with('.gitignore', 'a').and_yield(file)
+        file.should_receive(:puts).with('new_line')
+        file.should_receive(:puts).with("")
+
         subject.add_line '.gitignore', 'new_line'
       end
     end

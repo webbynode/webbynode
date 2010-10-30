@@ -195,8 +195,12 @@ module Webbynode
     
     def add_line(file, line)
       create_if_missing(file)
-      return if File.read(file).include?("#{line}")
-      File.open(file, 'a') { |f| f.puts line }
+      contents = File.read(file)
+      return if contents.include?("#{line}")
+      File.open(file, 'a') do |f| 
+        f.puts "" if !contents.empty? and !(contents =~ /\n$/)
+        f.puts line
+      end
     end
     
     def properties(s)

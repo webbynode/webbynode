@@ -4,7 +4,7 @@ module Webbynode::Commands
     
     def execute
       unless server.application_pushed?
-        io.log "Before being able to run remote commands from your webby, you must first push your application to it."
+        io.log "Before being able to run remote commands from your webby, you must first push your application."
         exit
       end
 

@@ -17,6 +17,8 @@ module Webbynode::Commands
       else
         io.log "Console only works for Rails 3 apps."
       end
+    rescue Webbynode::GitRemoteDoesNotExistError
+      io.log "Remote 'webbynode' doesn't exist. Did you run 'wn init' for this app?"
     end
   end
 end

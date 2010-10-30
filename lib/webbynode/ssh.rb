@@ -33,6 +33,29 @@ module Webbynode
     
     end
     
+    def logs(app_name)
+      begin
+        connect
+        ch = @conn.open_channel do |ssh|
+          ch.exec "cd #{app_name}; tail -f log/production.log" do |ch, success|
+            abort "Could not connect to rails app" unless success
+
+            ch.on_data          { |ch, data| puts data}
+            ch.on_extended_data { |ch, type, data| puts data }
+          end
+
+          @conn.loop
+        end
+        
+        ch.wait
+      rescue SystemExit, Interrupt
+        puts ""
+        puts ""
+        puts "Logging done."
+      rescue Exception => e
+      end
+    end
+    
     def console(app_name)
       connect
       input = 'something'

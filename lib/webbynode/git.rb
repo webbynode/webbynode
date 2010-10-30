@@ -68,6 +68,13 @@ module Webbynode
       end
     end
     
+    def current_branch
+      contents = io.exec("git symbolic-ref HEAD")
+      return nil if contents.empty?
+      
+      contents.gsub(/^refs\/heads\//, "")
+    end
+    
     def tracks?(file)
       io.exec2("git ls-files #{file} --error-unmatch") != 1
     end

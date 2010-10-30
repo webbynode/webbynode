@@ -125,6 +125,26 @@ describe Webbynode::Git do
     end
   end
   
+  describe '#current_branch' do
+    it "returns the current branch, if there is one" do
+      io = double(:io)
+      io.should_receive(:exec).with("git symbolic-ref HEAD").and_return("refs/heads/some_other")
+      
+      git = Webbynode::Git.new
+      git.stub(:io).and_return(io)
+      git.current_branch.should == 'some_other'
+    end
+    
+    it "returns nil otherwise" do
+      io = double(:io)
+      io.should_receive(:exec).with("git symbolic-ref HEAD").and_return("")
+      
+      git = Webbynode::Git.new
+      git.stub(:io).and_return(io)
+      git.current_branch.should be_nil
+    end
+  end
+  
   describe '#check_git_ignore' do
     context "when config/database.yml is absent" do
       it "adds the line to .gitignore" do

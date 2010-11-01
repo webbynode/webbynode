@@ -34,21 +34,24 @@ module Webbynode
     end
     
     def logs(app_name)
-      begin
-        connect
-        ch = @conn.open_channel do |ssh|
-          ch.exec "cd #{app_name}; tail -f log/production.log" do |ch, success|
-            abort "Could not connect to rails app" unless success
+      connect
+      ch = @conn.open_channel do |ssh|
+        ch.request_pty
+        ch.exec "cd #{app_name}; tail -f log/production.log" do |ch, success|
+          abort "Could not connect to rails app" unless success
 
-            ch.on_data          { |ch, data| puts data}
-            ch.on_extended_data { |ch, type, data| puts data }
-          end
-
-          @conn.loop
+          ch.on_data          { |ch, data| puts data}
+          ch.on_extended_data { |ch, type, data| puts data }
         end
+
+        @conn.loop
+      end
         
+      begin
         ch.wait
       rescue SystemExit, Interrupt
+        ch.send_data(Net::SSH::Connection::Term::VINTR)
+        
         puts ""
         puts ""
         puts "Logging done."
@@ -96,7 +99,16 @@ module Webbynode
         @conn.loop
       end
       
-      ch.wait
+      begin
+        ch.wait
+      rescue SystemExit, Interrupt
+        ch.send_data(Net::SSH::Connection::Term::VINTR)
+        ch.send_data("quit\n")
+        
+        puts ""
+        puts "Console done."
+      rescue Exception => e
+      end
     end
     
     def execute(script, echo=false, ret_exit_code=false)

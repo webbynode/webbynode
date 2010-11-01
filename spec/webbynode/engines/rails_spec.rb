@@ -15,7 +15,7 @@ describe Webbynode::Engines::Rails do
 
     its(:engine_id)    { should == 'rails' }
     its(:engine_name)  { should == 'Rails 2' }
-    its(:git_excluded) { should == ["config/database.yml", "db/schema.rb"] }
+    its(:git_excluded) { should == ["config/database.yml"] } #, "db/schema.rb"] }
   end
   
   describe '#detect' do

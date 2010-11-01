@@ -2,7 +2,7 @@ module Webbynode::Engines
   class Rails3
     include Engine
     set_name "Rails 3"
-    git_excludes "config/database.yml", "db/schema.rb"
+    git_excludes "config/database.yml" #, "db/schema.rb"
 
     def detected?
       io.file_exists?('script/rails')

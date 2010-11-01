@@ -15,7 +15,7 @@ describe Webbynode::Engines::Rails3 do
 
     its(:engine_id)    { should == 'rails3' }
     its(:engine_name)  { should == 'Rails 3' }
-    its(:git_excluded) { should == ["config/database.yml", "db/schema.rb"] }
+    its(:git_excluded) { should == ["config/database.yml"] } #, "db/schema.rb"] }
   end
   
   describe '#prepare' do

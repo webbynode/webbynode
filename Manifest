@@ -1,8 +1,12 @@
+Gemfile
+Gemfile.lock
+Guardfile
 Manifest
 PostInstall.txt
 README.rdoc
 Rakefile
 assets/webbynode.png
+autotest/discover.rb
 bin/webbynode
 bin/wn
 changelog.rdoc

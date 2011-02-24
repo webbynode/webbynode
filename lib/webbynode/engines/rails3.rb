@@ -17,6 +17,13 @@ module Webbynode::Engines
     
     def check_gemfile
       return unless gemfile.present?
+      
+      contents = io.read_file("config/database.yml")
+      if contents =~ /mysql2/
+        io.add_setting "rails3_adapter", "mysql2"
+      else
+        io.remove_setting "rails3_adapter"
+      end
 
       dependencies = gemfile.dependencies(:without => [:development, :test])
       if dependencies.include? 'sqlite3-ruby'

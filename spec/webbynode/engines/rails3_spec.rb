@@ -28,6 +28,21 @@ describe Webbynode::Engines::Rails3 do
       subject.stub!(:gemfile).and_return(gemfile)
       lambda { subject.prepare }.should raise_error(Webbynode::Command::CommandError)
     end
+
+    it "adds a rails3_adapter setting when mysql2 is used on the database.yml" do
+      io.should_receive(:read_file).with("config/database.yml").and_return("mysql2")
+      io.should_receive(:add_setting).with('rails3_adapter', 'mysql2')
+
+      subject.prepare
+    end
+    
+    it "doesn't add a rails3_adapter otherwise" do
+      io.should_receive(:read_file).with("config/database.yml").and_return("mysql")
+      io.should_receive(:add_setting).with('rails3_adapter', 'mysql2').never
+      io.should_receive(:remove_setting).with('rails3_adapter')
+
+      subject.prepare
+    end
   end
   
   describe '#detect' do

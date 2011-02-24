@@ -163,7 +163,7 @@ describe Webbynode::Commands::Push do
     describe "#perform_before_tasks" do
       before(:each) do
         push.before_tasks.stub!(:has_tasks?).and_return(true)
-        io.stub!(:exec).with("git push webbynode master")
+        io.stub!(:exec).with("git push webbynode +HEAD:master", false)
       end
       
       it "should provide feedback to the user that it's going to perform the tasks" do
@@ -182,7 +182,7 @@ describe Webbynode::Commands::Push do
     describe "#perform_after_tasks" do
       before(:each) do
         push.after_tasks.stub!(:has_tasks?).and_return(true)
-        io.stub!(:exec).with("git push webbynode master")
+        io.stub!(:exec).with("git push webbynode +HEAD:master", false)
       end
       
       it "should provide feedback to the user that it's going to perform the tasks" do

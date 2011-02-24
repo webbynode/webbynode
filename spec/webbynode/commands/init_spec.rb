@@ -267,7 +267,7 @@ describe Webbynode::Commands::Init do
       io.stub(:file_exists?).with("script/rails").and_return(false)
       io.stub(:directory?).with('app').and_return(true)
       io.stub(:directory?).with('app/controllers').and_return(true)
-      io.stub(:file_exists?).with('config/environent.rb').and_return(true)
+      io.stub(:file_exists?).with('config/environment.rb').and_return(true)
 
       Webbynode::Io.stub(:new).and_return(io)
       Webbynode::Git.stub(:new).and_return(git_handler)

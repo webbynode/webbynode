@@ -8,5 +8,14 @@ module Webbynode::Engines
       io.directory?('app') && io.directory?('app/controllers') &&
       io.file_exists?('config/environment.rb')
     end
+    
+    def prepare
+      contents = io.read_file("config/database.yml")
+      if contents =~ /mysql2/
+        io.add_setting "rails_adapter", "mysql2"
+      else
+        io.remove_setting "rails_adapter"
+      end
+    end
   end
 end

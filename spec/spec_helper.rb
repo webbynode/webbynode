@@ -1,6 +1,6 @@
 # Require RSpec
 require 'rubygems'
-require 'spec'
+require 'rspec'
 require 'pp'
 begin
   require 'fakeweb'
@@ -44,7 +44,7 @@ module Kernel
   def ppd(x); $stderr.puts x.pretty_inspect; end
 end
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   config.include Webbynode::IoStub
 
   config.before(:each) do

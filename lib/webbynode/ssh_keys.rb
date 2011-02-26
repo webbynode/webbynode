@@ -6,6 +6,10 @@ module Webbynode
       run_remote_command "mkdir ~/.ssh 2>/dev/null; chmod 700 ~/.ssh; echo \"#{key}\" >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys"
     end
     
+    def add_key_to_remote_user(key, folder)
+      run_remote_command "mkdir #{folder}/.ssh 2>/dev/null; chmod 700 #{folder}/.ssh; echo \"#{key}\" >> #{folder}/.ssh/authorized_keys; chmod 644 #{folder}/.ssh/authorized_keys"
+    end
+    
     # lists all authorized keys on the remote server
     def remote_authorized_keys
       run_remote_command "cat \$HOME/.ssh/authorized_keys"

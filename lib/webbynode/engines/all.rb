@@ -1,5 +1,6 @@
 module Webbynode::Engines
   All = [
+    Webbynode::Engines::Html,
     Webbynode::Engines::Django,
     Webbynode::Engines::WSGI,
     Webbynode::Engines::Php,

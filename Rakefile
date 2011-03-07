@@ -4,7 +4,7 @@ require 'rake/testtask'
 
 require 'echoe'  
   
-Echoe.new('webbynode', '1.0.4.2') do |p|  
+Echoe.new('webbynode', '1.0.4.4') do |p|  
   p.description     = "Webbynode Deployment Gem"  
   p.url             = "http://webbynode.com"  
   p.author          = "Felipe Coury"
@@ -12,7 +12,7 @@ Echoe.new('webbynode', '1.0.4.2') do |p|
   p.ignore_pattern  = ["tmp/*", "script/*"]  
   p.dependencies = [ 
     ['bundler', '>=0.9.26'],
-    ['net-ssh', '>=2.0.20'],
+    ['net-ssh', '=2.1.0'],
     ['highline', '>=1.5.2'],
     ['httparty', '>=0.4.5'],
     ['launchy',  '>=0.3.7'],

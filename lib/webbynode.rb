@@ -62,7 +62,7 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'logs')
 require File.join(File.dirname(__FILE__), 'webbynode', 'application')
 
 module Webbynode
-  VERSION = '1.0.4.2'
+  VERSION = '1.0.4.4'
 end
 
 class Array
@@ -75,5 +75,14 @@ class Array
     return last if array.empty?
 
     "#{array.join(", ")} #{last_join} #{last}"
+  end
+end
+
+class Net::HTTP
+  alias_method :old_initialize, :initialize
+  def initialize(*args)
+    old_initialize(*args)
+    @ssl_context = OpenSSL::SSL::SSLContext.new
+    @ssl_context.verify_mode = OpenSSL::SSL::VERIFY_NONE
   end
 end

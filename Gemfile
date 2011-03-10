@@ -17,4 +17,5 @@ group :development do
   gem 'fakeweb'
   gem 'echoe'
   gem 'rcov'
+	gem 'rb-fsevent'
 end

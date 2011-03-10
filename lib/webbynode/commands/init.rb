@@ -14,7 +14,7 @@ module Webbynode::Commands
         return
       end
       
-      io.log "Webbynode Rapp - http://rapp.webbynode.com"
+      io.log "#{"Webbynode Rapp".color(:blue)} - #{"http://rapp.webbynode.com".underline}"
 
       @overwrite   = false
 
@@ -30,7 +30,7 @@ module Webbynode::Commands
       
       check_git_clean if @git_present
       
-      io.log "Initializing application #{@app_name} #{@dns_entry ? "with dns #{@dns_entry}" : ""}", :start
+      io.log "Initializing application #{@app_name.color(:yellow)} #{@dns_entry ? "with dns #{@dns_entry.color(:yellow)}" : ""}"
       
       detect_engine
       
@@ -73,8 +73,9 @@ module Webbynode::Commands
     
     def check_git_clean
       unless git.clean?
+        io.log ""
         raise CommandError, 
-          "Cannot initialize: git has pending changes. Execute a git commit or add changes to .gitignore and try again."
+          "#{"Cannot initialize:".color(:red)} #{"git has pending changes.".color(:yellow)}\nExecute a git commit or add changes to .gitignore and try again."
       end
     end
     
@@ -82,7 +83,7 @@ module Webbynode::Commands
       return unless pushand_exists?
       
       io.log ""
-      io.log "It seems this application was initialized before."
+      io.log "It seems this application was initialized before.".color(:yellow)
       
       unless ask('Do you want to initialize it again (y/n)?').downcase == 'y'
         puts ""
@@ -176,14 +177,14 @@ module Webbynode::Commands
           webby = api_webbies[api_webbies.keys.first]
         else
           io.log ""
-          io.log "Current Webbies in your account:"
+          io.log "Current Webbies in your account:".color(:yellow)
           io.log ""
         
           choices = []
           api_webbies.keys.sort.each_with_index do |webby_key, i|
             webby = api_webbies[webby_key]
             choices << webby
-            io.log "  #{i+1}. #{webby['name']} (#{webby['ip']})"
+            io.log "  #{i+1}. #{webby['name'].color(:yellow)} (#{webby['ip']})"
           end
         
           io.log "", :simple
@@ -192,7 +193,7 @@ module Webbynode::Commands
         end
         
         io.log "", :simple
-        io.log "Set deployment Webby to #{webby['name']}."
+        io.log "Set deployment Webby to #{webby['name'].color(:yellow)}."
         
         return webby['ip']
       end

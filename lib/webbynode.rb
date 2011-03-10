@@ -8,6 +8,15 @@ require 'net/ssh'
 require 'highline/import'
 require 'readline'
 require 'awesome_print'
+require 'rainbow'
+
+begin
+  require 'Win32/Console/ANSI' if RUBY_PLATFORM =~ /mswin/
+rescue LoadError
+  puts "Hint: if you want to make your output better in windows, install the win32console gem:"
+  puts "      gem install win32console"
+  puts ""
+end
 
 require File.join(File.dirname(__FILE__), 'webbynode', 'io')
 require File.join(File.dirname(__FILE__), 'webbynode', 'git')

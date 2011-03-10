@@ -4,6 +4,7 @@ gem 'httparty'
 gem 'domainatrix'
 gem 'net-ssh'
 gem 'highline'
+gem 'rainbow'
 
 group :development do
   gem 'rspec'

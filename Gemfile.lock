@@ -34,6 +34,7 @@ GEM
     net-ssh (2.1.0)
     open_gem (1.4.2)
       launchy (~> 0.3.5)
+    rainbow (1.1.1)
     rake (0.8.7)
     rb-fsevent (0.4.0)
     rcov (0.9.9)
@@ -66,6 +67,7 @@ DEPENDENCIES
   highline
   httparty
   net-ssh
+  rainbow
   rb-fsevent
   rcov
   rspec

@@ -17,6 +17,7 @@ require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'lib', 'webbyn
 # Set Testing Environment
 $testing = true
 FakeWeb.allow_net_connect = false
+Sickill::Rainbow.enabled  = false
 
 # Helper Methods
 module Webbynode::IoStub

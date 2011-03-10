@@ -15,15 +15,22 @@ module Webbynode::Engines
     
     private
     
+    def handle_adapter
+      if io.file_exists?("config/database.yml")
+        contents = io.read_file("config/database.yml")
+        if contents =~ /mysql2/
+          io.add_setting "rails3_adapter", "mysql2"
+          return
+        end
+      end
+
+      io.remove_setting "rails3_adapter"
+    end
+    
     def check_gemfile
       return unless gemfile.present?
       
-      contents = io.read_file("config/database.yml")
-      if contents =~ /mysql2/
-        io.add_setting "rails3_adapter", "mysql2"
-      else
-        io.remove_setting "rails3_adapter"
-      end
+      handle_adapter
 
       dependencies = gemfile.dependencies(:without => [:development, :test])
       if dependencies.include? 'sqlite3-ruby'

@@ -10,12 +10,15 @@ module Webbynode::Engines
     end
     
     def prepare
-      contents = io.read_file("config/database.yml")
-      if contents =~ /mysql2/
-        io.add_setting "rails_adapter", "mysql2"
-      else
-        io.remove_setting "rails_adapter"
+      if io.file_exists?("config/database.yml")
+        contents = io.read_file("config/database.yml")
+        if contents =~ /mysql2/
+          io.add_setting "rails_adapter", "mysql2"
+          return
+        end
       end
+
+      io.remove_setting "rails_adapter"
     end
   end
 end

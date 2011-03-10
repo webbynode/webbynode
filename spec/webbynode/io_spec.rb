@@ -2,6 +2,13 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 
 describe Webbynode::Io do
+  describe '#list_files' do
+    it 'list files that match' do
+      Dir.should_receive(:glob).with("/tmp/*.abcdef").and_return(["abcdef"])
+      subject.list_files("/tmp/*.abcdef").should == ["abcdef"]
+    end
+  end
+  
   describe '#sed' do
     it 'replaces a regexp' do
       text = read_fixture('settings.py')

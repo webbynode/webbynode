@@ -7,7 +7,7 @@ require 'domainatrix'
 require 'net/ssh'
 require 'highline/import'
 require 'readline'
-require 'pp'
+require 'awesome_print'
 
 require File.join(File.dirname(__FILE__), 'webbynode', 'io')
 require File.join(File.dirname(__FILE__), 'webbynode', 'git')
@@ -35,6 +35,7 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'engines', 'nodejs')
 require File.join(File.dirname(__FILE__), 'webbynode', 'engines', 'wsgi')
 require File.join(File.dirname(__FILE__), 'webbynode', 'engines', 'html')
 require File.join(File.dirname(__FILE__), 'webbynode', 'engines', 'all')
+require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'accounts')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'apps')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'addons')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'init')

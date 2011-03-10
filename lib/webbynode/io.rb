@@ -14,6 +14,10 @@ module Webbynode
       Config::CONFIG["host_os"] =~ /mswin|mingw/
     end
     
+    def list_files(dir)
+      Dir.glob(dir)
+    end
+    
     def is_windows?
       Io.is_windows?
     end

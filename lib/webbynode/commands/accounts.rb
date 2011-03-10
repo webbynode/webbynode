@@ -1,17 +1,18 @@
 module Webbynode::Commands
   class Accounts < Webbynode::Command
     summary "Manages multiple Webbynode accounts"
+    add_alias "account"
     
-    Prefix = "#{Webbynode::Io.home_dir}/.webbynode"
-    
-    attr_accessor :action
-
     parameter :action, String, "use, new, save, delete or list.", 
       :validate => { :in => ["use", "new", "save", "delete", "list"] },
       :default  => "list",
       :required => false
     parameter :name, String, "account name", :required => false
     
+    Prefix = "#{Webbynode::Io.home_dir}/.webbynode"
+    
+    attr_accessor :action
+
     def execute
       @action = param(:action) || "default"
       send(action)

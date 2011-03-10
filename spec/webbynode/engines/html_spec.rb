@@ -6,7 +6,7 @@ describe Webbynode::Engines::Html do
     subject { Webbynode::Engines::Html }
 
     its(:engine_id)    { should == 'html' }
-    its(:engine_name)  { should == 'HTML' }
+    its(:engine_name)  { should == 'Html' }
     its(:git_excluded) { should be_empty }
   end
 end

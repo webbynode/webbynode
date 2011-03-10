@@ -201,14 +201,16 @@ describe Webbynode::Commands::Init do
     context "when no engine was detected" do
       it "prompts for the engine" do
         io_handler.should_receive(:log).with("Supported engines:")
-        io_handler.should_receive(:log).with("  1. Django")
-        io_handler.should_receive(:log).with("  2. WSGI")
-        io_handler.should_receive(:log).with("  3. PHP")
-        io_handler.should_receive(:log).with("  4. Rack")
-        io_handler.should_receive(:log).with("  5. Rails 2")
-        io_handler.should_receive(:log).with("  6. Rails 3")
+        io_handler.should_receive(:log).with("  1. Html")
+        io_handler.should_receive(:log).with("  2. Django")
+        io_handler.should_receive(:log).with("  3. WSGI")
+        io_handler.should_receive(:log).with("  4. PHP")
+        io_handler.should_receive(:log).with("  5. Rack")
+        io_handler.should_receive(:log).with("  6. Rails 2")
+        io_handler.should_receive(:log).with("  7. Rails 3")
+        io_handler.should_receive(:log).with("  8. NodeJS")
 
-        subject.should_receive(:ask).with('Select the engine your app uses:', Integer).and_return(1)
+        subject.should_receive(:ask).with('Select the engine your app uses:', Integer).and_return(2)
 
         io_handler.should_receive(:add_setting).with("engine", "django")
         io_handler.should_receive(:log).with("Initializing with Django engine...")
@@ -267,6 +269,7 @@ describe Webbynode::Commands::Init do
       io.stub(:file_exists?).with("script/rails").and_return(false)
       io.stub(:directory?).with('app').and_return(true)
       io.stub(:directory?).with('app/controllers').and_return(true)
+      io.stub(:file_exists?).with('config/database.yml').and_return(false)
       io.stub(:file_exists?).with('config/environment.rb').and_return(true)
 
       Webbynode::Io.stub(:new).and_return(io)
@@ -731,7 +734,7 @@ describe Webbynode::Commands::Init do
       git_handler.should_receive(:clean?).and_return(false)
       
       lambda { @command.execute }.should raise_error(Webbynode::Command::CommandError,
-        "Cannot initialize: git has pending changes. Execute a git commit or add changes to .gitignore and try again.")
+        "Cannot initialize: git has pending changes.\nExecute a git commit or add changes to .gitignore and try again.")
     end
     
     it "shows that a commit is being added" do

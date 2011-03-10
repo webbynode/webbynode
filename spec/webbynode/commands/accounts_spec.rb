@@ -16,7 +16,7 @@ describe Webbynode::Commands::Accounts do
     subject { prepare nil }
 
     it "shows current account" do
-      api.should_receive(:credentials).and_return({:email => "fcoury@me.com", :token => "apitoken"})
+      api.should_receive(:credentials).and_return({"email" => "fcoury@me.com", "token" => "apitoken"})
       io.should_receive(:log).with("Current account: fcoury@me.com")
       subject.execute
     end

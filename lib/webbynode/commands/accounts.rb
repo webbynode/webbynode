@@ -8,7 +8,8 @@ module Webbynode::Commands
 
     parameter :action, String, "use, new, save, delete or list.", 
       :validate => { :in => ["use", "new", "save", "delete", "list"] },
-      :default  => "list"
+      :default  => "list",
+      :required => false
     parameter :name, String, "account name", :required => false
     
     def execute
@@ -20,7 +21,7 @@ module Webbynode::Commands
     
     def default
       credentials = api.credentials
-      io.log "Current account: #{credentials[:email]}"
+      io.log "Current account: #{credentials["email"]}"
     end
     
     def list

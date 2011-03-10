@@ -1,6 +1,7 @@
 module Webbynode::Commands
   class Webbies < Webbynode::Command
     summary "Lists the Webbies you currently own"
+    add_alias "list"
     
     def execute
       puts "Fetching list of your Webbies..."

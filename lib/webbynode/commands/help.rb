@@ -5,7 +5,7 @@ module Webbynode::Commands
     
     def execute
       if param(:command) == "commands"
-        puts "usage: webbynode COMMAND"
+        puts "usage: #{"webbynode".color(:white).bright} #{"COMMAND".color(:green)}"
         puts
         puts "Available commands:"
         dir = File.join(File.expand_path(File.dirname(__FILE__)), "/*.rb")
@@ -13,10 +13,10 @@ module Webbynode::Commands
           command = file.split("/").last
           command.gsub!(/\.rb/, "")
           
-          puts "    #{command.ljust(10)} #{Webbynode::Command.class_for(command).setting(:summary)}"
+          puts "    #{command.ljust(15).color(:green)} #{Webbynode::Command.class_for(command).setting(:summary)}"
         end
         puts 
-        puts "Try 'webbynode help COMMAND' for more information."
+        puts "Try '#{"webbynode help".color(:white).bright} #{"COMMAND".color(:green)}' for more information."
       else
         kls = Help.for(param(:command))
         if kls

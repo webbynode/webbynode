@@ -117,11 +117,11 @@ module Webbynode::Commands
       def show_tasks(from_file = false)
         read_tasks(session_file, true) if from_file
         if session_tasks.empty?
-          io.log_and_exit "You haven't set up any tasks for \"#{type.gsub('_',' ').capitalize}\"."
+          io.log_and_exit "You haven't set up any #{type.gsub('_',' ').capitalize.color(:yellow)} tasks yet."
         end
-        io.log "These are the current tasks for \"#{type.gsub('_',' ').capitalize}\":"
+        io.log "#{type.gsub('_',' ').capitalize.color(:yellow)} tasks:"
         session_tasks.each_with_index do |task, index|
-          io.log "[#{index}] #{task}"
+          io.log "[#{index}] #{task.color(:cyan)}"
         end
       end
       

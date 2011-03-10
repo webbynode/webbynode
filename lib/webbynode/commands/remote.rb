@@ -19,10 +19,14 @@ module Webbynode::Commands
       remote_app_name = pushand.parse_remote_app_name
       
       # Notify the user
-      io.log("Performing the requested remote command..")
+      io.log "Executing remote command...".color(:cyan)
       
       # Executes the command on the remote server inside the application root folder
-      remote_executor.exec("cd #{remote_app_name}; #{param_values.join(" ")}", true)
+      result = spinner {
+        remote_executor.exec("cd #{remote_app_name}; #{param_values.join(" ")}", false)
+      }
+
+      puts result
     end
   end
 end

@@ -186,15 +186,15 @@ describe Webbynode::Commands::Tasks do
     end
     
     it "should display no tasks, since there are none initially" do
-      io.should_receive(:log).with("These are the current tasks for \"After push\":")
-      io.should_not_receive(:log)
+      io.should_receive(:log).with("After push tasks:")
+      # io.should_not_receive(:log)
       stask.execute
       stask.should have(0).session_tasks
     end
     
     it "should display 3 tasks: task0 task1 task2" do
       3.times {|num| stask.session_tasks << "task#{num}"}
-      io.should_receive(:log).with("These are the current tasks for \"After push\":")
+      io.should_receive(:log).with("After push tasks:")
       stask.stub!(:read_tasks)
       io.should_not_receive(:log_and_exit)
       io.should_receive(:log).with("[0] task0")
@@ -206,8 +206,8 @@ describe Webbynode::Commands::Tasks do
     
     it "should tell the user that there are no tasks if there aren't any" do
       stask.stub!(:read_tasks)
-      io.should_receive(:log_and_exit).with("You haven't set up any tasks for \"After push\".")
-      io.should_not_receive(:log).with("These are the current tasks for \"After push\".")
+      io.should_receive(:log_and_exit).with("You haven't set up any After push tasks yet.")
+      # io.should_not_receive(:log).with("After push tasks:")
       stask.execute
     end
   end
@@ -241,7 +241,7 @@ describe Webbynode::Commands::Tasks do
       end
       
       it "should display the updated list of tasks" do
-        io.should_receive(:log).with("These are the current tasks for \"After push\":")
+        io.should_receive(:log).with("After push tasks:")
         io.should_receive(:log).with("[0] rake db:migrate RAILS_ENV=production")
         task.execute
       end
@@ -274,7 +274,7 @@ describe Webbynode::Commands::Tasks do
       it "should display the updated list of tasks" do
         3.times {|num| rtask.session_tasks << "task#{num}" }
         rtask.stub(:read_tasks)
-        io.should_receive(:log).with("These are the current tasks for \"After push\":")
+        io.should_receive(:log).with("After push tasks:")
         io.should_receive(:log).with("[0] task0")
         io.should_not_receive(:log).with("[1] task1")
         io.should_receive(:log).with("[1] task2")

@@ -280,6 +280,32 @@ module Webbynode
     end
     
     private
+    
+    def spinner(&code)
+      chars = %w{ | / - \\ }
+
+      result = nil
+      t = Thread.new { 
+        result = code.call
+      }
+      while t.alive?
+        print chars[0]
+        STDOUT.flush
+
+        sleep 0.1
+
+        print "\b"
+        STDOUT.flush
+
+        chars.push chars.shift
+      end
+
+      print " \b"
+      STDOUT.flush
+
+      t.join
+      result
+    end
 
     def parse_args(args)
       settings[:options].each { |o| o.reset! }

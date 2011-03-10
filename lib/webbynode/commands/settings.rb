@@ -15,7 +15,7 @@ module Webbynode::Commands
     def show
       io.with_setting do |hash|
         hash.each_pair do |k, v|
-          io.log "#{k} = #{v}"
+          io.log "#{k.color(:yellow)} = #{v.to_s.color(:cyan)}"
         end
       end
     end

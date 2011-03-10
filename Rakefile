@@ -4,7 +4,7 @@ require 'rake/testtask'
 
 require 'echoe'  
   
-Echoe.new('webbynode', '1.0.4.4') do |p|  
+Echoe.new('webbynode', '1.0.5.beta') do |p|  
   p.description     = "Webbynode Deployment Gem"  
   p.url             = "http://webbynode.com"  
   p.author          = "Felipe Coury"
@@ -17,6 +17,7 @@ Echoe.new('webbynode', '1.0.4.4') do |p|
     ['httparty', '>=0.4.5'],
     ['launchy',  '>=0.3.7'],
     ['domainatrix','>=0.0.7'],
+    ['rainbow','1.1.1'],
   ]
   # p.dependencies = [
   #   ['activeresource','>= 2.3.4'],
@@ -36,6 +37,10 @@ the comfort of your command line.
 
 Please read our guide for a quickstart:
 http://guides.webbynode.com/articles/rapidapps/
+
+For more information use the commands:
+wn help
+wn guides
 
 "
 end

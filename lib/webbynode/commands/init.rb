@@ -14,7 +14,7 @@ module Webbynode::Commands
         return
       end
       
-      io.log "#{"Webbynode Rapp".color(:blue)} - #{"http://rapp.webbynode.com".underline}"
+      io.log "#{"Webbynode Rapp".color(:white).bright} - #{"http://rapp.webbynode.com".underline}"
 
       @overwrite   = false
 
@@ -22,7 +22,7 @@ module Webbynode::Commands
       check_initialized
       
       @webby       = param(:webby)
-      @app_name    = io.app_name
+      @app_name    = spinner { io.app_name }
       @git_present = git.present?
       @dns_entry   = option(:dns) ? "#{option(:dns)}" : @app_name
 
@@ -44,12 +44,12 @@ module Webbynode::Commands
       
       handle_dns option(:dns) if option(:adddns)
       
-      io.log "Application #{@app_name} ready for Rapid Deployment", :finish
+      io.log "Application #{@app_name.color(:yellow)} ready for Rapid Deployment", :finish
       
     rescue Net::SSH::HostKeyMismatch
       io.log ""
       io.log "Error pushing to your server:"
-      io.log "  #{$!}"
+      io.log "  #{$!.to_s.color(:red)}"
       io.log ""
       io.log "This usually happens because you redeployed the server and the fingerprint changed."
       io.log ""
@@ -60,13 +60,13 @@ module Webbynode::Commands
       io.log ""
 
     rescue Webbynode::InvalidAuthentication
-      io.log "Could not connect to webby: invalid authentication.", true
+      io.log "Could not connect to webby: invalid authentication.".color(:red), true
 
     rescue Webbynode::PermissionError
-      io.log "Could not create an SSH key: permission error.", true
+      io.log "Could not create an SSH key: permission error.".color(:red), true
 
     rescue Webbynode::GitRemoteAlreadyExistsError
-      io.log "Application already initialized."
+      io.log "Application already initialized.".color(:red)
     end
     
     private
@@ -131,8 +131,7 @@ module Webbynode::Commands
     def delete_remote
       return unless git.remote_exists?('webbynode')
       
-      io.log ""
-      io.log "Webbynode git integration already initialized."
+      io.log "Webbynode git integration already initialized.".color(:yellow)
       if @overwrite || ask('Do you want to overwrite the current settings (y/n)?').downcase == 'y'
         git.delete_remote('webbynode')
       end
@@ -148,16 +147,17 @@ module Webbynode::Commands
     end
     
     def add_remote
-      io.log "Adding webbynode as git remote..."
+      io.log "Adding webbynode as git remote, please wait..."
       options = {}
       options[:port] = option(:port).to_i if option(:port)
       options[:home] = @git_home if @git_home
 
       params = [@git_user, "webbynode", @webby_ip, @app_name, options]
 
-      Webbynode::Server.new(@webby_ip, @git_user, option(:port) || 22).add_ssh_key LocalSshKey, nil
-
-      git.add_remote *params
+      spinner {
+        Webbynode::Server.new(@webby_ip, @git_user, option(:port) || 22).add_ssh_key LocalSshKey, nil
+        git.add_remote *params
+      }
     end
     
     def create_git_remote
@@ -169,7 +169,7 @@ module Webbynode::Commands
     def get_ip(webby)
       return webby if webby =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/
         
-      api_webbies = api.webbies
+      api_webbies = spinner { api.webbies } 
       
       unless webby
         # TODO: raise CommandError id size = 0
@@ -245,7 +245,6 @@ module Webbynode::Commands
       choice = ask("Select the engine your app uses:", Integer) { |q| q.in = 1..(engines.size+1) }
       engine = engines[choice-1]
       
-      io.log ""
       io.log "Initializing with #{engine.engine_name} engine..."
       
       engine

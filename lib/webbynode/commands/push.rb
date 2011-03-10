@@ -34,11 +34,11 @@ module Webbynode::Commands
       perform_before_tasks if before_tasks.has_tasks?
       
       # Logs a initialization message to the user
-      io.log "Pushing #{app_name}", :start
+      io.log "Pushing #{app_name.color(:cyan)}", :start
       
       # Checks for server-side updates
       if check_for_updates
-        io.log "Note: Rapp Engine updated" 
+        io.log "Note: Rapp Engine updated".color(:yellow)
         io.log ""
       end
       
@@ -50,7 +50,7 @@ module Webbynode::Commands
       after_tasks.read_tasks(Webbynode::Commands::Tasks::AfterPushTasksFile)
       perform_after_tasks if after_tasks.has_tasks?
       
-      io.log "Finished pushing #{app_name}", :finish
+      io.log "Finished pushing #{app_name.color(:cyan)}", :finish
     end
     
     
@@ -58,18 +58,18 @@ module Webbynode::Commands
       
       # Performs the before push tasks locally
       def perform_before_tasks
-        io.log "Performing Before Push Tasks...", :action
+        io.log "Performing #{"Before Push".color(:yellow)} Tasks...", :action
         before_tasks.session_tasks.each do |task|
-          io.log "  Performing Task: #{task}", :action
+          io.log "  Performing Task: #{task.color(:cyan)}", :action
           io.exec(task)
         end
       end
       
       # Performs the after push tasks remotely from the application root
       def perform_after_tasks
-        io.log "Performing After Push Tasks...", :action
+        io.log "Performing #{"After Push".color(:yellow)} Tasks...", :action
         after_tasks.session_tasks.each do |task|
-          io.log "  Performing Task: #{task}", :action
+          io.log "  Performing Task: #{task.color(:cyan)}", :action
           remote_executor.exec("cd #{pushand.parse_remote_app_name}; #{task}", true)
         end
       end

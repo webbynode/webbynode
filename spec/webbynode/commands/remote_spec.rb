@@ -24,7 +24,7 @@ describe Webbynode::Commands::Remote do
   end
   
   it "should notify the user" do
-    io.should_receive(:log).with("Performing the requested remote command..")
+    io.should_receive(:log).with("Executing remote command...")
     remote.run
   end
  
@@ -44,7 +44,7 @@ describe Webbynode::Commands::Remote do
       remote.stub(:validate_initialization)
       load_all_mocks(remote)
       pushand.should_receive(:parse_remote_app_name).and_return('test.webbynode.com')
-      re.should_receive(:exec).with("cd test.webbynode.com; ls -la", true)
+      re.should_receive(:exec).with("cd test.webbynode.com; ls -la", false)
       remote.run
     end
     
@@ -55,7 +55,7 @@ describe Webbynode::Commands::Remote do
       remote.stub(:validate_initialization)
       remote.stub(:validate_remote_application_availability)
                   
-      re.should_receive(:exec).with("cd webbynode; these are the params", true)
+      re.should_receive(:exec).with("cd webbynode; these are the params", false).and_return("something")
       remote.run
     end
     

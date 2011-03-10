@@ -3,7 +3,7 @@ require File.join(File.expand_path(File.dirname(__FILE__)), '../..', 'spec_helpe
 
 describe Webbynode::Commands::Accounts do
   let(:api) { double("API") }
-  let(:io)  { double("Io")}
+  let(:io)  { double("Io").as_null_object }
   
   def prepare(*params)
     Webbynode::Commands::Accounts.new(*params).tap do |a|
@@ -31,14 +31,44 @@ describe Webbynode::Commands::Accounts do
       io.should_receive(:log).with("biz")
       subject.execute
     end
+    
+    it "tells when no configs found" do
+      io.should_receive(:list_files).with("#{Webbynode::Io.home_dir}/.webbynode_*").and_return([])
+      io.should_receive(:log).with("No accounts found. Use 'wn accounts save' to save current account with an alias.")
+      subject.execute
+    end
   end
   
   describe '#save' do
     subject { prepare "save", "name" }
     
-    it "renames the properties file" do
+    it "copies the properties file" do
+      io.should_receive(:file_exists?).with("#{Webbynode::Io.home_dir}/.webbynode_name").and_return(false)
       io.should_receive(:copy_file).with("#{Webbynode::Io.home_dir}/.webbynode", "#{Webbynode::Io.home_dir}/.webbynode_name")
       subject.execute
+    end
+    
+    context "file exists" do
+      context "when confirms overwriting" do
+        it "overwrites the file" do
+          io.should_receive(:file_exists?).with("#{Webbynode::Io.home_dir}/.webbynode_name").and_return(true)
+          subject.should_receive(:ask).with("Do you want to overwrite saved account name (y/n)? ").once.ordered.and_return("y")
+          io.should_receive(:copy_file).with("#{Webbynode::Io.home_dir}/.webbynode", "#{Webbynode::Io.home_dir}/.webbynode_name")
+
+          subject.execute
+        end
+      end
+
+      context "when aborts overwriting" do
+        it "doesn't overwrite the file" do
+          io.should_receive(:file_exists?).with("#{Webbynode::Io.home_dir}/.webbynode_name").and_return(true)
+          subject.should_receive(:ask).with("Do you want to overwrite saved account name (y/n)? ").once.ordered.and_return("n")
+          io.should_receive(:copy_file).with("#{Webbynode::Io.home_dir}/.webbynode", "#{Webbynode::Io.home_dir}/.webbynode_name").never
+          io.should_receive(:log).with("Save aborted.")
+
+          subject.execute
+        end
+      end
     end
   end
   
@@ -46,8 +76,17 @@ describe Webbynode::Commands::Accounts do
     subject { prepare "use", "name" }
     
     it "renames the properties file" do
+      io.should_receive(:file_exists?).with("#{Webbynode::Io.home_dir}/.webbynode_name").and_return(true)
       io.should_receive(:copy_file).with("#{Webbynode::Io.home_dir}/.webbynode_name", "#{Webbynode::Io.home_dir}/.webbynode")
       subject.execute
+    end
+    
+    context "when file doesn't exist" do
+      it "shows an error message" do
+        io.should_receive(:file_exists?).with("#{Webbynode::Io.home_dir}/.webbynode_name").and_return(false)
+        io.should_receive(:log).with("Account alias 'name' not found. Use 'wn account list' for a full list.")
+        subject.execute
+      end
     end
   end
   
@@ -57,6 +96,24 @@ describe Webbynode::Commands::Accounts do
     it "reinitializes the account" do
       api.should_receive(:init_credentials).with(true)
       subject.execute
+    end
+  end
+  
+  describe '#delete' do
+    subject { prepare "delete", "name" }
+    
+    it "deletes the account" do
+      io.should_receive(:file_exists?).with("#{Webbynode::Io.home_dir}/.webbynode_name").and_return(true)
+      io.should_receive(:delete_file).with("#{Webbynode::Io.home_dir}/.webbynode_name")
+      subject.execute
+    end
+    
+    context "when account doesn't exist" do
+      it "shows an error" do
+        io.should_receive(:file_exists?).with("#{Webbynode::Io.home_dir}/.webbynode_name").and_return(false)
+        io.should_receive(:log).with("Account alias 'name' not found. Use 'wn account list' for a full list.")
+        subject.execute
+      end
     end
   end
 end

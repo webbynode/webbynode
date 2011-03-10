@@ -19,6 +19,17 @@ module Webbynode::Commands
     
     private
     
+    def missing_target?
+      unless io.file_exists?(target)
+        io.log "Account alias '#{param(:name)}' not found. Use 'wn account list' for a full list."
+        return true
+      end      
+    end
+    
+    def target
+      @target ||= "#{Prefix}_#{param(:name)}"
+    end
+    
     def default
       credentials = api.credentials
       io.log "Current account: #{credentials["email"]}"
@@ -26,6 +37,12 @@ module Webbynode::Commands
     
     def list
       files = io.list_files "#{Prefix}_*"
+      
+      unless files.any?
+        io.log "No accounts found. Use 'wn accounts save' to save current account with an alias."
+        return
+      end
+      
       files.each do |f|
         if f =~ /\.webbynode_(.*)/
           io.log $1
@@ -34,15 +51,26 @@ module Webbynode::Commands
     end
     
     def save
-      io.copy_file "#{Prefix}", "#{Prefix}_#{param(:name)}"
+      if io.file_exists?(target) and ask("Do you want to overwrite saved account name (y/n)? ").downcase != "y"
+        io.log "Save aborted."
+        return
+      end
+        
+      io.copy_file "#{Prefix}", target
     end
     
     def use
-      io.copy_file "#{Prefix}_#{param(:name)}", "#{Prefix}"
+      return if missing_target?
+      io.copy_file target, "#{Prefix}"
     end
     
     def new
       api.init_credentials true
+    end
+    
+    def delete
+      return if missing_target?
+      io.delete_file target
     end
   end
 end

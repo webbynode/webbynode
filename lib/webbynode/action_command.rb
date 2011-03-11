@@ -2,7 +2,7 @@ module Webbynode
   class ActionCommand < Webbynode::Command
     attr_reader :action
     
-    def self.allowed_actions(*actions)
+    def self.allowed_actions(actions)
       self.parameter :action, String, actions.join(", "), 
         :validate => { :in => actions },
         :required => false

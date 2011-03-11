@@ -8,7 +8,7 @@ module Webbynode::Commands
     attr_reader :db_credentials
     
     def pull
-      ask_db_credentials unless retrieve_db_credentials
+      ask_db_credentials
       
       io.log "Pulling remote data to database #{db_credentials[:name]}"
     end
@@ -17,12 +17,11 @@ module Webbynode::Commands
     
     def query(question, default)
       answer = ask("#{question} [#{default}]: ")
-      answer = default if answer.nil? or answer.blank?
+      answer = default if answer.blank?
       answer
     end
     
     def retrieve_db_credentials
-      return false unless io.load_setting "database_name"
       @db_credentials = {
         :name => io.load_setting("database_name"),
         :user => io.load_setting("database_user"),
@@ -31,18 +30,25 @@ module Webbynode::Commands
     end
     
     def ask_db_credentials
-      @db_credentials = {
-        :name         => query("Database name", io.db_name),
-        :user         => query("User name", io.db_name),
-        :password     => query("Password", "")
-      }
+      retrieve_db_credentials
+      
+      unless db_credentials[:name]
+        db_credentials[:name] = query("Database name", io.db_name)
+        db_credentials[:user] = query("    User name", io.db_name)
+      end
+      
+      db_credentials[:password] ||= query("     Password", "")
+      
       save_db_credentials
     end
     
     def save_db_credentials
       io.add_setting "database_name", db_credentials[:name]
       io.add_setting "database_user", db_credentials[:user]
-      io.add_setting "database_password", db_credentials[:password]
+      
+      if ask("Save password (y/n)? ").downcase == 'y'
+        io.add_setting "database_password", db_credentials[:password]
+      end
     end
   end
 end

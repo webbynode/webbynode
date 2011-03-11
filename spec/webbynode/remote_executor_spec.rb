@@ -9,6 +9,13 @@ describe Webbynode::RemoteExecutor do
     end
   end
   
+  describe '#retrieve_db_password' do
+    it "retrieves the remote db password" do
+      subject.should_receive(:exec).with(%q(echo `cat /var/webbynode/templates/rails/database.yml | grep password: | tail -1 | cut -d ":" -f 2`)).and_return("password\n")
+      subject.retrieve_db_password.should == "password"
+    end
+  end
+  
   describe "#new" do
     subject { Webbynode::RemoteExecutor.new("2.1.2.2", 'user', 2020) }
     

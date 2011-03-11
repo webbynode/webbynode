@@ -20,6 +20,11 @@ module Webbynode
       exec('pwd').strip
     end
     
+    def retrieve_db_password
+      password = exec %q(echo `cat /var/webbynode/templates/rails/database.yml | grep password: | tail -1 | cut -d ":" -f 2`)
+      password.strip
+    end
+    
     def exec(cmd, echo=false, exit_code=false)
       begin
         ssh.execute(cmd, echo, exit_code)

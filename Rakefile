@@ -13,6 +13,7 @@ Echoe.new('webbynode', '1.0.5.beta2') do |p|
   p.dependencies = [ 
     ['bundler', '>=0.9.26'],
     ['net-ssh', '=2.1.0'],
+    ['taps', '~>0.3.19'],
     ['highline', '>=1.5.2'],
     ['httparty', '>=0.4.5'],
     ['launchy',  '>=0.3.7'],

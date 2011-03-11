@@ -2,11 +2,17 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), '../..', 'spec_helper')
 
 describe Webbynode::Commands::Database do
-  let(:io) { double("io").as_null_object }
+  let(:io)  { double("io").as_null_object }
+  let(:re)  { double("re").as_null_object }
+  let(:git) { double("git").as_null_object }
+  let(:pa)  { double("pushand").as_null_object }
   
   def prepare(*params)
     Webbynode::Commands::Database.new(*params).tap do |a|
       a.stub(:io).and_return(io)
+      a.stub(:remote_executor).and_return(re)
+      a.stub(:git).and_return(git)
+      a.stub(:pushand).and_return(pa)
     end
   end
   
@@ -24,9 +30,7 @@ describe Webbynode::Commands::Database do
       subject.should_receive(:ask).with("     Password []: ").and_return("")
       subject.should_receive(:ask).with("Save password (y/n)? ").and_return("y")
       
-      io.should_receive(:log).with("Pulling remote data to database myapp")
-      
-      subject.execute
+      subject.ask_db_credentials
     end
     
     context "when user doesn't authorize" do
@@ -45,7 +49,7 @@ describe Webbynode::Commands::Database do
         io.should_receive(:add_setting).with("database_password", "password").never
         subject.should_receive(:ask).with("Save password (y/n)? ").and_return("n")
 
-        subject.execute
+        subject.ask_db_credentials
       end
     end
     
@@ -63,7 +67,7 @@ describe Webbynode::Commands::Database do
 
         io.should_receive(:add_setting).with("database_password", "password")
 
-        subject.execute
+        subject.ask_db_credentials
       end
     end
     
@@ -76,7 +80,7 @@ describe Webbynode::Commands::Database do
 
         subject.should_receive(:ask).with("     Password []: ").and_return("password")
         subject.should_receive(:ask).with("Save password (y/n)? ").and_return("n")
-        subject.execute
+        subject.ask_db_credentials
       end
     end
     
@@ -89,7 +93,13 @@ describe Webbynode::Commands::Database do
 
         subject.should_receive(:ask).with("     Password []: ").never
         subject.should_receive(:ask).with("Save password (y/n)? ").never
-        subject.execute
+        subject.ask_db_credentials
+      end
+    end
+    
+    describe "#pull" do
+      it "executes taps" do
+        
       end
     end
   end

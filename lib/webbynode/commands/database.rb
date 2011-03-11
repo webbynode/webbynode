@@ -5,15 +5,37 @@ module Webbynode::Commands
     allowed_actions %w(pull push)
     
     requires_initialization!
-    attr_reader :db_credentials
+    attr_reader :db
     
     def pull
-      ask_db_credentials
-      
-      io.log "Pulling remote data to database #{db_credentials[:name]}"
+      go :pull
     end
     
-    private
+    def push
+      go :push
+    end
+    
+    def go(action)
+      ask_db_credentials
+      
+      io.log "#{action.to_s.capitalize}ing remote data to database #{db[:name]}"
+      
+      db_name  = pushand.remote_db_name
+      password = remote_executor.retrieve_db_password
+      ip       = git.parse_remote_ip
+
+      taps = Webbynode::Taps.new(db_name, password, io, remote_executor)
+      begin
+        taps.start
+        sleep 4
+        taps.send(action, :user => db[:user], 
+          :password     => db[:password],
+          :database     => db[:name],
+          :remote_ip    => ip)
+      ensure
+        taps.finish
+      end    
+    end
     
     def query(question, default)
       answer = ask("#{question} [#{default}]: ")
@@ -22,7 +44,7 @@ module Webbynode::Commands
     end
     
     def retrieve_db_credentials
-      @db_credentials = {
+      @db = {
         :name => io.load_setting("database_name"),
         :user => io.load_setting("database_user"),
         :password => io.load_setting("database_password")
@@ -32,14 +54,14 @@ module Webbynode::Commands
     def ask_db_credentials
       retrieve_db_credentials
       
-      unless db_credentials[:name]
-        db_credentials[:name] = query("Database name", io.db_name)
-        db_credentials[:user] = query("    User name", io.db_name)
+      unless db[:name]
+        db[:name] = query("Database name", io.db_name)
+        db[:user] = query("    User name", io.db_name)
       end
       
       save_password = false
-      unless db_credentials[:password]
-        db_credentials[:password] = query("     Password", "")
+      unless db[:password]
+        db[:password] = query("     Password", "")
         save_password = ask("Save password (y/n)? ").downcase == 'y'
       end
       
@@ -47,11 +69,11 @@ module Webbynode::Commands
     end
     
     def save_db_credentials(save_password)
-      io.add_setting "database_name", db_credentials[:name]
-      io.add_setting "database_user", db_credentials[:user]
+      io.add_setting "database_name", db[:name]
+      io.add_setting "database_user", db[:user]
       
       if save_password
-        io.add_setting "database_password", db_credentials[:password]
+        io.add_setting "database_password", db[:password]
       end
     end
   end

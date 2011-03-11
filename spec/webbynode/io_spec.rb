@@ -11,6 +11,7 @@ describe Webbynode::Io do
   
   describe '#sed' do
     it 'replaces a regexp' do
+      pending "Missing fixture settings.py"
       text = read_fixture('settings.py')
       File.should_receive(:read).with('settings.template.py').and_return(text)      
       File.should_receive(:open).with('settings.template.py', 'w').and_yield(file = double('File'))
@@ -43,6 +44,22 @@ describe Webbynode::Io do
       end
     end
   end
+  
+  describe '#db_name' do
+    context "when successful" do
+      it "should return the current folder" do
+        Dir.should_receive(:pwd).and_return("/some/deep/folder/where/you/find/app_name")
+        Webbynode::Io.new.db_name.should == "appname"
+      end
+
+      it "should transform dots and spaces into underscores" do
+        Dir.should_receive(:pwd).and_return("/some/deep/folder/where/you/find/my.app here")
+        Webbynode::Io.new.db_name.should == "myapphere"
+      end
+    end
+  end
+  
+  
   
   describe '#add_setting' do
     let(:io) { Webbynode::Io.new }

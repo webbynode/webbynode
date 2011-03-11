@@ -54,6 +54,10 @@ module Webbynode
       Dir.pwd.split("/").last.gsub(/[\.| ]/, "_")
     end
     
+    def db_name
+      app_name.gsub(/[-._]/, "")      
+    end
+    
     def mkdir(path)
       # TODO: raise "Tried to create real folder: #{path}" if $testing
       FileUtils.mkdir_p(path)

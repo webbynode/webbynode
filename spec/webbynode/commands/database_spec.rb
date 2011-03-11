@@ -79,5 +79,18 @@ describe Webbynode::Commands::Database do
         subject.execute
       end
     end
+    
+    context "when password is stored" do
+      it "doesn't prompt for password again" do
+        io.should_receive(:load_setting).with("database_password").and_return("password")
+
+        io.should_receive(:load_setting).with("database_name").and_return("dbname")
+        io.should_receive(:load_setting).with("database_user").and_return("user")
+
+        subject.should_receive(:ask).with("     Password []: ").never
+        subject.should_receive(:ask).with("Save password (y/n)? ").never
+        subject.execute
+      end
+    end
   end
 end

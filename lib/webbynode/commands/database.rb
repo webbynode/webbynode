@@ -37,16 +37,20 @@ module Webbynode::Commands
         db_credentials[:user] = query("    User name", io.db_name)
       end
       
-      db_credentials[:password] ||= query("     Password", "")
+      save_password = false
+      unless db_credentials[:password]
+        db_credentials[:password] = query("     Password", "")
+        save_password = ask("Save password (y/n)? ").downcase == 'y'
+      end
       
-      save_db_credentials
+      save_db_credentials(save_password)
     end
     
-    def save_db_credentials
+    def save_db_credentials(save_password)
       io.add_setting "database_name", db_credentials[:name]
       io.add_setting "database_user", db_credentials[:user]
       
-      if ask("Save password (y/n)? ").downcase == 'y'
+      if save_password
         io.add_setting "database_password", db_credentials[:password]
       end
     end

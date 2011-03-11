@@ -7,6 +7,12 @@ module Webbynode
     def initialize(*args)
       args = ["help", "commands"] unless args.any?
       
+      if args.first.include?(":")
+        arg = args.shift
+        args.unshift arg.split(":")[1]
+        args.unshift arg.split(":")[0]
+      end
+      
       @command = args.shift
       @params = args
     end

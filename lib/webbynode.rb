@@ -7,7 +7,6 @@ require 'domainatrix'
 require 'net/ssh'
 require 'highline/import'
 require 'readline'
-require 'awesome_print'
 require 'rainbow'
 
 begin
@@ -70,10 +69,11 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'authorize_ro
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'console')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'logs')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'guides')
+require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'ssh')
 require File.join(File.dirname(__FILE__), 'webbynode', 'application')
 
 module Webbynode
-  VERSION = '1.0.5.beta'
+  VERSION = '1.0.5.beta2'
 end
 
 class Array

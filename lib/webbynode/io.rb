@@ -73,6 +73,10 @@ module Webbynode
       [$? == 0, result]
     end
     
+    def execute(s)
+      Kernel.exec s
+    end
+    
     def directory?(s)
       File.directory?(s)
     end

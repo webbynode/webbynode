@@ -10,6 +10,16 @@ describe Webbynode::Server do
     Webbynode::Server.new("1.2.3.4", "git", 22).remote_executor.class.should == Webbynode::RemoteExecutor
   end
   
+  describe '#ssh' do
+    it "connects to the server" do
+      io = mock('Io')
+      server = Webbynode::Server.new("1.2.3.4", "git", 22)
+      server.should_receive(:io).and_return(io)
+      io.should_receive(:execute).with("ssh -p 22 git@1.2.3.4")
+      server.ssh
+    end
+  end
+  
   describe '#new' do
     it "creates an SSH connection with proper settings" do
       Webbynode::Ssh.should_receive(:new).with("1.2.3.4", "git", 22)

@@ -16,6 +16,10 @@ module Webbynode
     def io
       @io ||= Webbynode::Io.new
     end
+    
+    def ssh
+      io.execute "ssh -p #{port} git@#{ip}"
+    end
    
     def remote_executor
       @remote_executor ||= Webbynode::RemoteExecutor.new(ip, user, port)

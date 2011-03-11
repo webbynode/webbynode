@@ -1,8 +1,11 @@
 module Webbynode::Commands
   class Database < Webbynode::ActionCommand
     summary "Manages your application database"
+
     add_alias "db"
     allowed_actions %w(pull push)
+    
+    option :debug, "Show server communication steps"
     
     requires_initialization!
     attr_reader :db
@@ -23,16 +26,26 @@ module Webbynode::Commands
       db_name  = pushand.remote_db_name
       password = remote_executor.retrieve_db_password
       ip       = git.parse_remote_ip
+      
+      if option(:debug)
+        io.log ""
+        io.log "Retrieving contents from #{db_name} database in #{ip}..."
+      end
 
       taps = Webbynode::Taps.new(db_name, password, io, remote_executor)
+      taps.debug = option(:debug)
       begin
+        io.log "Starting taps in server mode..." if option(:debug)
         taps.start
+        io.log "Waiting for taps to start..." if option(:debug)
         sleep 4
+        io.log "Sending action #{action} with db #{db[:name]}..." if option(:debug)
         taps.send(action, :user => db[:user], 
           :password     => db[:password],
           :database     => db[:name],
           :remote_ip    => ip)
       ensure
+        io.log "Stopping taps server..."
         taps.finish
       end    
     end

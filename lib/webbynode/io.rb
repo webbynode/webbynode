@@ -85,7 +85,7 @@ module Webbynode
     end
     
     def execute(s)
-      Kernel.exec s
+      exec s
       $?
     end
     

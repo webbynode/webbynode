@@ -14,6 +14,13 @@ describe Webbynode::Taps do
   its(:io)                { should == io }
   its(:remote_executor)   { should == re }
   
+  it "installs taps gem remotely, if missing"
+  it "detects taps already running"
+  
+  describe 'debugging' do
+    
+  end
+  
   describe '#start' do
     it "starts a tap server" do
       io.should_receive(:random_password).and_return("some_username")
@@ -47,7 +54,6 @@ describe Webbynode::Taps do
           :database        => "local_db",
           :remote_ip       => "1.1.2.2"
       end
-
       
       it "raises an error if pull fails" do
         io.should_receive(:execute).and_return(1)

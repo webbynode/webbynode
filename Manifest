@@ -26,6 +26,7 @@ lib/webbynode/api_client.rb
 lib/webbynode/application.rb
 lib/webbynode/attribute_accessors.rb
 lib/webbynode/command.rb
+lib/webbynode/commands/accounts.rb
 lib/webbynode/commands/add_backup.rb
 lib/webbynode/commands/add_key.rb
 lib/webbynode/commands/addons.rb
@@ -36,6 +37,7 @@ lib/webbynode/commands/change_dns.rb
 lib/webbynode/commands/config.rb
 lib/webbynode/commands/console.rb
 lib/webbynode/commands/delete.rb
+lib/webbynode/commands/guides.rb
 lib/webbynode/commands/help.rb
 lib/webbynode/commands/init.rb
 lib/webbynode/commands/logs.rb
@@ -99,12 +101,12 @@ spec/fixtures/git/status/clean
 spec/fixtures/git/status/dirty
 spec/fixtures/nodejs/server.js
 spec/fixtures/pushand
-spec/fixtures/settings.py
 spec/fixtures/trial/user_add
 spec/spec_helper.rb
 spec/webbynode/api_client_spec.rb
 spec/webbynode/application_spec.rb
 spec/webbynode/command_spec.rb
+spec/webbynode/commands/accounts_spec.rb
 spec/webbynode/commands/add_backup_spec.rb
 spec/webbynode/commands/add_key_spec.rb
 spec/webbynode/commands/addons_spec.rb
@@ -115,6 +117,7 @@ spec/webbynode/commands/change_dns_spec.rb
 spec/webbynode/commands/config_spec.rb
 spec/webbynode/commands/console_spec.rb
 spec/webbynode/commands/delete_spec.rb
+spec/webbynode/commands/guides_spec.rb
 spec/webbynode/commands/help_spec.rb
 spec/webbynode/commands/init_spec.rb
 spec/webbynode/commands/logs_spec.rb
@@ -146,3 +149,4 @@ spec/webbynode/remote_executor_spec.rb
 spec/webbynode/server_spec.rb
 spec/webbynode/ssh_spec.rb
 spec/webbynode/trial_spec.rb
+webbynode.gemspec

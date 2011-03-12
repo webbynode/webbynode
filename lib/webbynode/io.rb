@@ -57,6 +57,10 @@ module Webbynode
       File.open(file, 'w') { |f| f.write(contents) }
     end
     
+    def file_matches(file, regexp)
+      File.read(file) =~ regexp
+    end
+    
     def app_name
       Dir.pwd.split("/").last.gsub(/[\.| ]/, "_")
     end
@@ -85,7 +89,7 @@ module Webbynode
     end
     
     def execute(s)
-      exec s
+      Kernel.exec s
       $?
     end
     
@@ -198,6 +202,10 @@ module Webbynode
     
     def delete_file(file_name)
       File.delete(file_name)
+    end
+    
+    def rename_file(old_name, new_name)
+      File.rename(old_name, new_name)
     end
     
     def templates_path

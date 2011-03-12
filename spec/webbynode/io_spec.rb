@@ -354,4 +354,22 @@ describe Webbynode::Io do
       cfg[:other].should == "rest"
     end
   end
+  
+  describe '#rename_file' do
+    it "renames the file" do
+      File.should_receive(:rename).with("old", "new")
+      subject.rename_file "old", "new"
+    end
+  end
+  
+  describe '#file_matches' do
+    before(:each) do
+      File.stub(:read).with('file').and_return("name = felipe\nage = 12")
+    end
+
+    it 'compares file contents against a regexp' do
+      subject.file_matches("file", /name = felipe/).should be_true
+      subject.file_matches("file", /name = paulo/).should be_false
+    end
+  end
 end

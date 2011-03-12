@@ -12,23 +12,17 @@ describe Webbynode::Commands::Accounts do
     end
   end
   
-  describe '#default' do
-    subject { prepare nil }
-
-    it "shows current account" do
-      api.should_receive(:credentials).and_return({"email" => "fcoury@me.com", "token" => "apitoken"})
-      io.should_receive(:log).with("Current account: fcoury@me.com")
-      subject.execute
-    end
-  end
-  
   describe '#list' do
+    let(:dir) { Webbynode::Io.home_dir }
     subject { prepare "list" }
 
     it "shows all available accounts" do
-      io.should_receive(:list_files).with("#{Webbynode::Io.home_dir}/.webbynode_*").and_return(["#{Webbynode::Io.home_dir}/.webbynode_personal", "#{Webbynode::Io.home_dir}/.webbynode_biz"])
-      io.should_receive(:log).with("personal")
-      io.should_receive(:log).with("biz")
+      api.should_receive(:credentials).and_return({"email" => "fcoury@me.com", "token" => "apitoken"})
+      io.should_receive(:list_files).with("#{dir}/.webbynode_*").and_return(["#{dir}/.webbynode_personal", "#{dir}/.webbynode_biz"])
+      io.should_receive(:file_matches).with("#{dir}/.webbynode_personal", /email=fcoury@me.com/).and_return(true)
+      io.should_receive(:file_matches).with("#{dir}/.webbynode_biz", /email=fcoury@me.com/).and_return(false)
+      io.should_receive(:log).with("* personal")
+      io.should_receive(:log).with("  biz")
       subject.execute
     end
     
@@ -78,13 +72,14 @@ describe Webbynode::Commands::Accounts do
     it "renames the properties file" do
       io.should_receive(:file_exists?).with("#{Webbynode::Io.home_dir}/.webbynode_name").and_return(true)
       io.should_receive(:copy_file).with("#{Webbynode::Io.home_dir}/.webbynode_name", "#{Webbynode::Io.home_dir}/.webbynode")
+      io.should_receive(:log).with("Successfully switched to account alias name.")
       subject.execute
     end
     
     context "when file doesn't exist" do
       it "shows an error message" do
         io.should_receive(:file_exists?).with("#{Webbynode::Io.home_dir}/.webbynode_name").and_return(false)
-        io.should_receive(:log).with("Account alias 'name' not found. Use 'wn account list' for a full list.")
+        io.should_receive(:log).with("Account alias name not found. Use wn account list for a full list.")
         subject.execute
       end
     end
@@ -111,9 +106,37 @@ describe Webbynode::Commands::Accounts do
     context "when account doesn't exist" do
       it "shows an error" do
         io.should_receive(:file_exists?).with("#{Webbynode::Io.home_dir}/.webbynode_name").and_return(false)
-        io.should_receive(:log).with("Account alias 'name' not found. Use 'wn account list' for a full list.")
+        io.should_receive(:log).with("Account alias name not found. Use wn account list for a full list.")
         subject.execute
       end
+    end
+  end
+  
+  describe '#rename' do
+    let(:dir) { Webbynode::Io.home_dir }
+    subject { prepare "rename", "old_name", "new_name" }
+    
+    it "renames the .webbynode_xxx file" do
+      io.should_receive(:file_exists?).with("#{dir}/.webbynode_old_name").and_return(true)
+      io.should_receive(:file_exists?).with("#{dir}/.webbynode_new_name").and_return(false)
+      io.should_receive(:rename_file).with("#{dir}/.webbynode_old_name", "#{dir}/.webbynode_new_name")
+      io.should_receive(:log).with("Account alias old_name successfully renamed to new_name.")
+      subject.execute
+    end
+    
+    it "raises an error if file doesn't exist" do
+      io.should_receive(:file_exists?).with("#{dir}/.webbynode_old_name").and_return(false)
+      io.should_receive(:rename_file).never
+      io.should_receive(:log).with(/not found/)
+      subject.execute
+    end
+    
+    it "raises an error if target file already exist" do
+      io.should_receive(:file_exists?).with("#{dir}/.webbynode_old_name").and_return(true)
+      io.should_receive(:file_exists?).with("#{dir}/.webbynode_new_name").and_return(true)
+      io.should_receive(:rename_file).never
+      io.should_receive(:log).with("Account alias new_name already exists, use wn account delete to remove it first.")
+      subject.execute
     end
   end
 end

@@ -158,6 +158,7 @@ describe Webbynode::Commands::Init do
         io_handler.stub!(:add_to_git_ignore)
         
         Webbynode::Git.stub(:new).and_return(git_handler)
+        Webbynode::Io.stub(:new).and_return(mock("io").as_null_object)
         
         subject.stub!(:option).with(:engine).and_return('rails')
         subject.send(:detect_engine)
@@ -513,6 +514,7 @@ describe Webbynode::Commands::Init do
     @command.api.should_receive(:ask).with("API token:   ").and_return("234def")
     @command.api.should_receive(:ask).with("Login email: ").and_return("abc123")
     @command.api.should_receive(:properties).any_number_of_times.and_return(props)
+    api.stub(:puts)
     @command.run
     
     stdout.should =~ /Couldn't find Webby 'my_webby_name' on your account. Your Webbies are/

@@ -150,11 +150,6 @@ describe Webbynode::Commands::Tasks do
   end
   
   context "should initialize the [add] or [remove] action, depending on user input" do
-    it "should have a [add] and [remove] method availble" do
-      task.private_methods.should include('add')
-      task.private_methods.should include('remove')
-    end
-    
     it "should initialize the [add] method" do
       task.should_receive(:send).with('add')
       task.execute

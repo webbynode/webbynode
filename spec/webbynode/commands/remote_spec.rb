@@ -25,6 +25,7 @@ describe Webbynode::Commands::Remote do
   
   it "should notify the user" do
     io.should_receive(:log).with("Executing remote command...")
+    remote.stub(:puts)
     remote.run
   end
  
@@ -54,7 +55,7 @@ describe Webbynode::Commands::Remote do
       load_all_mocks(remote)
       remote.stub(:validate_initialization)
       remote.stub(:validate_remote_application_availability)
-                  
+      
       re.should_receive(:exec).with("cd webbynode; these are the params", false).and_return("something")
       remote.run
     end
@@ -62,6 +63,7 @@ describe Webbynode::Commands::Remote do
     it "should parse the pushand file for the application folder name on the remote server" do
       remote.stub(:validate_initialization)
       pushand.should_receive(:parse_remote_app_name).and_return("dummy_app")
+      remote.stub(:puts)
       remote.run
     end
 

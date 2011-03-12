@@ -8,7 +8,7 @@ module Webbynode::Commands
       secret = io.general_settings['aws_secret']
       
       unless key and secret
-        puts io.read_from_template("backup")
+        io.log io.read_from_template("backup")
         
         key    = ask("AWS key: ")
         secret = ask("AWS secret: ") unless key.blank?

@@ -12,10 +12,8 @@ describe Webbynode::Server do
   
   describe '#ssh' do
     it "connects to the server" do
-      io = mock('Io')
       server = Webbynode::Server.new("1.2.3.4", "git", 22)
-      server.should_receive(:io).and_return(io)
-      io.should_receive(:execute).with("ssh -p 22 git@1.2.3.4")
+      Kernel.should_receive(:exec).with("ssh -p 22 git@1.2.3.4")
       server.ssh
     end
   end

@@ -84,7 +84,7 @@ module Webbynode
         email = overwrite[:email] if overwrite.is_a?(Hash) and overwrite[:email]
         token = overwrite[:token] if overwrite.is_a?(Hash) and overwrite[:token]
         
-        puts io.read_from_template("api_token") unless email and token
+        io.log io.read_from_template("api_token") unless email and token
 
         email ||= ask("Login email: ")
         token ||= ask("API token:   ")

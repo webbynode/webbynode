@@ -165,6 +165,8 @@ describe Webbynode::ApiClient do
         api.should_receive(:ask).with("Login email: ").once.ordered.and_return("login@email.com")
         api.should_receive(:ask).with("API token:   ").once.ordered.and_return("apitoken")
         
+        io.stub(:log)
+
         creds = api.init_credentials(true)
         creds[:email].should == "login@email.com"
         creds[:token].should == "apitoken"
@@ -203,6 +205,8 @@ describe Webbynode::ApiClient do
         api.should_receive(:ask).with("Login email: ").once.ordered.and_return("login@email.com")
         api.should_receive(:ask).with("API token:   ").once.ordered.and_return("apitoken")
         
+        io.stub(:log)
+
         api.init_credentials
       end
 
@@ -219,6 +223,8 @@ describe Webbynode::ApiClient do
         
         api.should_receive(:ask).with("Login email: ").once.ordered.and_return("login@email.com")
         api.should_receive(:ask).with("API token:   ").once.ordered.and_return("apitoken")
+
+        io.stub(:log)
         
         lambda { api.init_credentials }.should raise_error(Webbynode::ApiClient::Unauthorized, "You have provided the wrong credentials")
       end

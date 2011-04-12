@@ -24,7 +24,7 @@ module Webbynode
     end
     
     def clean?
-      io.exec("git status") =~ /working directory clean/
+      io.exec("git status") =~ /nothing to commit/
     end
     
     def delete_file(file)

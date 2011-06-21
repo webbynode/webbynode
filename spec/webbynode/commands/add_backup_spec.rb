@@ -5,18 +5,21 @@ describe Webbynode::Commands::AddBackup do
   def tie_dependencies(cmd)
     cmd.should_receive(:io).any_number_of_times.and_return(io)
     cmd.should_receive(:remote_executor).any_number_of_times.and_return(re)
+    cmd.should_receive(:pushand).any_number_of_times.and_return(pushand)
     cmd
   end
   
   let(:io)  { double("io").as_null_object }
   let(:re)  { double("remote_executor").as_null_object }
+  let(:pushand)  { double("pushand").as_null_object }
   let(:cmd) { 
     cmd = Webbynode::Commands::AddBackup.new
     tie_dependencies(cmd)
   }
   
   it "should allow user to specify a retention period, in days" do
-    io.should_receive(:app_name).and_return("app")
+    # io.should_receive(:app_name).and_return("app")
+    pushand.should_receive(:parse_remote_app_name).and_return("app")
     io.should_receive(:general_settings).any_number_of_times.and_return({ "aws_key" => "abc", "aws_secret" => "def" })
     re.should_receive(:exec).with("config_app_backup").with(%Q(config_app_backup app "abc" "def" 10), true)
 
@@ -57,7 +60,8 @@ describe Webbynode::Commands::AddBackup do
   end
   
   it "should execute the config_app_backup utility on the server" do
-    io.should_receive(:app_name).and_return("app_name")
+    # io.should_receive(:app_name).and_return("app_name")
+    pushand.should_receive(:parse_remote_app_name).and_return("app_name")
     io.should_receive(:general_settings).any_number_of_times.and_return({ "aws_key" => "awskey", "aws_secret" => "awsecret" })
     re.should_receive(:exec).with("config_app_backup").with(%Q(config_app_backup app_name "awskey" "awsecret"), true)
 

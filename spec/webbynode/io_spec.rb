@@ -42,6 +42,11 @@ describe Webbynode::Io do
         Dir.should_receive(:pwd).and_return("/some/deep/folder/where/you/find/my.app here")
         Webbynode::Io.new.app_name.should == "my_app_here"
       end
+
+      it "should keep the case" do
+        Dir.should_receive(:pwd).and_return("/some/deep/folder/where/you/find/AnAwesomeApp")
+        Webbynode::Io.new.app_name.should == "AnAwesomeApp"
+      end
     end
   end
   
@@ -58,8 +63,6 @@ describe Webbynode::Io do
       end
     end
   end
-  
-  
   
   describe '#add_setting' do
     let(:io) { Webbynode::Io.new }

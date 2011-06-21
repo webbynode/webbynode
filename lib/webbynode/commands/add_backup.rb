@@ -23,7 +23,7 @@ module Webbynode::Commands
         io.add_general_setting("aws_secret", secret)
       end
 
-      app_name = io.app_name
+      app_name = pushand.parse_remote_app_name
       io.log "Configuring backup for #{app_name}...", :start
       
       retain = option(:retain)

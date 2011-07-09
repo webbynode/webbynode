@@ -18,7 +18,7 @@ module Webbynode
     end
     
     def ssh
-      Kernel.exec "ssh -p #{port} git@#{ip}"
+      Kernel.exec "ssh -p #{port} #{user}@#{ip}"
     end
    
     def remote_executor

@@ -16,6 +16,12 @@ describe Webbynode::Server do
       Kernel.should_receive(:exec).with("ssh -p 22 git@1.2.3.4")
       server.ssh
     end
+
+    it "uses git's remote user" do
+      server = Webbynode::Server.new("1.2.3.4", "deploy", 22)
+      Kernel.should_receive(:exec).with("ssh -p 22 deploy@1.2.3.4")
+      server.ssh
+    end
   end
   
   describe '#new' do

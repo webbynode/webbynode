@@ -68,14 +68,14 @@ module Webbynode
         end
 
         ch.env "PATH", "/usr/bin:/usr/local/bin:/opt/ruby-enterprise/bin"
-        ch.exec "cd #{app_name}; rails console production" do |ch, success|
+        ch.exec "cd #{app_name} && rails console production" do |ch, success|
           abort "Could not connect to rails console" unless success
 
           ch.on_data do |ch, data|
             next if data.chomp == input.chomp || data.chomp == ''
             if data =~ /^irb(.*)[\>|\*] /
               prompt = ''
-              data.each_with_index do |s, i|
+              data.chars.each_with_index do |s, i|
                 if s =~ /^irb(.*)[\>|\*] /
                   prompt = s
                 else
@@ -108,6 +108,7 @@ module Webbynode
         puts ""
         puts "Console done."
       rescue Exception => e
+        puts "Error: #{$!.message}"
       end
     end
     

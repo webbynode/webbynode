@@ -10,6 +10,7 @@ module Webbynode::Commands
     
     summary "Sends pending changes on the current application to your Webby"
     option :dirty, "Allows pushing even if the current application has git changes pending"
+    option :'recreate-vhost', "Recreates the vhost file, overwriting any manual changes"
     
     def initialize(*args)
       super
@@ -33,6 +34,8 @@ module Webbynode::Commands
       before_tasks.read_tasks(Webbynode::Commands::Tasks::BeforePushTasksFile)
       perform_before_tasks if before_tasks.has_tasks?
       
+      handle_semaphore
+      
       # Logs a initialization message to the user
       io.log "Pushing #{app_name.color(:cyan)}", :start
       
@@ -53,6 +56,10 @@ module Webbynode::Commands
       io.log "Finished pushing #{app_name.color(:cyan)}", :finish
     end
     
+    def handle_semaphore
+      return unless option(:'recreate-vhost')
+      remote_executor.exec "mkdir -p /var/webbynode/semaphores && touch /var/webbynode/semaphores/recreate_#{app_name}"
+    end
     
     private
       

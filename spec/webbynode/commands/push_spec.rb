@@ -80,6 +80,24 @@ describe Webbynode::Commands::Push do
 
       pushcmd.execute
     end
+
+    it "should create a semaphore if --recreate-vhost is passed" do
+      pushcmd = Webbynode::Commands::Push.new("--recreate-vhost")
+      pushcmd.should_receive(:io).any_number_of_times.and_return(io)
+      pushcmd.should_receive(:remote_executor).any_number_of_times.and_return(re)
+      pushcmd.should_receive(:pushand).any_number_of_times.and_return(pushand)
+      pushcmd.should_receive(:git).any_number_of_times.and_return(git)
+      pushcmd.before_tasks.stub!(:read_tasks)
+      pushcmd.after_tasks.stub!(:read_tasks)
+      pushcmd.stub(:check_for_updates)
+
+      pushand.should_receive(:parse_remote_app_name).and_return("app")
+      
+      io.should_receive(:log).with("Finished pushing app", :finish)
+      re.should_receive(:exec).with("mkdir -p /var/webbynode/semaphores && touch /var/webbynode/semaphores/recreate_app")
+
+      pushcmd.execute
+    end
     
     context "when succesful" do
       it "should notify the user" do

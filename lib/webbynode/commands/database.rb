@@ -39,10 +39,13 @@ module Webbynode::Commands
         io.log ""
         io.log "Retrieving contents from #{db_name} database in #{ip}..."
       end
-
+      
       taps = Webbynode::Taps.new(db_name, password, io, remote_executor)
       taps.debug = option(:debug)
       begin
+        io.log "Checking for dependencies..." if option(:debug)
+        taps.ensure_gems!
+
         io.log "Starting taps in server mode..." if option(:debug)
         taps.start
 

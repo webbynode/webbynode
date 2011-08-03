@@ -17,6 +17,22 @@ module Webbynode
       @remote_executor = remote_executor
     end
     
+    def ensure_gems!
+      check_and_install ['taps', '0.3.23'], 'mysql'
+    end
+    
+    def check_and_install(*gems)
+      gems.each do |g| 
+        if g.is_a?(Array)
+          gemd = *g
+        else
+          gemd = [g]
+        end
+        
+        remote_executor.install_gem *gemd unless remote_executor.gem_installed?(*gemd)
+      end
+    end
+    
     def start
       @user = io.random_password
       @password = io.random_password
@@ -61,10 +77,8 @@ module Webbynode
     def execute(action, options)
       raise "Taps server was not started" unless user
       
-      local_url = "mysql://#{options[:user]}:#{options[:password]}@localhost/#{options[:database]}"
-      remote_url = "http://#{user}:#{password}@#{options[:remote_ip]}:5000"
-      
-      io.log "Running taps #{action}"
+      local_url = "mysql://#{options[:user]}:#{CGI.escape(options[:password])}@localhost/#{options[:database]}"
+      remote_url = "http://#{user}:#{CGI.escape(password)}@#{options[:remote_ip]}:5000"
       
       ::Taps::Cli.new([]).clientxfer(action.to_sym, 
         :database_url => local_url, 

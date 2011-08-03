@@ -37,7 +37,18 @@ describe Webbynode::Commands::Database do
   
   describe '#pull' do
     subject { prepare "pull" }
+    
+    it "installs taps and mysql when none installed" do
+      Webbynode::Taps.should_receive(:new).and_return(taps)
 
+      subject.stub(:ask_db_credentials)
+      subject.stub(:db).and_return({ :name => 'db_name' })
+      subject.stub(:sleep)
+      taps.stub(:start)
+      taps.should_receive(:ensure_gems!)
+      
+      subject.execute
+    end
     
     context 'db failures' do
       def prepare_with_error(error)

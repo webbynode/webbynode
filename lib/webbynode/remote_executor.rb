@@ -16,6 +16,18 @@ module Webbynode
       ssh.execute "mkdir -p #{folder}"
     end
     
+    def version(v)
+      v ? "-v=#{v} " : ""
+    end
+    
+    def gem_installed?(gem_name, version=nil)
+      exec("gem list -i #{version(version)}#{gem_name}") == 'true'
+    end
+    
+    def install_gem(gem_name, version=nil)
+      exec("sudo gem install #{version(version)}#{gem_name} > /dev/null 2>1; echo $?") == '0'
+    end
+
     def remote_home
       exec('pwd').strip
     end

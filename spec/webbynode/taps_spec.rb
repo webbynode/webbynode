@@ -17,6 +17,22 @@ describe Webbynode::Taps do
   it "installs taps gem remotely, if missing"
   it "detects taps already running"
   
+  describe '#ensure_gems!' do
+    it "checks for installed taps" do
+      re.should_receive(:gem_installed?).with('taps', '0.3.23').and_return(false)
+      re.should_receive(:install_gem).with('taps', '0.3.23')
+      
+      subject.ensure_gems!
+    end
+
+    it "checks for installed mysql" do
+      re.should_receive(:gem_installed?).with('mysql').and_return(false)
+      re.should_receive(:install_gem).with('mysql')
+      
+      subject.ensure_gems!
+    end
+  end
+  
   describe '#start' do
     it "starts a tap server" do
       io.should_receive(:random_password).and_return("some_username")

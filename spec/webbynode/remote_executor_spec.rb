@@ -9,6 +9,35 @@ describe Webbynode::RemoteExecutor do
     end
   end
   
+  describe '#version' do
+    it { subject.version('0.2.23').should == '-v=0.2.23 ' }
+    it { subject.version(nil).should == '' }
+  end
+  
+  describe '#gem_installed?' do
+    it "returns true when gem is installed" do
+      subject.should_receive(:exec).with("gem list -i -v=0.2.23 taps").and_return('true')
+      subject.gem_installed?('taps', '0.2.23').should be_true
+    end
+
+    it "returns false when gem isn't installed" do
+      subject.should_receive(:exec).with("gem list -i mysql").and_return('false')
+      subject.gem_installed?('mysql').should be_false
+    end
+  end
+  
+  describe '#install_gem' do
+    it "returns true when gem is successfully installed" do
+      subject.should_receive(:exec).with("sudo gem install taps > /dev/null 2>1; echo $?").and_return('0')
+      subject.install_gem('taps').should be_true
+    end
+
+    it "returns false when gem can't be installed" do
+      subject.should_receive(:exec).with("sudo gem install mysql > /dev/null 2>1; echo $?").and_return('2')
+      subject.install_gem('mysql').should be_false
+    end
+  end
+  
   describe '#retrieve_db_password' do
     it "retrieves the remote db password" do
       subject.should_receive(:exec).with(%q(echo `cat /var/webbynode/templates/rails/database.yml | grep password: | tail -1 | cut -d ":" -f 2`)).and_return("password\n")

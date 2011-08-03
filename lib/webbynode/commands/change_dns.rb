@@ -29,6 +29,9 @@ module Webbynode::Commands
       end
 
       io.log "Your application will start responding to #{param(:dns_entry)} after next deployment."
+    rescue Webbynode::ApiClient::InactiveZone
+      io.log "Domain #{$!.message.color(:yellow)} already setup on Webbynode DNS, but it's inactive."
+      io.log "Please reactivate it and try again."
     end
   end
 end

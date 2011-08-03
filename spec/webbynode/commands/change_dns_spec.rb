@@ -25,6 +25,18 @@ describe Webbynode::Commands::ChangeDns do
     cmd.run
   end
   
+  it "gives an error message when zone exists, but is inactive" do
+    git.should_receive(:parse_remote_ip).and_return("1.2.3.4")
+    api.should_receive(:create_record).with("the.newdns.com", "1.2.3.4").and_raise(Webbynode::ApiClient::InactiveZone.new( "the.newdns.com"))
+
+    io.should_receive(:log).with("Changing DNS to the.newdns.com...", :quiet_start)
+    io.should_receive(:log).with("Creating DNS entry for the.newdns.com...")
+    io.should_receive(:log).with("Domain the.newdns.com already setup on Webbynode DNS, but it's inactive.")
+    io.should_receive(:log).with("Please reactivate it and try again.")
+    
+    cmd.run
+  end
+  
   it "should give an error message if there are git changes pending" do
     git.should_receive(:clean?).and_return(false)
     

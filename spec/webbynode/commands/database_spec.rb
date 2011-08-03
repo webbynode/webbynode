@@ -2,10 +2,11 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), '../..', 'spec_helper')
 
 describe Webbynode::Commands::Database do
-  let(:io)  { double("io").as_null_object }
-  let(:re)  { double("re").as_null_object }
-  let(:git) { double("git").as_null_object }
-  let(:pa)  { double("pushand").as_null_object }
+  let(:io)   { double("io").as_null_object }
+  let(:re)   { double("re").as_null_object }
+  let(:git)  { double("git").as_null_object }
+  let(:pa)   { double("pushand").as_null_object }
+  let(:taps) { double("taps").as_null_object }
   
   def prepare(*params)
     Webbynode::Commands::Database.new(*params).tap do |a|
@@ -36,6 +37,53 @@ describe Webbynode::Commands::Database do
   
   describe '#pull' do
     subject { prepare "pull" }
+
+    
+    context 'db failures' do
+      def prepare_with_error(error)
+        subject.stub(:ask_db_credentials)
+        subject.stub(:db).and_return({ :name => 'db_name' })
+        subject.stub(:sleep)
+
+        Webbynode::Taps.should_receive(:new).and_return(taps)
+
+        pa.should_receive(:remote_db_name).and_return('db_name')
+        re.should_receive(:retrieve_db_password).and_return('password')
+        git.should_receive(:parse_remote_ip).and_return('1.2.3.4')
+
+        taps.should_receive(:pull).and_raise(TapsError.new(error))
+      end
+      
+      it "shows an user friendly error message cannot connect to local database" do
+        prepare_with_error "Failed to connect to database:
+          Sequel::DatabaseConnectionError -> Mysql::Error: Access denied for user 'root'@'localhost' (using password: YES)"
+        io.should_receive(:log).with("ERROR: Invalid MySQL credentials for your local database (Access denied for user 'root'@'localhost' (using password: YES))")
+
+        subject.execute
+      end
+      
+      it "shows an user friendly error for URI errors" do
+        prepare_with_error "Failed to connect to database:
+          URI::InvalidURIError -> the scheme mysql does not accept registry part: root:P@ssw0rd@localhost (or bad hostname?)."
+        io.should_receive(:log).with("ERROR: Unexpected error - the scheme mysql does not accept registry part: root:P@ssw0rd@localhost (or bad hostname?).")
+
+        subject.execute
+      end
+        
+      it "shows an user friendly error message when a MySQL database doesn't exist" do
+        prepare_with_error "Failed to connect to database:\n          Sequel::DatabaseConnectionError -> Mysql::Error: Unknown database 'r3app'"
+        io.should_receive(:log).with("ERROR: Unknown database r3app. Create the local database and try again.")
+
+        subject.execute
+      end
+      
+      it "shows an user friendly error message when an adapter is not present" do
+        prepare_with_error "Failed to connect to database:\n        Sequel::AdapterNotFound -> LoadError: no such file to load -- mysql"
+        io.should_receive(:log).with("ERROR: Missing database adapter. You need to install mysql gem to handle your database.")
+
+        subject.execute
+      end
+    end
     
     it "asks the local database credentials and name" do
       io.should_receive(:load_setting).with("database_name").and_return(nil)

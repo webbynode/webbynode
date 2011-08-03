@@ -45,13 +45,29 @@ module Webbynode::Commands
       begin
         io.log "Starting taps in server mode..." if option(:debug)
         taps.start
+
         io.log "Waiting for taps to start..." if option(:debug)
         sleep 4
+
         io.log "Sending action #{action} with db #{db[:name]}..." if option(:debug)
         taps.send(action, :user => db[:user], 
           :password     => db[:password],
           :database     => db[:name],
           :remote_ip    => ip)
+      rescue TapsError
+        if $!.message =~ /LoadError: no such file to load -- (.*)/
+          io.log "#{"ERROR:".color(:red)} Missing database adapter. You need to install #{$1.color(:yellow)} gem to handle your database."
+        elsif $!.message =~ /Mysql::Error: Unknown database '(.*)'/
+          io.log "#{"ERROR:".color(:red)} Unknown database #{$1.color(:yellow)}. Create the local database and try again."
+        elsif $!.message =~ /Sequel::DatabaseConnectionError -\> Mysql::Error: (.*)/
+          io.log "#{"ERROR:".color(:red)} Invalid MySQL credentials for your local database (#{$1})"
+        else
+          if $!.message =~ /(.*) -\> (.*)/
+            io.log "#{"ERROR:".color(:red)} Unexpected error - #{$2}"
+          else
+            io.log "#{"ERROR:".color(:red)} Unexpected error - #{$!.message}"
+          end
+        end
       ensure
         io.log "Stopping taps server..."
         taps.finish

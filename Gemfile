@@ -5,7 +5,7 @@ gem 'domainatrix'
 gem 'net-ssh'
 gem 'highline'
 gem 'rainbow'
-gem 'taps'
+gem 'taps', '0.3.23'
 
 group :development do
   gem 'rspec'

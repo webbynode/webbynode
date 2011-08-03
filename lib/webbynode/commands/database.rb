@@ -10,6 +10,10 @@ module Webbynode::Commands
     requires_initialization!
     attr_reader :db
     
+    def default
+      io.log "Missing action: use #{"pull".color(:yellow)} or #{"push".color(:yellow)}. For more help use #{"#{File.basename $0} help database".color(:yellow)}."
+    end
+    
     def pull
       go :pull
     end

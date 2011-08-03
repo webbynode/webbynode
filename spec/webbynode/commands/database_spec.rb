@@ -22,12 +22,13 @@ describe Webbynode::Commands::Database do
 
     it 'asks for credentials again, even if already provided' do
       io.should_receive(:load_setting).with("database_name").and_return("dbname")
+      io.should_receive(:load_setting).with("database_user").and_return("username")
       io.should_receive(:load_setting).with("database_password").and_return("dbpassword")
       
       io.should_receive(:db_name).any_number_of_times.and_return("myapp")
       
       subject.should_receive(:ask).with("Database name [dbname]: ").and_return("")
-      subject.should_receive(:ask).with("    User name [dname]: ").and_return("")
+      subject.should_receive(:ask).with("    User name [username]: ").and_return("")
       subject.should_receive(:ask).with("     Password []: ").and_return("")
       subject.should_receive(:ask).with("Save password (y/n)? ").and_return("y")
 

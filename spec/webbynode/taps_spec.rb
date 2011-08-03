@@ -72,6 +72,22 @@ describe Webbynode::Taps do
           :remote_ip       => "1.1.2.2"
       end
       
+      it "encodes the local and remote password" do
+        subject.stub(:password).and_return("P@ssw=rd")
+        
+        taps_cli = double('taps')
+        ::Taps::Cli.stub(:new).and_return(taps_cli)
+
+        taps_cli.should_receive(:clientxfer).with(:pull,
+          :database_url => "mysql://local_user:P%40ssw0rd@localhost/local_db",
+          :remote_url => "http://user:P%40ssw%3Drd@1.1.2.2:5000")
+
+        subject.pull :user => "local_user", 
+          :password        => "P@ssw0rd",
+          :database        => "local_db",
+          :remote_ip       => "1.1.2.2"
+      end
+      
       it "raises an error if pull fails" do
         pending "find a better way to detect errors"
         io.should_receive(:execute).and_return(1)

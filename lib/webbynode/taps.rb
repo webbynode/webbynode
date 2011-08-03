@@ -1,5 +1,6 @@
 require 'taps/operation'
 require 'taps/cli'
+require 'cgi'
 
 module Webbynode
   class Taps
@@ -84,5 +85,17 @@ module Webbynode
         :database_url => local_url, 
         :remote_url => remote_url)
     end
+  end
+end
+
+class TapsError < StandardError; end
+
+class Taps::Config
+  def self.puts(error)
+    @error = error
+  end
+  
+  def self.exit(num)
+    raise TapsError, @error
   end
 end

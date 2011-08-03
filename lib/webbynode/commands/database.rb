@@ -11,7 +11,7 @@ module Webbynode::Commands
     attr_reader :db
     
     def default
-      io.log "Missing action: use #{"pull".color(:yellow)} or #{"push".color(:yellow)}. For more help use #{"#{File.basename $0} help database".color(:yellow)}."
+      io.log "Missing action: use #{"pull".color(:yellow)}, #{"push".color(:yellow)} or #{"config".color(:yellow)}. For more help use #{"#{File.basename $0} help database".color(:yellow)}."
     end
     
     def pull

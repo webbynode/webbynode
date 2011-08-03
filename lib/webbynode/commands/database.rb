@@ -3,7 +3,7 @@ module Webbynode::Commands
     summary "Manages your application database"
 
     add_alias "db"
-    allowed_actions %w(pull push)
+    allowed_actions %w(pull push config)
     
     option :debug, "Show server communication steps"
     
@@ -20,6 +20,10 @@ module Webbynode::Commands
     
     def push
       go :push
+    end
+    
+    def config
+      ask_db_credentials(true)
     end
     
     def go(action)
@@ -68,16 +72,16 @@ module Webbynode::Commands
       }
     end
     
-    def ask_db_credentials
+    def ask_db_credentials(force=false)
       retrieve_db_credentials
       
-      unless db[:name]
-        db[:name] = query("Database name", io.db_name)
-        db[:user] = query("    User name", io.db_name)
+      if force || db[:name].nil?
+        db[:name] = query("Database name", db[:name] || io.db_name)
+        db[:user] = query("    User name", db[:user] || io.db_name)
       end
       
       save_password = false
-      unless db[:password]
+      if force || db[:password].nil?
         db[:password] = query("     Password", "")
         save_password = ask("Save password (y/n)? ").downcase == 'y'
       end

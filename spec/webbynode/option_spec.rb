@@ -9,6 +9,13 @@ describe Webbynode::Option do
   it "should parse the name" do
     Webbynode::Option.new(:param1).name.should == :param1
     Webbynode::Option.new(:param2).name.should == :param2
+    Webbynode::Option.new(:'long-param2').name.should == :'long-param2'
+  end
+  
+  describe '#name_for' do
+    it "parses names with dash" do
+      Webbynode::Option.name_for('--long-param2').should == 'long-param2'
+    end
   end
   
   it "should parse the type, if given" do

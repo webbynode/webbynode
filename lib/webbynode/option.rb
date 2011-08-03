@@ -4,7 +4,7 @@ module Webbynode
     attr_accessor :value
     
     def Option.name_for(s)
-      return $1 if s =~ /^--(\w+)(=("[^"]+"|[\w]+))*/
+      return $1 if s =~ /^--([\w-]+)(=("[^"]+"|[\w]+))*/
     end
     
     def initialize(*args)

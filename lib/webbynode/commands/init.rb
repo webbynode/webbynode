@@ -5,7 +5,9 @@ module Webbynode::Commands
     option :dns, String, "The DNS used for this application"
     option :adddns, "Creates the DNS entries for the domain"
     option :port, "Specifies an alternate SSH port to connect to Webby", :validate => :integer
-    option :engine, "Sets the application engine for the app", :validate => { :in => ['php', 'rack', 'rails', 'rails3'] }
+    option :engine, "Sets the application engine for the app", :validate => { 
+      :in => ['php', 'rack', 'rails', 'rails3', 'html', 'wsgi', 'django', 'nodejs'] 
+    }
     option :trial, "Initializes this app for Rapp Trial"
     
     def execute

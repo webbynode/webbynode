@@ -25,4 +25,12 @@ describe Webbynode::PushAnd do
       @pushand.parse_remote_app_name.should == "app_name"
     end
   end
+  
+  describe "#create!" do
+    it "creates .pushand" do
+      @io.should_receive(:create_file).with(".pushand", 
+        "#! /bin/bash\nphd $0 app_name dns_entry\n", true)
+      @pushand.create!("app_name", "dns_entry")
+    end
+  end
 end

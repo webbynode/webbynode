@@ -16,5 +16,9 @@ module Webbynode
     def remote_db_name
       parse_remote_app_name.gsub(/[-._]/, "")      
     end
+    
+    def create!(app_name, dns_entry)
+      io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name} #{dns_entry}\n", true)
+    end
   end
 end

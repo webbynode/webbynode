@@ -6,6 +6,7 @@ describe Webbynode::Commands::Init do
   let(:io_handler)  { double("io").as_null_object }
   let(:gemfile)     { double("gemfile").as_null_object.tap { |g| g.stub!(:present?).and_return(false) } }
   let(:api)         { double("api").as_null_object }
+  let(:pushand)     { stub.as_null_object }
   
   def create_init(ip="4.3.2.1", host=nil, extra=[])
     host = "--dns=#{host}" if host
@@ -13,6 +14,7 @@ describe Webbynode::Commands::Init do
     @command.stub!(:gemfile).and_return(gemfile)
     @command.should_receive(:git).any_number_of_times.and_return(git_handler) 
     @command.should_receive(:io).any_number_of_times.and_return(io_handler)
+    @command.stub!(:pushand).and_return(pushand)
     io_handler.stub!(:file_exists?).with(".pushand").and_return(false)
   end
   
@@ -41,7 +43,16 @@ describe Webbynode::Commands::Init do
       cmd.stub!(:git).and_return(git_handler)
       cmd.stub!(:io).and_return(io_handler)
       cmd.stub!(:api).and_return(api)
+      cmd.stub!(:pushand).and_return(pushand)
     end      
+  end
+  
+  describe '#create_pushand' do
+    it "creates .pushand when missing" do
+      subject.should_receive(:pushand_exists?).and_return(false)
+      pushand.should_receive(:create!)
+      subject.create_pushand
+    end
   end
   
   describe 'in trial mode' do
@@ -64,6 +75,7 @@ describe Webbynode::Commands::Init do
       git_handler.should_receive(:add_remote).with('user', 'webbynode', 'trial.webbyapp.com', 'trial_app', :home => '/home/user')
 
       subject.should_receive(:get_ip).never
+      subject.should_receive(:create_pushand)
       subject.run
     end
     
@@ -75,6 +87,7 @@ describe Webbynode::Commands::Init do
       git_handler.should_receive(:add_remote).with('user', 'webbynode', 'trial.webbyapp.com', 'trial_app', :home => '/home/user')
 
       subject.should_receive(:get_ip).never
+      subject.should_receive(:create_pushand)
       subject.run
     end
   end
@@ -119,6 +132,7 @@ describe Webbynode::Commands::Init do
       subject.stub!(:git).and_return(git_handler)
       subject.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
 
+      subject.should_receive(:create_pushand)
       subject.run
     end
     
@@ -246,6 +260,7 @@ describe Webbynode::Commands::Init do
         io_handler.should_receive(:file_exists?).with("script/rails").never
         io_handler.should_receive(:add_setting).with("engine", "php")
 
+        subject.should_receive(:create_pushand)
         subject.run
       end
     end
@@ -351,13 +366,15 @@ describe Webbynode::Commands::Init do
         cmd.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
         cmd.stub!(:git).and_return(git_handler) 
         cmd.stub!(:io).and_return(io_handler) 
+        cmd.stub(:create_pushand)
       end
     end
     
     it "doesn't ask if user already agreed to reinitialize" do
       subject.stub!(:pushand_exists?).and_return(true)
       io_handler.should_receive(:app_name).any_number_of_times.and_return("mah_app")
-      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 mah_app mah_app\n", true)
+
+      subject.should_receive(:create_pushand)
 
       subject.should_receive(:ask).with("Do you want to initialize it again (y/n)?").once.ordered.and_return("y")
       
@@ -395,6 +412,7 @@ describe Webbynode::Commands::Init do
       command.stub!(:gemfile).and_return(gemfile)
       command.should_receive(:git).any_number_of_times.and_return(git_handler) 
       command.should_receive(:io).any_number_of_times.and_return(io_handler)
+      command.stub(:create_pushand)
 
       io_handler.should_receive(:add_setting).with("engine", "php")
       command.run
@@ -409,6 +427,9 @@ describe Webbynode::Commands::Init do
       @command.stub!(:gemfile).and_return(gemfile)
       @command.stub!(:git).and_return(git_handler) 
       @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+      @command.stub(:create_pushand)
+      @command.stub(:create_webbynode_tree)
+      
       io.stub!(:file_exists?).with(".pushand").and_return(false)
     end
     
@@ -594,7 +615,8 @@ describe Webbynode::Commands::Init do
     it "should assume host is app's name when not given" do
       @command.should_receive(:pushand_exists?).any_number_of_times.and_return(false)
       io_handler.should_receive(:app_name).any_number_of_times.and_return("application_name")
-      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 application_name application_name\n", true)
+
+      pushand.should_receive(:create!).with("application_name", "application_name")
     
       @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
       @command.run
@@ -605,7 +627,8 @@ describe Webbynode::Commands::Init do
       
       io_handler.should_receive(:file_exists?).with(".pushand").and_return(false)
       io_handler.should_receive(:app_name).any_number_of_times.and_return("application_name")
-      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 application_name my.com.br\n", true)
+      
+      pushand.should_receive(:create!).with("application_name", "my.com.br")
     
       @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
       @command.run
@@ -627,6 +650,7 @@ describe Webbynode::Commands::Init do
     before(:each) do
       git.stub(:remote_exists?).and_return(false)
       subject.should_receive(:pushand_exists?).any_number_of_times.and_return(false)
+      subject.stub(:create_pushand)
     end
 
     it "creates the .webbynode system folder and stub files" do
@@ -649,7 +673,7 @@ describe Webbynode::Commands::Init do
     it "should be created and made an executable" do
       io_handler.should_receive(:file_exists?).with(".pushand").and_return(false)
       io_handler.should_receive(:app_name).any_number_of_times.and_return("mah_app")
-      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 mah_app mah_app\n", true)
+      pushand.should_receive(:create!).with("mah_app", "mah_app")
       
       @command.run
     end
@@ -672,7 +696,7 @@ describe Webbynode::Commands::Init do
     it "is replaced if user answers yes" do
       @command.stub(:pushand_exists?).and_return(true)
       io_handler.should_receive(:app_name).any_number_of_times.and_return("mah_app")
-      io_handler.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 mah_app mah_app\n", true)
+      pushand.should_receive(:create!).with("mah_app", "mah_app")
       
       io_handler.should_receive(:log).with("Commiting Webbynode changes...")
       git_handler.should_receive(:add).with(".")
@@ -687,6 +711,7 @@ describe Webbynode::Commands::Init do
   context "when git repo doesn't exist yet" do
     before(:each) do
       @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+      @command.stub!(:create_pushand)
     end
 
     it "should create a new git repo" do
@@ -729,6 +754,7 @@ describe Webbynode::Commands::Init do
   context "when git repo is initialized" do
     before(:each) do
       @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
+      @command.stub!(:create_pushand)
     end
     
     it "complains if git is in a dirty state" do

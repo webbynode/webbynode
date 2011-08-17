@@ -71,6 +71,13 @@ module Webbynode::Commands
       io.log "Application already initialized.".color(:red)
     end
     
+    def create_pushand
+      return if pushand_exists? && !@overwrite
+
+      io.log ""
+      pushand.create!(@app_name, @dns_entry)
+    end
+    
     private
     
     def check_git_clean
@@ -114,13 +121,6 @@ module Webbynode::Commands
     
     def pushand_exists?
       io.file_exists?(".pushand")
-    end
-    
-    def create_pushand
-      return if pushand_exists? && !@overwrite
-
-      io.log ""
-      io.create_file(".pushand", "#! /bin/bash\nphd $0 #{@app_name} #{@dns_entry}\n", true)
     end
     
     def create_git_commit

@@ -11,7 +11,8 @@ describe Webbynode::Commands::Webbies do
       :email => "fcoury@me.com", :response => read_fixture("api/webbies"))
     
     api = Webbynode::ApiClient.new
-    api.stub("properties")
+    api.stub(:properties)
+    api.stub(:credentials)
     
     cmd = Webbynode::Commands::Webbies.new
     cmd.should_receive(:api).and_return(api)

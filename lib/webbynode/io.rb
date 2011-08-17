@@ -70,6 +70,7 @@ module Webbynode
     end
     
     def mkdir(path)
+      raise "Tried to create real directory: #{path}" if $testing
       # TODO: raise "Tried to create real folder: #{path}" if $testing
       FileUtils.mkdir_p(path)
     end

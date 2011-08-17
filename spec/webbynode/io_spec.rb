@@ -88,6 +88,7 @@ describe Webbynode::Io do
       props.should_receive(:save)
       
       io.should_receive(:properties).with(".webbynode/settings").and_return(props)
+      io.stub(:mkdir)
       io.add_setting("engine", "php")
     end
   end
@@ -100,6 +101,7 @@ describe Webbynode::Io do
       props.should_receive(:save)
 
       io.should_receive(:properties).with(".webbynode/settings").and_return(props)
+      io.stub(:mkdir)
       io.add_multi_setting("addons", ['a', 'b', 'c'])
     end
   end
@@ -125,6 +127,7 @@ describe Webbynode::Io do
       props.should_receive(:save)
       
       io.should_receive(:properties).with(".webbynode/settings").and_return(props)
+      io.stub(:mkdir)
       io.remove_setting("engine")
     end
   end

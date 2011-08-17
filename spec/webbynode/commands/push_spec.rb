@@ -25,6 +25,7 @@ describe Webbynode::Commands::Push do
       cmd.stub!(:pushand).and_return(pushand)
       cmd.stub!(:git).and_return(git)
       cmd.after_tasks.stub!(:read_tasks)
+      cmd.stub!(:ensure_tasks_folder)
     end
   end
   
@@ -42,6 +43,8 @@ describe Webbynode::Commands::Push do
       if [ $? -eq 1 ]; then exit 1; fi
       EOS
       
+      subject.before_tasks.should_receive(:ensure_tasks_folder)
+      subject.before_tasks.should_receive(:read_tasks)
       subject.execute
     end
   end
@@ -51,11 +54,13 @@ describe Webbynode::Commands::Push do
       pushand.should_receive(:parse_remote_app_name).and_return("test.webbynode.com")
       io.should_receive(:log).with("Pushing test.webbynode.com", :start)
       push.stub!(:exec)
+      push.before_tasks.should_receive(:ensure_tasks_folder)
       push.execute
     end
     
     it "should push the application to the webby" do
       io.should_receive(:exec).with("git push webbynode +HEAD:master", false)
+      push.before_tasks.should_receive(:ensure_tasks_folder)
       push.execute
     end
     
@@ -73,6 +78,7 @@ describe Webbynode::Commands::Push do
       pushcmd.should_receive(:git).any_number_of_times.and_return(git)
       pushcmd.before_tasks.stub!(:read_tasks)
       pushcmd.after_tasks.stub!(:read_tasks)
+      pushcmd.before_tasks.should_receive(:ensure_tasks_folder)
 
       pushand.should_receive(:parse_remote_app_name).and_return("app")
       io.should_receive(:log).with("Finished pushing app", :finish)
@@ -83,6 +89,7 @@ describe Webbynode::Commands::Push do
 
     it "should create a semaphore if --recreate-vhost is passed" do
       pushcmd = Webbynode::Commands::Push.new("--recreate-vhost")
+      pushcmd.before_tasks.should_receive(:ensure_tasks_folder)
       pushcmd.should_receive(:io).any_number_of_times.and_return(io)
       pushcmd.should_receive(:remote_executor).any_number_of_times.and_return(re)
       pushcmd.should_receive(:pushand).any_number_of_times.and_return(pushand)
@@ -102,12 +109,14 @@ describe Webbynode::Commands::Push do
     context "when succesful" do
       it "should notify the user" do
         pushand.should_receive(:parse_remote_app_name).and_return("test.webbynode.com")
+        push.before_tasks.should_receive(:ensure_tasks_folder)
         io.should_receive(:log).with("Finished pushing test.webbynode.com", :finish)
         push.execute
       end
     end
     
     describe "Tasks" do
+      before(:each) { push.before_tasks.should_receive(:ensure_tasks_folder) }
       it "should have 2 before_tasks present" do
         push.execute
         2.times { push.before_tasks.session_tasks << "foo" }
@@ -135,7 +144,7 @@ describe Webbynode::Commands::Push do
       end
       
       it "should ensure that there are at least blank files available to read from" do
-        push.before_tasks.should_receive(:ensure_tasks_folder)
+        # push.before_tasks.should_receive(:ensure_tasks_folder)
         push.execute
       end
       
@@ -156,6 +165,7 @@ describe Webbynode::Commands::Push do
       context "when there are one or more tasks available" do
         before(:each) do
           push.before_tasks.stub!(:has_tasks?).and_return(true)
+          push.before_tasks.should_receive(:ensure_tasks_folder)
         end
         
         it "should perform these tasks in order" do
@@ -169,6 +179,7 @@ describe Webbynode::Commands::Push do
       context "when there are one or more tasks available" do
         before(:each) do
           push.after_tasks.stub!(:has_tasks?).and_return(true)
+          push.before_tasks.should_receive(:ensure_tasks_folder)
         end
         
         it "should perform these tasks in order" do
@@ -181,6 +192,7 @@ describe Webbynode::Commands::Push do
     describe "#perform_before_tasks" do
       before(:each) do
         push.before_tasks.stub!(:has_tasks?).and_return(true)
+        push.before_tasks.should_receive(:ensure_tasks_folder)
         io.stub!(:exec).with("git push webbynode +HEAD:master", false)
       end
       
@@ -200,7 +212,9 @@ describe Webbynode::Commands::Push do
     describe "#perform_after_tasks" do
       before(:each) do
         push.after_tasks.stub!(:has_tasks?).and_return(true)
+        push.stub!(:io).and_return(io)
         io.stub!(:exec).with("git push webbynode +HEAD:master", false)
+        push.before_tasks.should_receive(:ensure_tasks_folder)
       end
       
       it "should provide feedback to the user that it's going to perform the tasks" do

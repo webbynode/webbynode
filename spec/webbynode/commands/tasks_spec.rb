@@ -159,6 +159,8 @@ describe Webbynode::Commands::Tasks do
       task = Webbynode::Commands::Tasks.new('remove', 'after_push', 'rake', 'db:migrate', 'RAILS_ENV=production')
       task.should_receive(:send).with('remove')
       task.stub!(:read_tasks)
+      io = stub.as_null_object
+      task.stub(:io).and_return(io)
       task.execute
     end
   end

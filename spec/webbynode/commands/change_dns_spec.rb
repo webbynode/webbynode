@@ -6,19 +6,19 @@ describe Webbynode::Commands::ChangeDns do
   let(:io)  { double("io").as_null_object }
   let(:api) { double("api").as_null_object }
   let(:cmd) { Webbynode::Commands::ChangeDns.new("the.newdns.com") }
-  
+  let(:pushand) { stub.as_null_object }
 
   before(:each) do
     FakeWeb.clean_registry
     cmd.should_receive(:io).any_number_of_times.and_return(io)
     cmd.should_receive(:git).any_number_of_times.and_return(git)
     cmd.should_receive(:api).any_number_of_times.and_return(api)
-    
+    cmd.stub(:pushand).and_return(pushand)
   end
 
   it "should change pushand" do
     io.should_receive(:app_name).and_return("myapp")
-    io.should_receive(:create_file).with(".pushand", "#! /bin/bash\nphd $0 myapp the.newdns.com\n", true)
+    pushand.should_receive(:create!).with("myapp", "the.newdns.com")
     git.should_receive(:parse_remote_ip).and_return("1.2.3.4")
     api.should_receive(:create_record).with("the.newdns.com", "1.2.3.4")
     

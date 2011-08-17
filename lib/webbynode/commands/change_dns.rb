@@ -17,7 +17,7 @@ module Webbynode::Commands
       handle_dns param(:dns_entry)
       
       app_name = io.app_name
-      io.create_file(".pushand", "#! /bin/bash\nphd $0 #{app_name} #{param(:dns_entry)}\n", true)
+      pushand.create!(app_name, param(:dns_entry))
 
       git.add ".pushand"
       git.add ".webbynode/settings" if io.file_exists?(".webbynode/settings")

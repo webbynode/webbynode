@@ -190,6 +190,7 @@ module Webbynode
     end
     
     def create_file(file_name, contents, executable=nil)
+      raise "Tried to create real file: #{file_name}" if $testing and !$testing_io
       File.open(file_name, "w") do |file|
         file.write(contents)
       end

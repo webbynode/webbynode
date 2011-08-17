@@ -2,6 +2,14 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'spec_helper')
 
 describe Webbynode::Io do
+  before do
+    $testing_io = true
+  end
+  
+  after do
+    $testing_io = false
+  end
+  
   describe '#list_files' do
     it 'list files that match' do
       Dir.should_receive(:glob).with("/tmp/*.abcdef").and_return(["abcdef"])
@@ -305,7 +313,7 @@ describe Webbynode::Io do
       it "executes the command and retrieve the output and exit code" do
         io = Webbynode::Io.new
         io.should_receive(:`).with("ls -la").and_return("output for ls -la")
-        io.exec3("ls -la").should == [false, "output for ls -la"]
+        io.exec3("ls -la")[1].should == "output for ls -la"
       end
     end
   end

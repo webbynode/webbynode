@@ -6,13 +6,15 @@ describe Webbynode::Commands::Logs do
   let(:re)      { double("RemoteExecutor").as_null_object }
   let(:git)     { double("Git").as_null_object }
   let(:server)  { double("Server").as_null_object }
-  
+  let(:pushand) { stub.as_null_object }
+    
   subject do
     Webbynode::Commands::Logs.new.tap do |cmd|
       cmd.stub!(:io).and_return(io)
       cmd.stub!(:remote_executor).and_return(re)
       cmd.stub!(:server).and_return(server)
       cmd.stub!(:git).and_return(git)
+      cmd.stub!(:pushand).and_return(pushand)
     end  
   end
   

@@ -39,6 +39,7 @@ lib/webbynode/commands/config.rb
 lib/webbynode/commands/console.rb
 lib/webbynode/commands/database.rb
 lib/webbynode/commands/delete.rb
+lib/webbynode/commands/dns_aliases.rb
 lib/webbynode/commands/guides.rb
 lib/webbynode/commands/help.rb
 lib/webbynode/commands/init.rb
@@ -122,6 +123,7 @@ spec/webbynode/commands/config_spec.rb
 spec/webbynode/commands/console_spec.rb
 spec/webbynode/commands/database_spec.rb
 spec/webbynode/commands/delete_spec.rb
+spec/webbynode/commands/dns_aliases_spec.rb
 spec/webbynode/commands/guides_spec.rb
 spec/webbynode/commands/help_spec.rb
 spec/webbynode/commands/init_spec.rb

@@ -93,6 +93,14 @@ class Array
   end
 end
 
+unless Object.respond_to?(:blank?)
+  class Object
+    def blank?
+      respond_to?(:empty?) ? empty? : !self
+    end
+  end
+end
+
 class Net::HTTP
   alias_method :old_initialize, :initialize
   def initialize(*args)

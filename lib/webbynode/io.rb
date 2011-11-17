@@ -11,7 +11,7 @@ module Webbynode
     TemplatesPath = File.join(File.dirname(__FILE__), '..', 'templates')
     
     def self.is_windows?
-      Config::CONFIG["host_os"] =~ /mswin|mingw/
+      RbConfig::CONFIG["host_os"] =~ /mswin|mingw/
     end
     
     def random_password(len=10)

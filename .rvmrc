@@ -1,2 +1,1 @@
-rvm use ree
-rvm gemset use webbynode
+rvm ruby-1.9.3-p0-perf

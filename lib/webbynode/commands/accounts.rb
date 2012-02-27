@@ -67,7 +67,8 @@ module Webbynode::Commands
     def use
       return if missing_target?
       io.copy_file target, "#{Prefix}"
-      io.log "Successfully switched to account alias #{param(:name).color(:yellow)}."
+      account_alias = param(:name).dup
+      io.log "Successfully switched to account alias #{account_alias.color(:yellow)}."
     end
     
     def new

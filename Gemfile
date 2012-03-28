@@ -4,7 +4,7 @@ gem 'httparty'
 gem 'domainatrix'
 gem 'net-ssh'
 gem 'highline'
-gem 'rainbow', '~> 1.1.3'
+gem 'webbynode-rainbow', '~> 1.1.3'
 gem 'taps', '0.3.23'
 
 group :development do

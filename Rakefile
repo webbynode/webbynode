@@ -4,7 +4,7 @@ require 'rake/testtask'
 
 require 'echoe'  
   
-Echoe.new('webbynode', '1.0.5.1') do |p|  
+Echoe.new('webbynode', '1.0.5.2') do |p|  
   p.description     = "Webbynode Deployment Gem"  
   p.url             = "http://webbynode.com"  
   p.author          = "Felipe Coury"
@@ -18,7 +18,7 @@ Echoe.new('webbynode', '1.0.5.1') do |p|
     ['httparty', '>=0.4.5'],
     ['launchy',  '>=0.3.7'],
     ['domainatrix','>=0.0.7'],
-    ['rainbow','~>1.1.3'],
+    ['webbynode-rainbow','~>1.1.3'],
   ]
   # p.dependencies = [
   #   ['activeresource','>= 2.3.4'],

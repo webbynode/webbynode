@@ -4,7 +4,7 @@ module Webbynode::Engines
     set_name "NodeJS"
 
     def detected?
-      io.file_exists?('server.js')
+      io.file_exists?('server.js') || io.file_exists?('app.js')
     end
     
     def prepare
@@ -14,7 +14,13 @@ module Webbynode::Engines
         if contents =~ /listen\((\d+)\)/
           default_port = $1
         end
+      elsif io.file_exists?('app.js')
+        content = io.read_file('app.js')
+        if content =~ /listen\((\d+)\)/
+          default_port = $1
+        end
       end
+
       
       io.log ""
       io.log "Configure NodeJS Application"

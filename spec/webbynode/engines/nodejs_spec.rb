@@ -19,14 +19,25 @@ describe Webbynode::Engines::NodeJS do
   end
 
   describe '#detect' do
+    before do
+      io.stub(:file_exists?)
+    end
+
     it "returns true if server.js is found" do
       io.stub!(:file_exists?).with('server.js').and_return(true)
       
       subject.should be_detected
     end
 
-    it "returns false if any isn't found" do
+    it "returns true if app.js is found" do
+      io.stub!(:file_exists?).with('app.js').and_return(true)
+      
+      subject.should be_detected
+    end
+
+    it "returns false if both app.js and server.js aren't found" do
       io.stub!(:file_exists?).with('server.js').and_return(false)
+      io.stub!(:file_exists?).with('app.js').and_return(false)
       
       subject.should_not be_detected
     end
@@ -34,7 +45,7 @@ describe Webbynode::Engines::NodeJS do
   
   describe '#prepare' do
     before(:each) do
-      io.stub!(:file_exists?).with('server.js').and_return(false)
+      io.stub(:file_exists? => false)
     end
     
     it "tries to get the listen port" do

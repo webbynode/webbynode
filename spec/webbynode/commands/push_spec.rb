@@ -16,6 +16,7 @@ describe Webbynode::Commands::Push do
     push.should_receive(:git).any_number_of_times.and_return(git)
     push.before_tasks.stub!(:read_tasks)
     push.after_tasks.stub!(:read_tasks)
+    Webbynode::ApiClient.stub(:system => "manager")
   end
   
   subject do
@@ -30,22 +31,35 @@ describe Webbynode::Commands::Push do
   end
   
   context "before pushing" do
-    it "checks for update_rapp script remotely" do
-      re.should_receive(:exec).with(<<-EOS, false, true)
-      if [ ! -f /var/webbynode/update_rapp ]; then
-        cd /var/webbynode
-        wget http://repo.webbynode.com/rapidapps/update_rapp
-        chmod +x update_rapp
-        ln -s -f /var/webbynode/update_rapp /usr/bin/update_rapp
-      fi
+    context "with manager 2" do
+      it "doesn't check for updates" do
+        Webbynode::ApiClient.stub(:system => "manager2")
+        re.should_receive(:exec).with(/update_rapp/).never
+        subject.before_tasks.should_receive(:ensure_tasks_folder)
+        subject.before_tasks.should_receive(:read_tasks)
+        subject.execute
+      end
+    end
 
-      /var/webbynode/update_rapp
-      if [ $? -eq 1 ]; then exit 1; fi
-      EOS
-      
-      subject.before_tasks.should_receive(:ensure_tasks_folder)
-      subject.before_tasks.should_receive(:read_tasks)
-      subject.execute
+    context "with manager" do
+      it "checks for update_rapp script remotely" do
+        Webbynode::ApiClient.stub(:system => "manager")
+        re.should_receive(:exec).with(<<-EOS, false, true)
+        if [ ! -f /var/webbynode/update_rapp ]; then
+          cd /var/webbynode
+          wget http://repo.webbynode.com/rapidapps/update_rapp
+          chmod +x update_rapp
+          ln -s -f /var/webbynode/update_rapp /usr/bin/update_rapp
+        fi
+
+        /var/webbynode/update_rapp
+        if [ $? -eq 1 ]; then exit 1; fi
+        EOS
+        
+        subject.before_tasks.should_receive(:ensure_tasks_folder)
+        subject.before_tasks.should_receive(:read_tasks)
+        subject.execute
+      end
     end
   end
   

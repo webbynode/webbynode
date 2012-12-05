@@ -17,12 +17,18 @@ describe Webbynode::Commands::Accounts do
     subject { prepare "list" }
 
     it "shows all available accounts" do
-      api.should_receive(:credentials).and_return({"email" => "fcoury@me.com", "token" => "apitoken"})
-      io.should_receive(:list_files).with("#{dir}/.webbynode_*").and_return(["#{dir}/.webbynode_personal", "#{dir}/.webbynode_biz"])
-      io.should_receive(:file_matches).with("#{dir}/.webbynode_personal", /email=fcoury@me.com/).and_return(true)
-      io.should_receive(:file_matches).with("#{dir}/.webbynode_biz", /email=fcoury@me.com/).and_return(false)
+      api.stub(:credentials => {"email" => "fcoury@me.com", "token" => "apitoken", "system" => "manager"})
+      io.stub(:list_files).with("#{dir}/.webbynode_*").and_return(["#{dir}/.webbynode_personal", "#{dir}/.webbynode_biz", "#{dir}/.webbynode_other"])
+      io.stub(:file_matches).with("#{dir}/.webbynode_personal", /email=fcoury@me.com/).and_return(true)
+      io.stub(:file_matches).with("#{dir}/.webbynode_personal", /system=manager$/).and_return(true)
+      io.stub(:file_matches).with("#{dir}/.webbynode_other", /email=fcoury@me.com/).and_return(true)
+      io.stub(:file_matches).with("#{dir}/.webbynode_other", /system=manager$/).and_return(false)
+      io.stub(:file_matches).with("#{dir}/.webbynode_biz", /email=fcoury@me.com/).and_return(false)
+      io.stub(:file_matches).with("#{dir}/.webbynode_biz", /system=manager$/).and_return(false)
+
       io.should_receive(:log).with("* personal")
       io.should_receive(:log).with("  biz")
+      io.should_receive(:log).with("  other")
       subject.execute
     end
     

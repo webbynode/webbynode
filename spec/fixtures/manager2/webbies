@@ -1,0 +1,11 @@
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+X-UA-Compatible: IE=Edge
+ETag: "6a2662ac2678cf53e8f82265a0b5fd38"
+Cache-Control: max-age=0, private, must-revalidate
+Set-Cookie: _manager2_session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRkkiJTAwZTUzMTkxMWNiZTRjMDZkZmM3Y2I3ZmIwOGI3YjE0BjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsISSIJVXNlcgY7AEZbBmkCpRMw--7e55b7f8163de49e85750ed2ef358b3c980b9cc2; path=/; HttpOnly
+X-Request-Id: e9f835937eb6a1de4cd9968b1b7409ff
+X-Runtime: 0.440043
+Transfer-Encoding: chunked
+
+[{"id":71,"hostname":"webby6203.webbyapp.com","description":"sample server","plan":"Webbybeta","plan_id":3,"plan_name":"Webbybeta","power":"on","status":"online","available":true,"node_name":"local-01","mainipaddress":"192.168.183.200","internal_ip":null,"ram":"536870912","bandwidth":"10737418240","disk":"5368709120","bandwidthused":"","diskused":779324,"ram_size":"512 MB","disk_size":"5 GB","bandwidth_size":"10 GB","disk_space":"760 MB / 5 GB (15%)","bandwidth_overview":"0 Bytes / 10 GB (0%)","used_bandwidth_percent":0.0,"price":"$0.99","template":"ubuntu-12.04-x86_64","templatename":"Ubuntu 12.04 64-bit","groups":["All"],"loader":"<span class=\"loader hidden\"><img alt=\"Loader\" src=\"/assets/loader.gif\" /></span>","public_ips":null},{"id":71,"hostname":"sandbox.webbyapp.com","description":"sample server","plan":"Webbybeta","plan_id":3,"plan_name":"Webbybeta","power":"on","status":"online","available":true,"node_name":"local-01","mainipaddress":"201.81.121.201","internal_ip":null,"ram":"536870912","bandwidth":"10737418240","disk":"5368709120","bandwidthused":"","diskused":779324,"ram_size":"512 MB","disk_size":"5 GB","bandwidth_size":"10 GB","disk_space":"760 MB / 5 GB (15%)","bandwidth_overview":"0 Bytes / 10 GB (0%)","used_bandwidth_percent":0.0,"price":"$0.99","template":"ubuntu-12.04-x86_64","templatename":"Ubuntu 12.04 64-bit","groups":["All"],"loader":"<span class=\"loader hidden\"><img alt=\"Loader\" src=\"/assets/loader.gif\" /></span>","public_ips":null}]

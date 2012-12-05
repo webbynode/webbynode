@@ -16,7 +16,7 @@ module Webbynode::Commands
         return
       end
       
-      io.log "#{"Webbynode Rapp".color(:white).bright} - #{"http://rapp.webbynode.com".underline}"
+      io.log "#{"Webbynode Rapp".bright} - #{"http://rapp.webbynode.com".underline}"
 
       @overwrite   = false
 
@@ -32,7 +32,7 @@ module Webbynode::Commands
       
       check_git_clean if @git_present
       
-      io.log "Initializing application #{@app_name.color(:yellow)} #{@dns_entry ? "with dns #{@dns_entry.color(:yellow)}" : ""}"
+      io.log "Initializing application #{@app_name.bright} #{@dns_entry ? "with dns #{@dns_entry.bright}" : ""}"
       
       detect_engine
       
@@ -46,12 +46,12 @@ module Webbynode::Commands
       
       handle_dns option(:dns) if option(:adddns)
       
-      io.log "Application #{@app_name.color(:yellow)} ready for Rapid Deployment", :finish
+      io.log "Application #{@app_name.bright} ready for Rapid Deployment", :finish
       
     rescue Net::SSH::HostKeyMismatch
       io.log ""
       io.log "Error pushing to your server:"
-      io.log "  #{$!.to_s.color(:red)}"
+      io.log "  #{$!.to_s.bright}"
       io.log ""
       io.log "This usually happens because you redeployed the server and the fingerprint changed."
       io.log ""
@@ -62,13 +62,13 @@ module Webbynode::Commands
       io.log ""
 
     rescue Webbynode::InvalidAuthentication
-      io.log "Could not connect to webby: invalid authentication.".color(:red), true
+      io.log "Could not connect to webby: invalid authentication.".bright, true
 
     rescue Webbynode::PermissionError
-      io.log "Could not create an SSH key: permission error.".color(:red), true
+      io.log "Could not create an SSH key: permission error.".bright, true
 
     rescue Webbynode::GitRemoteAlreadyExistsError
-      io.log "Application already initialized.".color(:red)
+      io.log "Application already initialized.".bright
     end
     
     def create_pushand
@@ -84,7 +84,7 @@ module Webbynode::Commands
       unless git.clean?
         io.log ""
         raise CommandError, 
-          "#{"Cannot initialize:".color(:red)} #{"git has pending changes.".color(:yellow)}\nExecute a git commit or add changes to .gitignore and try again."
+          "#{"Cannot initialize:".bright} #{"git has pending changes.".bright}\nExecute a git commit or add changes to .gitignore and try again."
       end
     end
     
@@ -92,7 +92,7 @@ module Webbynode::Commands
       return unless pushand_exists?
       
       io.log ""
-      io.log "It seems this application was initialized before.".color(:yellow)
+      io.log "It seems this application was initialized before.".bright
       
       unless ask('Do you want to initialize it again (y/n)?').downcase == 'y'
         puts ""
@@ -133,7 +133,7 @@ module Webbynode::Commands
     def delete_remote
       return unless git.remote_exists?('webbynode')
       
-      io.log "Webbynode git integration already initialized.".color(:yellow)
+      io.log "Webbynode git integration already initialized.".bright
       if @overwrite || ask('Do you want to overwrite the current settings (y/n)?').downcase == 'y'
         git.delete_remote('webbynode')
       end
@@ -179,14 +179,14 @@ module Webbynode::Commands
           webby = api_webbies[api_webbies.keys.first]
         else
           io.log ""
-          io.log "Current Webbies in your account:".color(:yellow)
+          io.log "Current Webbies in your account:".bright
           io.log ""
         
           choices = []
           api_webbies.keys.sort.each_with_index do |webby_key, i|
             webby = api_webbies[webby_key]
             choices << webby
-            io.log "  #{i+1}. #{webby['name'].color(:yellow)} (#{webby['ip']})"
+            io.log "  #{i+1}. #{webby.name.bright} (#{webby.ip})"
           end
         
           io.log "", :simple
@@ -195,9 +195,9 @@ module Webbynode::Commands
         end
         
         io.log "", :simple
-        io.log "Set deployment Webby to #{webby['name'].color(:yellow)}."
+        io.log "Set deployment Webby to #{webby.name.bright}."
         
-        return webby['ip']
+        return webby.ip
       end
 
       io.log "Retrieving IP for Webby #{webby}..."

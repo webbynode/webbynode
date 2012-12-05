@@ -6,6 +6,7 @@ gem 'net-ssh'
 gem 'highline'
 gem 'webbynode-rainbow', '~> 1.1.3'
 gem 'taps', '0.3.23'
+gem 'sqlite3'
 
 group :development do
   gem 'rspec'
@@ -19,5 +20,5 @@ group :development do
   gem 'fakeweb'
   gem 'echoe'
   gem 'rcov'
-	gem 'rb-fsevent'
+  gem 'rb-fsevent', '~> 0.9.2'
 end

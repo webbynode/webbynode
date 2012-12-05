@@ -53,6 +53,10 @@ describe Webbynode::Command do
     end
     
     context "when git is missing" do
+      before do
+        Webbynode::ApiClient.stub(:instance)
+      end
+
       it "should provide a friendly error" do
         git.should_receive(:present?).and_return(false)
         
@@ -214,6 +218,8 @@ describe Webbynode::Command do
         raise Webbynode::ApiClient::Unauthorized
       end
     end
+
+    before { Webbynode::ApiClient.stub(:instance) }
     
     it "should output a friendly message" do
       cmd = UnauthorizedCommand.new

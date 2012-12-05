@@ -1,76 +1,53 @@
 module Webbynode
   class ApiClient
     include HTTParty
-    base_uri "https://manager.webbynode.com/api/yaml"
-
     CREDENTIALS_FILE = "#{Io.home_dir}/.webbynode"
 
     Unauthorized = Class.new(StandardError)
     InactiveZone = Class.new(StandardError)
     ApiError = Class.new(StandardError)
-    
+
     def io
       @io ||= Io.new
     end
-    
-    def zones
-      response = post("/dns")
-      if zones = response["zones"]
-        zones.inject({}) { |h, zone| h[zone[:domain]] = zone; h }
-      end
-    end
-    
-    def create_record(record, ip)
-      original_record = record
 
-      url = Domainatrix.parse("http://#{record}")
-      record = url.subdomain
-      domain = "#{url.domain}.#{url.public_suffix}."
-      
-      zone = zones[domain]
-      if zone
-        raise InactiveZone, domain unless zone[:status] == 'Active'
+    def self.system
+      ApiClient.new.credentials['system']
+    end
+
+    def self.instance
+      instance_for(system)
+    end
+
+    def self.instance_for(system)
+      if system == "manager2"
+        Manager2ApiClient.new
       else
-        zone = create_zone(domain)
+        ManagerApiClient.new
       end
-
-      create_a_record(zone[:id], record, ip, original_record)
     end
     
-    def create_zone(zone)
-      response = post("/dns/new", :query => {"zone[domain]" => zone, "zone[ttl]" => "86400"})
-      handle_error(response)
-      response
-    end
-    
-    def create_a_record(id, record, ip, original_record)
-      response = post("/dns/#{id}/records/new", :query => {"record[name]" => record, "record[type]" => "A", "record[data]" => ip})
-      if response["errors"] and response["errors"] =~ /Data has already been taken/
-        io.log "'#{original_record}' is already setup on Webbynode DNS, make sure it's pointing to #{ip}", :warning
-        return
+    def ip_for(hostname)
+      if webby = webbies[hostname]
+        webby.ip
       end
-      
-      handle_error(response)
-      response["record"]
     end
     
     def handle_error(response)
       raise ApiError, response["error"] if response["error"]
+      raise ApiError, format_error(response["errors"]) if response["errors"]
       raise ApiError, "invalid response from the API (code #{response.code})" unless response.code == 200
     end
-    
-    def ip_for(hostname)
-      (webbies[hostname] || {})['ip']
-    end
-    
-    def webbies
-      unless @webbies
-        response = post("/webbies") || {}
-        
-        @webbies = response
+
+    def format_error(error_hash)
+      output = []
+      error_hash.each_pair do |field, errors|
+        errors.each do |error|
+          output << "#{field} #{error}"
+        end
       end
-      
-      @webbies['webbies'].inject({}) { |h, webby| h[webby['name']] = webby; h }
+
+      output.join(", ")
     end
     
     def credentials
@@ -81,39 +58,34 @@ module Webbynode
       creds = if io.file_exists?(CREDENTIALS_FILE) and !overwrite
         properties
       else
+        system = overwrite[:system] if overwrite.is_a?(Hash) and overwrite[:system] 
         email = overwrite[:email] if overwrite.is_a?(Hash) and overwrite[:email]
         token = overwrite[:token] if overwrite.is_a?(Hash) and overwrite[:token]
         
-        io.log io.read_from_template("api_token") unless email and token
+        io.log io.read_from_template("api_token") unless email and token and system
 
-        email ||= ask("Login email: ")
-        token ||= ask("API token:   ")
+        system ||= ask("What's the end point you're using - manager or manager2? ")
+        email  ||= ask("Login email: ")
+        token  ||= ask("API token:   ")
+
+        puts ""
         
-        response = self.class.post("/webbies", :body => { :email => email, :token => token })
+        response = ApiClient.instance_for(system).check_auth(email, token)
         if response.code == 401 or response.code == 411
           raise Unauthorized, "You have provided the wrong credentials"
         end
 
         properties['email'] = email
         properties['token'] = token
+        properties['system'] = system
         properties.save
         
-        puts
-
-        { :email => email, :token => token }
+        { :email => email, :token => token, :system => system }
       end
     end
     
     def properties
       @properties ||= Webbynode::Properties.new(CREDENTIALS_FILE)
-    end
-    
-    def post(uri, options={})
-      response = self.class.post(uri, { :body => credentials }.merge(options))
-      if response.code == 401 or response.code == 411
-        raise Unauthorized, "You have provided the wrong credentials"
-      end
-      response
     end
   end
 end

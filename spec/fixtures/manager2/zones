@@ -1,0 +1,11 @@
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+X-UA-Compatible: IE=Edge
+ETag: "008c38dc8bf529335cf627ec2f9116e7"
+Cache-Control: max-age=0, private, must-revalidate
+Set-Cookie: _manager2_session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRkkiJTNiZDM1NDc1OTJhYjc1ZGYxYTBkYzlhZGQ4ZTEwNGIyBjsAVEkiGXdhcmRlbi51c2VyLnVzZXIua2V5BjsAVFsISSIJVXNlcgY7AEZbBmkCpRMw--26cedef41c3bfe0db351c6a0d9d75481bbe41f05; path=/; HttpOnly
+X-Request-Id: bb9dcb0d5162114f44a121537a9cb066
+X-Runtime: 0.237234
+Transfer-Encoding: chunked
+
+[{"id":18,"name":"developer.com"},{"id":20,"name":"rubyista.info"},{"id":21,"name":"webbyapp.com"}]

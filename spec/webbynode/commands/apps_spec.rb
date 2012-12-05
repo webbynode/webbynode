@@ -11,6 +11,7 @@ describe Webbynode::Commands::Apps do
   end
   
   it "executes list_apps remotely" do
+    Webbynode::ApiClient.stub(:system => "manager")
     re.should_receive(:exec).with("list_apps", true)
     subject.execute
   end

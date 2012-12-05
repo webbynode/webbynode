@@ -99,6 +99,7 @@ describe Webbynode::Commands::Database do
     
     it "asks the local database credentials and name" do
       io.should_receive(:load_setting).with("database_name").and_return(nil)
+      io.should_receive(:load_setting).with("database_user").and_return(nil)
       io.should_receive(:load_setting).with("database_password").and_return(nil)
       
       io.should_receive(:db_name).any_number_of_times.and_return("myapp")
@@ -114,6 +115,7 @@ describe Webbynode::Commands::Database do
     context "when user doesn't authorize" do
       it "stores all data but password" do
         io.should_receive(:load_setting).with("database_name").and_return(nil)
+        io.should_receive(:load_setting).with("database_user").and_return(nil)
         io.should_receive(:load_setting).with("database_password").and_return(nil)
         
         io.should_receive(:db_name).any_number_of_times.and_return("myapp")
@@ -134,9 +136,10 @@ describe Webbynode::Commands::Database do
     context "when user authorizes" do
       it "stores the password" do
         io.should_receive(:load_setting).with("database_name").and_return(nil)
+        io.should_receive(:load_setting).with("database_user").and_return(nil)
         io.should_receive(:load_setting).with("database_password").and_return(nil)
         
-        io.should_receive(:db_name).any_number_of_times.and_return("myapp")
+        io.stub(:db_name).any_number_of_times.and_return("myapp")
 
         subject.should_receive(:ask).with("Database name [myapp]: ").and_return("")
         subject.should_receive(:ask).with("    User name [myapp]: ").and_return("user")

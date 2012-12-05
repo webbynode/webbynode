@@ -213,7 +213,7 @@ module Webbynode
     end
     
     def api
-      @@api ||= Webbynode::ApiClient.new
+      @@api ||= ApiClient.instance
     end
     
     def notify(msg)
@@ -267,6 +267,7 @@ module Webbynode
       end
       
       begin
+        @@api = ApiClient.instance
         validate_initialization if settings[:requires_initialization!]
         validate_options        if settings[:requires_options!]
         execute

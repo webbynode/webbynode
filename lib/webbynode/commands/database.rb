@@ -11,7 +11,7 @@ module Webbynode::Commands
     attr_reader :db
     
     def default
-      io.log "Missing action: use #{"pull".color(:yellow)}, #{"push".color(:yellow)} or #{"config".color(:yellow)}. For more help use #{"#{File.basename $0} help database".color(:yellow)}."
+      io.log "Missing action: use #{"pull".bright}, #{"push".bright} or #{"config".bright}. For more help use #{"#{File.basename $0} help database".bright}."
     end
     
     def pull
@@ -59,16 +59,16 @@ module Webbynode::Commands
           :remote_ip    => ip)
       rescue TapsError
         if $!.message =~ /LoadError: no such file to load -- (.*)/
-          io.log "#{"ERROR:".color(:red)} Missing database adapter. You need to install #{$1.color(:yellow)} gem to handle your database."
+          io.log "#{"ERROR:".bright} Missing database adapter. You need to install #{$1.bright} gem to handle your database."
         elsif $!.message =~ /Mysql::Error: Unknown database '(.*)'/
-          io.log "#{"ERROR:".color(:red)} Unknown database #{$1.color(:yellow)}. Create the local database and try again."
+          io.log "#{"ERROR:".bright} Unknown database #{$1.bright}. Create the local database and try again."
         elsif $!.message =~ /Sequel::DatabaseConnectionError -\> Mysql::Error: (.*)/
-          io.log "#{"ERROR:".color(:red)} Invalid MySQL credentials for your local database (#{$1})"
+          io.log "#{"ERROR:".bright} Invalid MySQL credentials for your local database (#{$1})"
         else
           if $!.message =~ /(.*) -\> (.*)/
-            io.log "#{"ERROR:".color(:red)} Unexpected error - #{$2}"
+            io.log "#{"ERROR:".bright} Unexpected error - #{$2}"
           else
-            io.log "#{"ERROR:".color(:red)} Unexpected error - #{$!.message}"
+            io.log "#{"ERROR:".bright} Unexpected error - #{$!.message}"
           end
         end
       ensure
@@ -93,7 +93,7 @@ module Webbynode::Commands
     
     def ask_db_credentials(force=false)
       retrieve_db_credentials
-      
+
       if force || db[:name].nil?
         db[:name] = query("Database name", db[:name] || io.db_name)
         db[:user] = query("    User name", db[:user] || io.db_name)

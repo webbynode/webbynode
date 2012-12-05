@@ -19,7 +19,7 @@ module Webbynode::Commands
       remote_app_name = pushand.parse_remote_app_name
       
       # Notify the user
-      io.log "Executing remote command...".color(:cyan)
+      io.log "Executing remote command...".bright
       
       # Executes the command on the remote server inside the application root folder
       result = spinner {

@@ -7,6 +7,7 @@ describe Webbynode::Commands::Init do
   let(:gemfile)     { double("gemfile").as_null_object.tap { |g| g.stub!(:present?).and_return(false) } }
   let(:api)         { double("api").as_null_object }
   let(:pushand)     { stub.as_null_object }
+  let(:instance)    { stub(:instance).as_null_object }
   
   def create_init(ip="4.3.2.1", host=nil, extra=[])
     host = "--dns=#{host}" if host
@@ -24,20 +25,27 @@ describe Webbynode::Commands::Init do
     FakeWeb.clean_registry
     create_init
     git_handler.stub!(:remote_exists?).and_return(false)
+    Webbynode::ApiClient.stub(:system => "manager")
+    Webbynode::ApiClient.stub(:instance => instance)
+  end
+
+  def make_webby(hash)
+    webby        = Webbynode::Webby.new
+    hash.each_pair { |k,v| webby.send("#{k}=", v) }
+    webby
   end
   
   subject do
     Webbynode::Commands::Init.new.tap do |cmd|
-      webbies = {
-        'sandbox' => {
-          "ip"     => "201.81.121.201",
-          "status" => "on",
-          "name"   => "sandbox",
-          "notes"  => "",
-          "plan"   => "Webbybeta",
-          "node"   => "miami-b15"
-        }
-      }
+      webby        = Webbynode::Webby.new
+      webby.ip     = "201.81.121.201"
+      webby.status = "on"
+      webby.name   = "sandbox"
+      webby.plan   = "Webbybeta"
+      webby.node   = "miami-b15"
+
+      webbies = { 'sandbox' => webby }
+
       api.stub!(:webbies).and_return(webbies)
 
       cmd.stub!(:git).and_return(git_handler)
@@ -238,14 +246,13 @@ describe Webbynode::Commands::Init do
       subject do
         Webbynode::Commands::Init.new("--engine=php").tap do |cmd|
           webbies = {
-            'sandbox' => {
+            'sandbox' => make_webby({
               "ip"     => "201.81.121.201",
               "status" => "on",
               "name"   => "sandbox",
-              "notes"  => "",
               "plan"   => "Webbybeta",
               "node"   => "miami-b15"
-            }
+            })
           }
           api.stub!(:webbies).and_return(webbies)
 
@@ -319,30 +326,27 @@ describe Webbynode::Commands::Init do
     
     it "complains if missing and user has > 1 webby" do
       webbies = {
-        'webby3' => {
+        'webby3' => make_webby({
           "ip"     => "67.53.31.3",
           "status" => "on",
           "name"   => "webby3",
-          "notes"  => "",
           "plan"   => "Webbybeta",
           "node"   => "miami-b11"
-        },
-        'sandbox' => {
+        }),
+        'sandbox' => make_webby({
           "ip"     => "201.81.121.201",
           "status" => "on",
           "name"   => "sandbox",
-          "notes"  => "",
           "plan"   => "Webbybeta",
           "node"   => "miami-b15"
-        },
-        'webby2' => {
+        }),
+        'webby2' => make_webby({
           "ip"     => "67.53.31.2",
           "status" => "on",
           "name"   => "webby2",
-          "notes"  => "",
           "plan"   => "Webbybeta",
           "node"   => "miami-b11"
-        }
+        })
       }
       api.should_receive(:webbies).and_return(webbies)
       io_handler.should_receive(:log).with("Current Webbies in your account:")
@@ -517,47 +521,6 @@ describe Webbynode::Commands::Init do
       
       stdout.should =~ /Couldn't create your DNS entry: No DNS entry for id 99999/
     end
-  end
-  
-  it "should ask for user's login email if no credentials" do
-    FakeWeb.register_uri(:post, "#{Webbynode::ApiClient.base_uri}/webbies", 
-      :email => "fcoury@me.com", :response => read_fixture("api/webbies"))
-
-    io_handler.should_receive(:file_exists?).with(Webbynode::ApiClient::CREDENTIALS_FILE).and_return(false)
-    io_handler.should_receive(:app_name).any_number_of_times.and_return("my_app")
-
-    props = {}
-    props.stub(:save)
-
-    create_init("my_webby_name")
-    @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
-    @command.api.should_receive(:io).any_number_of_times.and_return(io_handler)
-    @command.api.should_receive(:ask).with("API token:   ").and_return("234def")
-    @command.api.should_receive(:ask).with("Login email: ").and_return("abc123")
-    @command.api.should_receive(:properties).any_number_of_times.and_return(props)
-    api.stub(:puts)
-    @command.run
-    
-    stdout.should =~ /Couldn't find Webby 'my_webby_name' on your account. Your Webbies are/
-    stdout.should =~ /'webby3067'/
-    stdout.should =~ /' and '/
-    stdout.should =~ /'sandbox'/
-  end
-  
-  it "should report the error if user provides wrong credentials" do
-    FakeWeb.register_uri(:post, "#{Webbynode::ApiClient.base_uri}/webbies", 
-      :email => "fcoury@me.com", :response => read_fixture("api/webbies_unauthorized"))
-
-    io_handler.should_receive(:app_name).any_number_of_times.and_return("my_app")
-    io_handler.should_receive(:create_file).never
-
-    create_init("my_webby_name")
-
-    @command.api.should_receive(:ip_for).and_raise(Webbynode::ApiClient::Unauthorized)
-    @command.stub!(:detect_engine).and_return(Webbynode::Engines::Rails)
-    @command.run
-
-    stdout.should =~ /Your credentials didn't match any Webbynode account./
   end
   
   it "should report Webby doesn't exist" do

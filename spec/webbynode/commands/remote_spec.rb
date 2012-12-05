@@ -2,6 +2,7 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), '../..', 'spec_helper')
 
 describe Webbynode::Commands::Remote do
+  let(:instance) { stub(:instance) }
   
   def load_all_mocks(rem=remote)
     rem.should_receive(:remote_executor).any_number_of_times.and_return(re)
@@ -9,6 +10,7 @@ describe Webbynode::Commands::Remote do
     rem.should_receive(:io).any_number_of_times.and_return(io)
     rem.should_receive(:pushand).any_number_of_times.and_return(pushand)
     rem.should_receive(:server).any_number_of_times.and_return(server)
+    Webbynode::ApiClient.stub(:instance => instance)
   end
   
   let(:re)      { double("RemoteExecutor").as_null_object }

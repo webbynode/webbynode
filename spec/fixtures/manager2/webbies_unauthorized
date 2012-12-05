@@ -1,0 +1,10 @@
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json; charset=utf-8
+X-UA-Compatible: IE=Edge
+Cache-Control: no-cache
+Set-Cookie: _manager2_session=BAh7BkkiD3Nlc3Npb25faWQGOgZFRkkiJTZlMmIzMmU2YjU0ZWFkYTAzMzEzNzExNzdiNTZkMjgxBjsAVA%3D%3D--c63c0ee5af07938f9c01ea6f879cec2667a67fae; path=/; HttpOnly
+X-Request-Id: ff212d338f2fe110fb7498c67804e488
+X-Runtime: 0.009122
+Transfer-Encoding: chunked
+
+{"error":"Invalid authentication token"}

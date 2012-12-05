@@ -6,33 +6,28 @@ module Webbynode::Commands
     def execute
       puts "Fetching list of your Webbies..."
       puts ""
-      
+
+      table(%w(Name IP Node Plan Status), %w(30 15 11 15 30)) { api.webbies }
+    end
+
+    def table(cols, sizes)
       header =  "  "
-      header << "Webbies".ljust(15).color(:white).bright.underline
-      header << " "
-      header << "IP".ljust(15).color(:white).bright.underline
-      header << " "
-      header << "Node".ljust(11).color(:white).bright.underline
-      header << " "
-      header << "Plan".ljust(15).color(:white).bright.underline
-      header << " "
-      header << "Status".ljust(14).color(:white).bright.underline
-      header << " "
-      
+      cols.each_with_index do |col, i|
+        #header << col.ljust(sizes[i].to_i).bright.underline
+        header << col.ljust(sizes[i].to_i).bright.underline
+        header << " "
+      end
+
       puts header
-
-      webbies = spinner { api.webbies }
-      
-      webbies.each_pair do |name, webby|
+      spinner { yield }.each_pair do |name, item|
         str = "  "
-        str << name.ljust(16).color(:yellow).bright
-        str << webby['ip'].ljust(16).color(:cyan).bright
-        str << webby['node'].ljust(12).color(:cyan).bright
-        str << webby['plan'].ljust(16).color(:cyan).bright
-        str << (webby['status'] == 'on' ? "on".color(:cyan).bright : "off")
-
+        cols.each_with_index do |col, i|
+          str << item.send(col.downcase).ljust(sizes[i].to_i+1)
+        end
         puts str
       end
+
+      puts ""
     end
   end
 end

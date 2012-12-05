@@ -22,9 +22,9 @@ module Webbynode::Commands
     
     def show
       if aliases.any?
-        io.log("Current aliases: #{aliases.join(' ').color(:yellow)}")
+        io.log("Current aliases: #{aliases.join(' ').bright}")
       else
-        io.log("No current aliases. To add new aliases use:\n\n  #{"#{File.basename $0} dns_aliases add ".color(:yellow)}new-dns-alias")
+        io.log("No current aliases. To add new aliases use:\n\n  #{"#{File.basename $0} dns_aliases add ".bright}new-dns-alias")
       end
     end
     
@@ -32,12 +32,12 @@ module Webbynode::Commands
       new_alias = param(:alias)
       
       if aliases.include?(new_alias)
-        io.log "Alias #{new_alias.color(:yellow)} already exists."
+        io.log "Alias #{new_alias.bright} already exists."
       else
         aliases << new_alias
         save_aliases
 
-        io.log "Alias #{new_alias.color(:yellow)} added."
+        io.log "Alias #{new_alias.bright} added."
         show
       end
     end
@@ -49,10 +49,10 @@ module Webbynode::Commands
         aliases.delete to_remove
         save_aliases
 
-        io.log "Alias #{to_remove.color(:yellow)} removed."
+        io.log "Alias #{to_remove.bright} removed."
         show
       else
-        io.log "Alias #{to_remove.color(:yellow)} doesn't exist."
+        io.log "Alias #{to_remove.bright} doesn't exist."
       end
     end
     

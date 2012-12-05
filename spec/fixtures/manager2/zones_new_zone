@@ -1,0 +1,11 @@
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+X-UA-Compatible: IE=Edge
+ETag: "c2f2bd693271cea091c60e9d46ccfb4b"
+Cache-Control: max-age=0, private, must-revalidate
+Set-Cookie: _manager2_session=BAh7B0kiGXdhcmRlbi51c2VyLnVzZXIua2V5BjoGRVRbCEkiCVVzZXIGOwBGWwZpAqUTMEkiD3Nlc3Npb25faWQGOwBGSSIlYmYxYzExZDU1OWRiMjgwMWJlYjAxNzAzMDJmMTlmYTIGOwBU--a6bc9a95f4359db2c22f1a86fbb68db4445818cf; path=/; HttpOnly
+X-Request-Id: 07e9ed44c58cafdd3c77b6cee1da0061
+X-Runtime: 0.080832
+Transfer-Encoding: chunked
+
+{"id":22,"name":"newzone.com"}

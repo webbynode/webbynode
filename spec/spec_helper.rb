@@ -51,6 +51,7 @@ RSpec.configure do |config|
   config.before(:each) do
     @orig_stdout = $stdout
     $stdout = StringIO.new
+    Webbynode::ApiClient.stub(:instance)
   end
   
   config.after(:each) do

@@ -24,7 +24,7 @@ module Webbynode::Commands
     
     def missing_target?
       unless io.file_exists?(target)
-        io.log "Account alias #{param(:name).color(:yellow)} not found. Use #{"wn account list".color(:white).bright} for a full list."
+        io.log "Account alias #{param(:name).bright} not found. Use #{"wn account list".bright} for a full list."
         return true
       end      
     end
@@ -35,7 +35,7 @@ module Webbynode::Commands
     
     def default
       credentials = api.credentials
-      io.log "Current account: #{credentials["email"].color(:yellow)}"
+      io.log "Current account: #{credentials["email"].bright}"
     end
     
     def list
@@ -46,11 +46,14 @@ module Webbynode::Commands
         return
       end
       
-      current = api.credentials["email"]
+      current_email  = api.credentials["email"]
+      current_system = api.credentials["system"]
       files.each do |f|
         if f =~ /\.webbynode_(.*)/
-          mark = io.file_matches(f, /email=#{current}/) ? "* " : "  "
-          io.log "#{mark.color(:yellow)}#{$1.color(:white).bright}"
+          current = io.file_matches(f, /email=#{current_email}/) 
+          current = current && io.file_matches(f, /system=#{current_system}$/)
+          mark = current ? "* " : "  "
+          io.log "#{mark.bright}#{$1}"
         end
       end
     end
@@ -68,7 +71,7 @@ module Webbynode::Commands
       return if missing_target?
       io.copy_file target, "#{Prefix}"
       account_alias = param(:name).dup
-      io.log "Successfully switched to account alias #{account_alias.color(:yellow)}."
+      io.log "Successfully switched to account alias #{account_alias.bright}."
     end
     
     def new
@@ -84,12 +87,12 @@ module Webbynode::Commands
       return if missing_target?
 
       if io.file_exists?("#{Prefix}_#{param(:new_name)}")
-        io.log "Account alias #{param(:new_name).color(:yellow)} already exists, use #{"wn account delete".color(:white).bright} to remove it first."
+        io.log "Account alias #{param(:new_name).bright} already exists, use #{"wn account delete".bright} to remove it first."
         return
       end
       
       io.rename_file "#{Prefix}_#{param(:name)}", "#{Prefix}_#{param(:new_name)}"
-      io.log "Account alias #{param(:name).color(:yellow)} successfully renamed to #{param(:new_name).color(:yellow)}."
+      io.log "Account alias #{param(:name).bright} successfully renamed to #{param(:new_name).bright}."
     end
   end
 end

@@ -1,8 +1,9 @@
 require 'launchy'
 
 module Webbynode::Commands
-  class Guides < Webbynode::Command
-    summary "Opens the Rapp Guides in your browser"
+  class Docs < Webbynode::Command
+    summary "Opens Webbynode Documentation in your browser"
+    add_alias "guides"
    
     def execute
       Launchy.open "http://wbno.de/rapp"

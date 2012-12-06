@@ -90,7 +90,7 @@ describe Webbynode::Commands::Init do
     it "asks for trial username when not found" do
       io_handler.should_receive(:general_settings).and_return({})
       io_handler.should_receive(:app_name).and_return('trial_app')
-      subject.should_receive(:ask).with('Enter your Rapp trial user: ').and_return('user')
+      subject.should_receive(:ask).with('Enter your Webbynode trial user: ').and_return('user')
       io_handler.should_receive(:add_general_setting).with('rapp_username', 'user')
       git_handler.should_receive(:add_remote).with('user', 'webbynode', 'trial.webbyapp.com', 'trial_app', :home => '/home/user')
 

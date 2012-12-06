@@ -41,7 +41,7 @@ module Webbynode::Commands
       
       # Checks for server-side updates
       if check_for_updates
-        io.log "Note: Rapp Engine updated".bright
+        io.log "Note: Deployment Engine updated".bright
         io.log ""
       end
       

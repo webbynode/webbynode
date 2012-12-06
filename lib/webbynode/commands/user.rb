@@ -1,14 +1,14 @@
 module Webbynode::Commands
   # class User < Webbynode::Command
-  #   summary "Manages Rapp Trial user"
+  #   summary "Manages Webbynode Trial user"
   #   parameter :action, 'Action to perform', :validate => { :in => ['add', 'remove', 'show', 'password']}
     
   #   def execute
-  #     io.log "Rapp Trial - http://rapp.webbynode.com"
+  #     io.log "Webbynode Trial - http://trial.webbynode.com"
   #     io.log ""
       
   #     if user = io.general_settings['rapp_username']
-  #       io.log "User #{user} is already configured for Rapp Trial."
+  #       io.log "User #{user} is already configured for Webbynode Trial."
   #       if ask('Do you want to overwrite this settings (y/n)?') != 'y'
   #         io.log ""
   #         io.log "Aborted."
@@ -16,7 +16,7 @@ module Webbynode::Commands
   #       end 
   #     end
       
-  #     io.log "Rapp Trial is a good way to try Webbynode's Rapp Engine without being a subscriber."
+  #     io.log "Webbynode Trial is a good way to try Webbynode's Webbynode Engine without being a subscriber."
   #     io.log "You can deploy your application and it will be online for up to 24 hours. We delete"
   #     io.log "all applications at 2AM EST, but your user will remain valid."
   #     io.log ""
@@ -28,7 +28,7 @@ module Webbynode::Commands
   #     end until valid_email?(email)
       
   #     io.log ""
-  #     io.log "Enter an username and password to start using Rapp Trial."
+  #     io.log "Enter an username and password to start using Webbynode Trial."
   #     io.log ""
       
   #     begin

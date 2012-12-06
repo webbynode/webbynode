@@ -8,7 +8,7 @@ module Webbynode::Commands
     option :engine, "Sets the application engine for the app", :validate => { 
       :in => ['php', 'rack', 'rails', 'rails3', 'html', 'wsgi', 'django', 'nodejs'] 
     }
-    option :trial, "Initializes this app for Rapp Trial"
+    option :trial, "Initializes this app for Webbynode Trial"
     
     def execute
       unless params.any?
@@ -16,7 +16,7 @@ module Webbynode::Commands
         return
       end
       
-      io.log "#{"Webbynode Rapp".bright} - #{"http://rapp.webbynode.com".underline}"
+      io.log "#{"Webbynode Deployment Tool".bright} - #{"http://docs.webbynode.com".underline}"
 
       @overwrite   = false
 
@@ -111,7 +111,7 @@ module Webbynode::Commands
         @git_user = io.general_settings['rapp_username']
         
         unless @git_user
-          @git_user = ask('Enter your Rapp trial user: ')
+          @git_user = ask('Enter your Webbynode trial user: ')
           io.add_general_setting 'rapp_username', @git_user
         end
         

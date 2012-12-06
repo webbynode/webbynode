@@ -1,7 +1,6 @@
 module Webbynode
   class Manager2ApiClient < ApiClient
-    # base_uri "https://manager2.webbynode.com/api"
-    base_uri "http://localhost:3000/api"
+    base_uri "https://manager2.webbynode.com/api"
 
     def zones
       response = get("/zones.json")

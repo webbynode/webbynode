@@ -36,6 +36,7 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'updater')
 require File.join(File.dirname(__FILE__), 'webbynode', 'trial')
 require File.join(File.dirname(__FILE__), 'webbynode', 'taps')
 require File.join(File.dirname(__FILE__), 'webbynode', 'properties')
+require File.join(File.dirname(__FILE__), 'webbynode', 'version')
 require File.join(File.dirname(__FILE__), 'webbynode', 'attribute_accessors')
 require File.join(File.dirname(__FILE__), 'webbynode', 'models', 'webby')
 require File.join(File.dirname(__FILE__), 'webbynode', 'engines', 'engine')
@@ -78,10 +79,6 @@ require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'guides')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'ssh')
 require File.join(File.dirname(__FILE__), 'webbynode', 'commands', 'database')
 require File.join(File.dirname(__FILE__), 'webbynode', 'application')
-
-module Webbynode
-  VERSION = '1.0.5.2'
-end
 
 class Array
   def to_phrase(last_join="and")

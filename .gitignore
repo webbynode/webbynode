@@ -1,12 +1,4 @@
-pkg
 .webbynode
 .pushand
-.devver
-.DS_Storesettings.py
-settings.py
-*.pyc
-*.pyo
-docs/_build
-config/database.yml
-db/schema.rb
-.redcar/tags
+pkg
+*.gem

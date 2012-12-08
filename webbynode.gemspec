@@ -21,7 +21,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "autotest-growl"   , "~> 0.2.9"
   s.add_development_dependency "awesome_print"    , "~> 0.3.2"
   s.add_development_dependency "fakeweb"          , "~> 1.3.0"
-  s.add_development_dependency "growl"            , "~> 1.0.3"
   s.add_development_dependency "guard"            , "~> 0.3.0"
   s.add_development_dependency "guard-rspec"      , "~> 0.1.9"
   s.add_development_dependency "rb-fsevent"       , "~> 0.9.2"

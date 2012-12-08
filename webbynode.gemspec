@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "guard"            , "~> 0.3.0"
   s.add_development_dependency "guard-rspec"      , "~> 0.1.9"
   s.add_development_dependency "rb-fsevent"       , "~> 0.9.2"
+  s.add_development_dependency "rake"             , "~> 10.0.2"
   s.add_development_dependency "rcov"             , "~> 0.9.9"
   s.add_development_dependency "rspec"            , "~> 2.12.0"
   s.add_development_dependency "ZenTest"          , "~> 4.5.0"

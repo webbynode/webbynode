@@ -1,11 +1,11 @@
 source :rubygems
 
-gem 'httparty'
 gem 'domainatrix'
-gem 'net-ssh'
 gem 'highline'
-gem 'webbynode-rainbow', '~> 1.1.3'
-gem 'taps', '0.3.23'
+gem 'httparty',           '~> 0.7.4'
+gem 'net-ssh',            '= 2.1.0'
+gem 'taps',               '0.3.23'
+gem 'webbynode-rainbow',  '~> 1.1.3'
 
 group :development do
   gem 'rspec'
@@ -19,5 +19,4 @@ group :development do
   gem 'fakeweb'
   gem 'echoe'
   gem 'rcov'
-	gem 'rb-fsevent'
 end

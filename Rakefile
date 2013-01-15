@@ -1,21 +1,21 @@
 require 'rubygems'
-require 'rake'  
+require 'rake'
 require 'rake/testtask'
 
-require 'echoe'  
-  
-Echoe.new('webbynode', '1.0.5.2') do |p|  
-  p.description     = "Webbynode Deployment Gem"  
-  p.url             = "http://webbynode.com"  
+require 'echoe'
+
+Echoe.new('webbynode', '1.0.5.3') do |p|
+  p.description     = "Webbynode Deployment Gem"
+  p.url             = "http://webbynode.com"
   p.author          = "Felipe Coury"
-  p.email           = "felipe@webbynode.com"  
-  p.ignore_pattern  = ["tmp/*", "script/*"]  
-  p.dependencies = [ 
+  p.email           = "felipe@webbynode.com"
+  p.ignore_pattern  = ["tmp/*", "script/*"]
+  p.dependencies = [
     ['bundler', '>=0.9.26'],
     ['net-ssh', '=2.1.0'],
     ['taps', '~>0.3.19'],
     ['highline', '>=1.5.2'],
-    ['httparty', '>=0.4.5'],
+    ['httparty', '~>0.7.4'],
     ['launchy',  '>=0.3.7'],
     ['domainatrix','>=0.0.7'],
     ['webbynode-rainbow','~>1.1.3'],

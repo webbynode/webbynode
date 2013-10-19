@@ -8,8 +8,12 @@ module Webbynode::Engines
 
     def detected?
       return unless io.file_exists?('Gemfile') && io.file_exists?('Gemfile.lock')
+
       bundler = Bundler::LockfileParser.new(File.read("Gemfile.lock"))
-      rails_version = bundler.specs.detect { |g| g.name == "railties" }.version
+      specs = bundler.specs.detect { |g| g.name == "railties" }
+      return unless specs
+
+      rails_version = specs.version
       rails_version >= Gem::Version.new('4.0.0.beta') && rails_version < Gem::Version.new('5.0.0') if rails_version
     end
 

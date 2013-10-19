@@ -24,12 +24,12 @@ module Webbynode::Engines
       if io.file_exists?("config/database.yml")
         contents = io.read_file("config/database.yml")
         if contents =~ /mysql2/
-          io.add_setting "rails3_adapter", "mysql2"
+          io.add_setting "rails4_adapter", "mysql2"
           return
         end
       end
 
-      io.remove_setting "rails3_adapter"
+      io.remove_setting "rails4_adapter"
     end
 
     def check_gemfile
@@ -38,19 +38,19 @@ module Webbynode::Engines
       handle_adapter
 
       dependencies = gemfile.dependencies(:without => [:development, :test])
-      if dependencies.include? 'sqlite3-ruby'
+      if dependencies.include? 'sqlite3'
         raise Webbynode::Command::CommandError, <<-EOS
 
 Gemfile dependency problem.
 
 The following gem dependency was found in your Gemfile:
 
-  gem 'sqlite3-ruby', :require => 'sqlite3'
+  gem 'sqlite3'
 
 This dependency will cause an error in production when using Passenger. We recommend you remove it.
 Also, be sure to define the database driver gem for the database type you are using in production (either the mysql or the pg gem).
 
-  gem 'mysql'
+  gem 'mysql2'
 
   -or-
 
@@ -60,18 +60,18 @@ If you would like to use SQLite3 in your development and test environments,
 you may do so by wrapping the gem definition inside the :test and :development groups.
 
   group :test do
-    gem 'sqlite3-ruby', :require => 'sqlite3'
+    gem 'sqlite3', :require => 'sqlite3'
   end
 
   -or-
 
   group :development do
-    gem 'sqlite3-ruby', :require => 'sqlite3'
+    gem 'sqlite3', :require => 'sqlite3'
   end
 
 To learn more about this issue, visit:
 
-  http://guides.webbynode.com/articles/rapidapps/rails3warning.html
+  http://guides.webbynode.com/articles/rapidapps/rails4warning.html
 
 EOS
       end

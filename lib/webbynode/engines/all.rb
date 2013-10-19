@@ -7,11 +7,13 @@ module Webbynode::Engines
     Webbynode::Engines::Rack,
     Webbynode::Engines::Rails,
     Webbynode::Engines::Rails3,
+    Webbynode::Engines::Rails4,
     Webbynode::Engines::NodeJS,
   ]
 
   Detectable = [
     # order matters!
+    Webbynode::Engines::Rails4,
     Webbynode::Engines::Rails3,
     Webbynode::Engines::Rails,
     Webbynode::Engines::Rack,

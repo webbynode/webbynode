@@ -65,6 +65,7 @@ lib/webbynode/engines/php.rb
 lib/webbynode/engines/rack.rb
 lib/webbynode/engines/rails.rb
 lib/webbynode/engines/rails3.rb
+lib/webbynode/engines/rails4.rb
 lib/webbynode/engines/wsgi.rb
 lib/webbynode/gemfile.rb
 lib/webbynode/git.rb

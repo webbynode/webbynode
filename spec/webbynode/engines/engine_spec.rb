@@ -7,6 +7,7 @@ describe Webbynode::Engines do
     it "returns the proper engine, by engine_name" do
       subject.find('rails').should == Webbynode::Engines::Rails
       subject.find('rails3').should == Webbynode::Engines::Rails3
+      subject.find('rails4').should == Webbynode::Engines::Rails4
       subject.find('django').should == Webbynode::Engines::Django
       subject.find('nodejs').should == Webbynode::Engines::NodeJS
       subject.find('rack').should == Webbynode::Engines::Rack
@@ -18,15 +19,15 @@ end
 describe Webbynode::Engines::Engine do
   let(:git) { double("Git") }
   subject do
-    Class.new.tap do |c| 
+    Class.new.tap do |c|
       c.send(:include, Webbynode::Engines::Engine)
       c.git_excludes "config/database.yml", "db/schema.rb"
     end.new.tap do |obj|
       obj.stub!(:git).and_return(git)
     end
   end
-  
-  describe '#prepare' do    
+
+  describe '#prepare' do
     it "add nontracked entries to .gitingore" do
       git.should_receive(:remove).never
       git.should_receive(:add_to_git_ignore).with("config/database.yml")

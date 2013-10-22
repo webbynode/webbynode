@@ -35,6 +35,7 @@ lib/webbynode/commands/alias.rb
 lib/webbynode/commands/apps.rb
 lib/webbynode/commands/authorize_root.rb
 lib/webbynode/commands/change_dns.rb
+lib/webbynode/commands/config.rb
 lib/webbynode/commands/credentials.rb
 lib/webbynode/commands/console.rb
 lib/webbynode/commands/database.rb

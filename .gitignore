@@ -3,3 +3,4 @@
 pkg
 *.gem
 config/database.yml
+sample_app

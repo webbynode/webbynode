@@ -7,12 +7,12 @@ describe Webbynode::Commands::Version do
   let(:io) { double('io').as_null_object }
 
   before(:each) do
-    version.should_receive(:io).any_number_of_times.and_return(io)
+    version.stub(:io).and_return(io)
   end
-  
+
   it "should return the version of the gem" do
     io.should_receive(:log).with("Rapid Deployment Gem v#{Webbynode::Version::STRING}")
     version.execute
   end
-  
+
 end

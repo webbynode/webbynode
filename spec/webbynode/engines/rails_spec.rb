@@ -6,10 +6,10 @@ describe Webbynode::Engines::Rails do
 
   subject do
     Webbynode::Engines::Rails.new.tap do |engine|
-      engine.stub!(:io).and_return(io)
+      engine.stub(:io).and_return(io)
     end
   end
-  
+
   describe 'class methods' do
     subject { Webbynode::Engines::Rails }
 
@@ -17,25 +17,25 @@ describe Webbynode::Engines::Rails do
     its(:engine_name)  { should == 'Rails 2' }
     its(:git_excluded) { should == ["config/database.yml"] } #, "db/schema.rb"] }
   end
-  
+
   describe '#detect' do
     it "returns true if app app/controllers and config/environent.rb are found" do
-      io.stub!(:directory?).with('app').and_return(true)
-      io.stub!(:directory?).with('app/controllers').and_return(true)
-      io.stub!(:file_exists?).with('config/environment.rb').and_return(true)
-      
+      io.stub(:directory?).with('app').and_return(true)
+      io.stub(:directory?).with('app/controllers').and_return(true)
+      io.stub(:file_exists?).with('config/environment.rb').and_return(true)
+
       subject.should be_detected
     end
 
     it "returns false if any isn't found" do
-      io.stub!(:directory?).with('app').and_return(true)
-      io.stub!(:directory?).with('app/controllers').and_return(false)
-      io.stub!(:file_exists?).with('config/environent.rb').and_return(true)
-      
+      io.stub(:directory?).with('app').and_return(true)
+      io.stub(:directory?).with('app/controllers').and_return(false)
+      io.stub(:file_exists?).with('config/environent.rb').and_return(true)
+
       subject.should_not be_detected
     end
   end
-  
+
   describe '#prepare' do
     it "adds a rails_adapter setting when mysql2 is used on the database.yml" do
       io.should_receive(:file_exists?).with("config/database.yml").and_return(true)
@@ -44,7 +44,7 @@ describe Webbynode::Engines::Rails do
 
       subject.prepare
     end
-    
+
     it "doesn't add a rails_adapter otherwise" do
       io.should_receive(:file_exists?).with("config/database.yml").and_return(true)
       io.should_receive(:read_file).with("config/database.yml").and_return("mysql")
@@ -61,6 +61,6 @@ describe Webbynode::Engines::Rails do
       io.should_receive(:remove_setting).with('rails_adapter')
 
       subject.prepare
-    end    
+    end
   end
 end

@@ -2,3 +2,4 @@
 .pushand
 pkg
 *.gem
+config/database.yml

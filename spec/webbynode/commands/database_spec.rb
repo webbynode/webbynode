@@ -7,7 +7,7 @@ describe Webbynode::Commands::Database do
   let(:git)  { double("git").as_null_object }
   let(:pa)   { double("pushand").as_null_object }
   let(:taps) { double("taps").as_null_object }
-  
+
   def prepare(*params)
     Webbynode::Commands::Database.new(*params).tap do |a|
       a.stub(:io).and_return(io)
@@ -16,7 +16,7 @@ describe Webbynode::Commands::Database do
       a.stub(:pushand).and_return(pa)
     end
   end
-  
+
   describe '#config' do
     subject { prepare "config" }
 
@@ -24,9 +24,9 @@ describe Webbynode::Commands::Database do
       io.should_receive(:load_setting).with("database_name").and_return("dbname")
       io.should_receive(:load_setting).with("database_user").and_return("username")
       io.should_receive(:load_setting).with("database_password").and_return("dbpassword")
-      
-      io.should_receive(:db_name).any_number_of_times.and_return("myapp")
-      
+
+      io.stub(:db_name).and_return("myapp")
+
       subject.should_receive(:ask).with("Database name [dbname]: ").and_return("")
       subject.should_receive(:ask).with("    User name [username]: ").and_return("")
       subject.should_receive(:ask).with("     Password []: ").and_return("")
@@ -35,10 +35,10 @@ describe Webbynode::Commands::Database do
       subject.execute
     end
   end
-  
+
   describe '#pull' do
     subject { prepare "pull" }
-    
+
     it "installs taps and mysql when none installed" do
       Webbynode::Taps.should_receive(:new).and_return(taps)
 
@@ -47,10 +47,10 @@ describe Webbynode::Commands::Database do
       subject.stub(:sleep)
       taps.stub(:start)
       taps.should_receive(:ensure_gems!)
-      
+
       subject.execute
     end
-    
+
     context 'db failures' do
       def prepare_with_error(error)
         subject.stub(:ask_db_credentials)
@@ -65,7 +65,7 @@ describe Webbynode::Commands::Database do
 
         taps.should_receive(:pull).and_raise(TapsError.new(error))
       end
-      
+
       it "shows an user friendly error message cannot connect to local database" do
         prepare_with_error "Failed to connect to database:
           Sequel::DatabaseConnectionError -> Mysql::Error: Access denied for user 'root'@'localhost' (using password: YES)"
@@ -73,7 +73,7 @@ describe Webbynode::Commands::Database do
 
         subject.execute
       end
-      
+
       it "shows an user friendly error for URI errors" do
         prepare_with_error "Failed to connect to database:
           URI::InvalidURIError -> the scheme mysql does not accept registry part: root:P@ssw0rd@localhost (or bad hostname?)."
@@ -81,14 +81,14 @@ describe Webbynode::Commands::Database do
 
         subject.execute
       end
-        
+
       it "shows an user friendly error message when a MySQL database doesn't exist" do
         prepare_with_error "Failed to connect to database:\n          Sequel::DatabaseConnectionError -> Mysql::Error: Unknown database 'r3app'"
         io.should_receive(:log).with("ERROR: Unknown database r3app. Create the local database and try again.")
 
         subject.execute
       end
-      
+
       it "shows an user friendly error message when an adapter is not present" do
         prepare_with_error "Failed to connect to database:\n        Sequel::AdapterNotFound -> LoadError: no such file to load -- mysql"
         io.should_receive(:log).with("ERROR: Missing database adapter. You need to install mysql gem to handle your database.")
@@ -96,29 +96,29 @@ describe Webbynode::Commands::Database do
         subject.execute
       end
     end
-    
+
     it "asks the local database credentials and name" do
       io.should_receive(:load_setting).with("database_name").and_return(nil)
       io.should_receive(:load_setting).with("database_user").and_return(nil)
       io.should_receive(:load_setting).with("database_password").and_return(nil)
-      
-      io.should_receive(:db_name).any_number_of_times.and_return("myapp")
-      
+
+      io.stub(:db_name).and_return("myapp")
+
       subject.should_receive(:ask).with("Database name [myapp]: ").and_return("")
       subject.should_receive(:ask).with("    User name [myapp]: ").and_return("")
       subject.should_receive(:ask).with("     Password []: ").and_return("")
       subject.should_receive(:ask).with("Save password (y/n)? ").and_return("y")
-      
+
       subject.ask_db_credentials
     end
-    
+
     context "when user doesn't authorize" do
       it "stores all data but password" do
         io.should_receive(:load_setting).with("database_name").and_return(nil)
         io.should_receive(:load_setting).with("database_user").and_return(nil)
         io.should_receive(:load_setting).with("database_password").and_return(nil)
-        
-        io.should_receive(:db_name).any_number_of_times.and_return("myapp")
+
+        io.stub(:db_name).and_return("myapp")
 
         subject.should_receive(:ask).with("Database name [myapp]: ").and_return("")
         subject.should_receive(:ask).with("    User name [myapp]: ").and_return("user")
@@ -132,14 +132,14 @@ describe Webbynode::Commands::Database do
         subject.ask_db_credentials
       end
     end
-    
+
     context "when user authorizes" do
       it "stores the password" do
         io.should_receive(:load_setting).with("database_name").and_return(nil)
         io.should_receive(:load_setting).with("database_user").and_return(nil)
         io.should_receive(:load_setting).with("database_password").and_return(nil)
-        
-        io.stub(:db_name).any_number_of_times.and_return("myapp")
+
+        io.stub(:db_name).and_return("myapp")
 
         subject.should_receive(:ask).with("Database name [myapp]: ").and_return("")
         subject.should_receive(:ask).with("    User name [myapp]: ").and_return("user")
@@ -151,7 +151,7 @@ describe Webbynode::Commands::Database do
         subject.ask_db_credentials
       end
     end
-    
+
     context "when password not stored" do
       it "prompts for the password again" do
         io.should_receive(:load_setting).with("database_password").and_return(nil)
@@ -164,7 +164,7 @@ describe Webbynode::Commands::Database do
         subject.ask_db_credentials
       end
     end
-    
+
     context "when password is stored" do
       it "doesn't prompt for password again" do
         io.should_receive(:load_setting).with("database_password").and_return("password")
@@ -177,10 +177,10 @@ describe Webbynode::Commands::Database do
         subject.ask_db_credentials
       end
     end
-    
+
     describe "#pull" do
       it "executes taps" do
-        
+
       end
     end
   end

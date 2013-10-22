@@ -23,7 +23,7 @@ describe Webbynode::Engines::Engine do
       c.send(:include, Webbynode::Engines::Engine)
       c.git_excludes "config/database.yml", "db/schema.rb"
     end.new.tap do |obj|
-      obj.stub!(:git).and_return(git)
+      obj.stub(:git).and_return(git)
     end
   end
 
@@ -33,8 +33,8 @@ describe Webbynode::Engines::Engine do
       git.should_receive(:add_to_git_ignore).with("config/database.yml")
       git.should_receive(:add_to_git_ignore).with("db/schema.rb")
 
-      git.stub!(:tracks?).with("config/database.yml").and_return(false)
-      git.stub!(:tracks?).with("db/schema.rb").and_return(false)
+      git.stub(:tracks?).with("config/database.yml").and_return(false)
+      git.stub(:tracks?).with("db/schema.rb").and_return(false)
 
       subject.prepare
     end
@@ -45,8 +45,8 @@ describe Webbynode::Engines::Engine do
       git.should_receive(:add_to_git_ignore).with("config/database.yml")
       git.should_receive(:add_to_git_ignore).with("db/schema.rb")
 
-      git.stub!(:tracks?).with("config/database.yml").and_return(true)
-      git.stub!(:tracks?).with("db/schema.rb").and_return(false)
+      git.stub(:tracks?).with("config/database.yml").and_return(true)
+      git.stub(:tracks?).with("db/schema.rb").and_return(false)
 
       subject.prepare
     end

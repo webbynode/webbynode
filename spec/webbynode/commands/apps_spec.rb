@@ -6,10 +6,10 @@ describe Webbynode::Commands::Apps do
 
   subject do
     Webbynode::Commands::Apps.new.tap do |cmd|
-      cmd.stub!(:remote_executor).and_return(re)
+      cmd.stub(:remote_executor).and_return(re)
     end
   end
-  
+
   it "executes list_apps remotely" do
     Webbynode::ApiClient.stub(:system => "manager")
     re.should_receive(:exec).with("list_apps", true)

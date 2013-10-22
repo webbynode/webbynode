@@ -6,10 +6,10 @@ describe Webbynode::Engines::WSGI do
 
   subject do
     Webbynode::Engines::WSGI.new.tap do |engine|
-      engine.stub!(:io).and_return(io)
+      engine.stub(:io).and_return(io)
     end
   end
-  
+
   describe 'class methods' do
     subject { Webbynode::Engines::WSGI }
 

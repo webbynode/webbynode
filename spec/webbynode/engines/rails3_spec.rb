@@ -6,10 +6,10 @@ describe Webbynode::Engines::Rails3 do
 
   subject do
     Webbynode::Engines::Rails3.new.tap do |engine|
-      engine.stub!(:io).and_return(io)
+      engine.stub(:io).and_return(io)
     end
   end
-  
+
   describe 'class methods' do
     subject { Webbynode::Engines::Rails3 }
 
@@ -17,15 +17,15 @@ describe Webbynode::Engines::Rails3 do
     its(:engine_name)  { should == 'Rails 3' }
     its(:git_excluded) { should == ["config/database.yml"] } #, "db/schema.rb"] }
   end
-  
+
   describe '#prepare' do
     let(:gemfile) { double('gemfile').as_null_object }
-    
+
     it "complains if there is a sqlite3-ruby dependency outside of development and test groups in Gemspec" do
       gemfile.should_receive(:present?).and_return(true)
       gemfile.should_receive(:dependencies).and_return(['sqlite3-ruby', 'mysql'])
 
-      subject.stub!(:gemfile).and_return(gemfile)
+      subject.stub(:gemfile).and_return(gemfile)
       lambda { subject.prepare }.should raise_error(Webbynode::Command::CommandError)
     end
 
@@ -36,7 +36,7 @@ describe Webbynode::Engines::Rails3 do
 
       subject.prepare
     end
-    
+
     it "doesn't add a rails3_adapter otherwise" do
       io.should_receive(:file_exists?).with("config/database.yml").and_return(true)
       io.should_receive(:read_file).with("config/database.yml").and_return("mysql")
@@ -53,19 +53,19 @@ describe Webbynode::Engines::Rails3 do
       io.should_receive(:remove_setting).with('rails3_adapter')
 
       subject.prepare
-    end    
+    end
   end
-  
+
   describe '#detect' do
     it "if script/rails exists" do
-      io.stub!(:file_exists?).with('script/rails').and_return(true)
-      
+      io.stub(:file_exists?).with('script/rails').and_return(true)
+
       subject.should be_detected
     end
 
     it "fails if script/rails doesn't exist" do
-      io.stub!(:file_exists?).with('script/rails').and_return(false)
-      
+      io.stub(:file_exists?).with('script/rails').and_return(false)
+
       subject.should_not be_detected
     end
   end

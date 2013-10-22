@@ -7,7 +7,7 @@ describe Webbynode::Commands::Settings do
   context 'with no params' do
     subject do
       Webbynode::Commands::Settings.new.tap do |cmd|
-        cmd.stub!(:io).and_return(io)
+        cmd.stub(:io).and_return(io)
       end
     end
 
@@ -18,11 +18,11 @@ describe Webbynode::Commands::Settings do
       subject.execute
     end
   end
-  
+
   context 'adding' do
     it "adds a new setting" do
       cmd = Webbynode::Commands::Settings.new("add", "hello", "world").tap do |cmd|
-        cmd.stub!(:io).and_return(io)
+        cmd.stub(:io).and_return(io)
       end
 
       io.should_receive(:add_setting).with('hello', 'world')
@@ -30,11 +30,11 @@ describe Webbynode::Commands::Settings do
       cmd.execute
     end
   end
-  
+
   context 'removing' do
     it "removes an existing setting" do
       cmd = Webbynode::Commands::Settings.new("remove", "hello").tap do |cmd|
-        cmd.stub!(:io).and_return(io)
+        cmd.stub(:io).and_return(io)
       end
 
       io.should_receive(:remove_setting).with('hello')

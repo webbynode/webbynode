@@ -6,10 +6,10 @@ describe Webbynode::Engines::Rack do
 
   subject do
     Webbynode::Engines::Rack.new.tap do |engine|
-      engine.stub!(:io).and_return(io)
+      engine.stub(:io).and_return(io)
     end
   end
-  
+
   describe 'class methods' do
     subject { Webbynode::Engines::Rack }
 
@@ -17,17 +17,17 @@ describe Webbynode::Engines::Rack do
     its(:engine_name)  { should == 'Rack' }
     its(:git_excluded) { should be_empty }
   end
-  
+
   describe '#detect' do
     it "if script/rails exists" do
-      io.stub!(:file_exists?).with('config.ru').and_return(true)
-      
+      io.stub(:file_exists?).with('config.ru').and_return(true)
+
       subject.should be_detected
     end
 
     it "fails if script/rails doesn't exist" do
-      io.stub!(:file_exists?).with('config.ru').and_return(false)
-      
+      io.stub(:file_exists?).with('config.ru').and_return(false)
+
       subject.should_not be_detected
     end
   end

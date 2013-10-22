@@ -6,18 +6,18 @@ describe Webbynode::Commands::Logs do
   let(:re)      { double("RemoteExecutor").as_null_object }
   let(:git)     { double("Git").as_null_object }
   let(:server)  { double("Server").as_null_object }
-  let(:pushand) { stub.as_null_object }
-    
+  let(:pushand) { double.as_null_object }
+
   subject do
     Webbynode::Commands::Logs.new.tap do |cmd|
-      cmd.stub!(:io).and_return(io)
-      cmd.stub!(:remote_executor).and_return(re)
-      cmd.stub!(:server).and_return(server)
-      cmd.stub!(:git).and_return(git)
-      cmd.stub!(:pushand).and_return(pushand)
-    end  
+      cmd.stub(:io).and_return(io)
+      cmd.stub(:remote_executor).and_return(re)
+      cmd.stub(:server).and_return(server)
+      cmd.stub(:git).and_return(git)
+      cmd.stub(:pushand).and_return(pushand)
+    end
   end
-  
+
   context "when remote is missing" do
     it "raises an error" do
       subject.should_receive(:server).and_raise(Webbynode::GitRemoteDoesNotExistError)
@@ -26,10 +26,10 @@ describe Webbynode::Commands::Logs do
       subject.execute
     end
   end
-  
+
   context "with prerequisites working" do
     before do
-      server.stub!(:application_pushed?).and_return(true)
+      server.stub(:application_pushed?).and_return(true)
     end
 
     it "works with Rails 3" do
@@ -41,7 +41,7 @@ describe Webbynode::Commands::Logs do
 
       subject.execute
     end
-    
+
     it "works with Rails 2" do
       ssh = double("Ssh")
       io.should_receive(:log).with("Connecting to display your Rails application logs...")

@@ -8,9 +8,9 @@ describe Webbynode::Commands::DnsAliases do
 
   def prepare(*params)
     Webbynode::Commands::DnsAliases.new(*params).tap do |a|
-      a.stub!(:remote_executor).and_return(re)
-      a.stub!(:pushand).and_return(pushand)
-      a.stub!(:io).and_return(io)
+      a.stub(:remote_executor).and_return(re)
+      a.stub(:pushand).and_return(pushand)
+      a.stub(:io).and_return(io)
     end
   end
 
@@ -23,7 +23,7 @@ describe Webbynode::Commands::DnsAliases do
 
       subject.execute
     end
-    
+
     it "tells the user that there are no current aliases" do
       io.should_receive(:load_setting).with('dns_alias').and_return(nil)
       io.should_receive(:log).with("No current aliases. To add new aliases use:\n\n  #{File.basename $0} dns_aliases add new-dns-alias")
@@ -31,7 +31,7 @@ describe Webbynode::Commands::DnsAliases do
       subject.execute
     end
   end
-  
+
   describe '#add' do
     subject { prepare 'add', 'alias2.com' }
 
@@ -43,14 +43,14 @@ describe Webbynode::Commands::DnsAliases do
 
       subject.execute
     end
-    
+
     it "properly spaces existing aliases" do
       io.should_receive(:load_setting).with('dns_alias').and_return("'alias0.com alias1.com'")
       io.should_receive(:add_setting).with('dns_alias', "'alias0.com alias1.com alias2.com'")
 
       subject.execute
     end
-    
+
     it "tells when alias already exist" do
       io.should_receive(:load_setting).with('dns_alias').and_return("'alias2.com'")
       io.should_receive(:log).with("Alias alias2.com already exists.")
@@ -59,7 +59,7 @@ describe Webbynode::Commands::DnsAliases do
       subject.execute
     end
   end
-  
+
   describe '#remove' do
     subject { prepare 'remove', 'alias2.com' }
 
@@ -71,7 +71,7 @@ describe Webbynode::Commands::DnsAliases do
 
       subject.execute
     end
-    
+
     it "tells when alias doesn't exist" do
       io.should_receive(:load_setting).with('dns_alias').and_return("'alias1.com'")
       io.should_receive(:log).with("Alias alias2.com doesn't exist.")

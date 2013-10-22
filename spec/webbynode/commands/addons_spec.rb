@@ -6,7 +6,7 @@ describe Webbynode::Commands::Addons do
   context 'with no params' do
     subject do
       Webbynode::Commands::Addons.new.tap do |cmd|
-        cmd.stub!(:io).and_return(io)
+        cmd.stub(:io).and_return(io)
       end
     end
 
@@ -20,14 +20,14 @@ describe Webbynode::Commands::Addons do
       io.should_receive(:log).with('   redis        Redis       Advanced key-value store')
       subject.execute
     end
-    
+
     it "shows installed addons" do
       io.should_receive(:load_setting).with('addons').and_return(['a', 'b', 'c'])
       io.should_receive(:log).with('Currently selected add-ons:')
       io.should_receive(:log).with('   a, b, c')
       subject.execute
     end
-    
+
     it "handles malformed addons setting" do
       io.should_receive(:load_setting).with('addons').and_return('somemalformedthing')
       io.should_receive(:log).with("No add-ons currently selected. Use 'wn addons add <name>' to add.")
@@ -41,12 +41,12 @@ describe Webbynode::Commands::Addons do
       subject.execute
     end
   end
-  
+
   context '#remove' do
     context "with no addon parameter" do
       subject do
         Webbynode::Commands::Addons.new('remove').tap do |cmd|
-          cmd.stub!(:io).and_return(io)
+          cmd.stub(:io).and_return(io)
         end
       end
 
@@ -55,11 +55,11 @@ describe Webbynode::Commands::Addons do
         subject.execute
       end
     end
-    
+
     context "with an invalid addon" do
       subject do
         Webbynode::Commands::Addons.new('remove', 'nothing').tap do |cmd|
-          cmd.stub!(:io).and_return(io)
+          cmd.stub(:io).and_return(io)
         end
       end
 
@@ -69,11 +69,11 @@ describe Webbynode::Commands::Addons do
         subject.execute
       end
     end
-    
+
     context "with an addon not installed" do
       subject do
         Webbynode::Commands::Addons.new('remove', 'redis').tap do |cmd|
-          cmd.stub!(:io).and_return(io)
+          cmd.stub(:io).and_return(io)
         end
       end
 
@@ -83,14 +83,14 @@ describe Webbynode::Commands::Addons do
         subject.execute
       end
     end
-    
+
     context "with a valid addon" do
       subject do
         Webbynode::Commands::Addons.new('remove', 'mongodb').tap do |cmd|
-          cmd.stub!(:io).and_return(io)
+          cmd.stub(:io).and_return(io)
         end
       end
-      
+
       context "when addon added" do
         it "removes de addon" do
           io.should_receive(:load_setting).with('addons').and_return(['redis', 'mongodb'])
@@ -113,7 +113,7 @@ describe Webbynode::Commands::Addons do
     context "with no addon parameter" do
       subject do
         Webbynode::Commands::Addons.new('add').tap do |cmd|
-          cmd.stub!(:io).and_return(io)
+          cmd.stub(:io).and_return(io)
         end
       end
 
@@ -122,11 +122,11 @@ describe Webbynode::Commands::Addons do
         subject.execute
       end
     end
-    
+
     context "with an invalid addon" do
       subject do
         Webbynode::Commands::Addons.new('add', 'nothing').tap do |cmd|
-          cmd.stub!(:io).and_return(io)
+          cmd.stub(:io).and_return(io)
         end
       end
 
@@ -135,14 +135,14 @@ describe Webbynode::Commands::Addons do
         subject.execute
       end
     end
-    
+
     context "with a valid addon" do
       subject do
         Webbynode::Commands::Addons.new('add', 'mongodb').tap do |cmd|
-          cmd.stub!(:io).and_return(io)
+          cmd.stub(:io).and_return(io)
         end
       end
-      
+
       it "handles malformed addons setting" do
         io.should_receive(:load_setting).with('addons').and_return('somerandomstuff')
         io.should_receive(:add_multi_setting).with('addons', ['mongodb'])
@@ -158,7 +158,7 @@ describe Webbynode::Commands::Addons do
           subject.execute
         end
       end
-      
+
       context "when setting exists" do
         it "add the engine to the array" do
           io.should_receive(:load_setting).with('addons').and_return(['redis'])
@@ -166,7 +166,7 @@ describe Webbynode::Commands::Addons do
           subject.execute
         end
       end
-      
+
       context "when addon already added" do
         it "keep the array as is" do
           io.should_receive(:load_setting).with('addons').and_return(['mongodb'])

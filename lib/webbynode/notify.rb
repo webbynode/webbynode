@@ -8,7 +8,8 @@ module Webbynode
     def self.message(message)
       if self.installed? and !$testing
         message = message.gsub(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]/, "")
-        %x(growlnotify -t "#{TITLE}" -m "#{message}" --image "#{IMAGE_PATH}")
+        
+        %x(growlnotify -t "#{TITLE.shellescape}" -m "#{message.shellescape}" --image "#{IMAGE_PATH.shellescape}")
       end
     end
     

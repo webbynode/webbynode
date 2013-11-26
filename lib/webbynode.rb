@@ -8,6 +8,7 @@ require 'net/ssh'
 require 'highline/import'
 require 'readline'
 require 'rainbow'
+require 'shellwords'
 
 begin
   require 'Win32/Console/ANSI' if RUBY_PLATFORM =~ /mswin/

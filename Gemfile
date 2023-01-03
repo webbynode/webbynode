@@ -2,7 +2,7 @@ source :rubygems
 
 gem 'domainatrix'
 gem 'highline'
-gem 'httparty',           '~> 0.7.4'
+gem 'httparty',           '~> 0.21.0'
 gem 'net-ssh',            '= 2.1.0'
 gem 'taps',               '0.3.23'
 gem 'webbynode-rainbow',  '~> 1.1.3'

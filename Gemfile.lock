@@ -7,7 +7,6 @@ GEM
     autotest-growl (0.2.9)
     awesome_print (0.3.2)
     configuration (1.2.0)
-    crack (0.1.8)
     database_cleaner (0.6.4)
     diff-lcs (1.1.2)
     domainatrix (0.0.7)
@@ -25,13 +24,16 @@ GEM
     guard-rspec (0.1.9)
       guard (>= 0.2.2)
     highline (1.6.1)
-    httparty (0.7.4)
-      crack (= 0.1.8)
+    httparty (0.21.0)
+      mini_mime (>= 1.0.0)
+      multi_xml (>= 0.5.2)
     json_pure (1.5.3)
     launchy (0.3.7)
       configuration (>= 0.0.5)
       rake (>= 0.8.1)
     mime-types (1.16)
+    mini_mime (1.1.2)
+    multi_xml (0.6.0)
     net-ssh (2.1.0)
     open_gem (1.4.2)
       launchy (~> 0.3.5)
@@ -80,7 +82,7 @@ DEPENDENCIES
   guard
   guard-rspec
   highline
-  httparty (~> 0.7.4)
+  httparty (~> 0.21.0)
   net-ssh (= 2.1.0)
   rcov
   rspec
